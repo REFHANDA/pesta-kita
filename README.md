@@ -55,9 +55,9 @@ Laravel, Blade, MySQL.
 **Kelompok 3 · Teknik Informatika 4B**
 Fakultas Teknik dan Ilmu Komputer, Universitas Nusantara PGRI Kediri, 2026
 
-| Nama                          | NPM        |
-| ----------------------------- | ---------- |
-| Refanda Setyadi Eko Wicaksono | 2313020058 |
-| Dimas Maulana                 | 2313020062 |
-| Septia Anggraini              | 2313020067 |
-| Aditya Bagas Bramatyo Kuzaky  | 2313020056 |
+| Nama                           | NPM        |
+| ------------------------------ | ---------- |
+| Refhanda Setyadi Eko Wicaksono | 2313020058 |
+| Dimas Maulana                  | 2313020062 |
+| Septia Anggraini               | 2313020067 |
+| Aditya Bagas Bramatyo Kuzaky   | 2313020056 |
