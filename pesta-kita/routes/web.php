@@ -69,3 +69,11 @@ Route::get('/klien/detail-venue', function () {
 Route::get('/klien/pesanan-tagihan', function () {
     return view('pesanan-tagihan');
 })->name('klien.pesanan-tagihan');
+
+Route::get('/klien/detail-pesanan', function () {
+    return view('detail-pesanan');
+})->name('klien.detail-pesanan');
+
+Route::get('/klien/evaluasi', function () {
+    return view('evaluasi');
+})->name('klien.evaluasi');

@@ -433,15 +433,13 @@
                 </div>
             </div>
 
-            <a href="{{ route('logout') }}"
-               class="logout"
-               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+            <a href="{{ route('login') }}" class="logout">
                 Keluar
             </a>
 
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none">
-                @csrf
-            </form>
+            <a href="{{ route('login') }}" class="logout">
+                Keluar
+            </a>
 
         </div>
 
