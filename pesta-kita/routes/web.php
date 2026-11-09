@@ -77,3 +77,12 @@ Route::get('/klien/detail-pesanan', function () {
 Route::get('/klien/evaluasi', function () {
     return view('evaluasi');
 })->name('klien.evaluasi');
+
+// NOTIFIKASI
+Route::get('/klien/notifikasi', function () {
+    return view('notifikasi');
+})->name('klien.notifikasi');
+
+Route::get('/klien/profil', function () {
+    return view('profil-saya');
+})->name('klien.profil');
