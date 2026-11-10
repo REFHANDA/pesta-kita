@@ -53,18 +53,19 @@
                     Masuk ke akun Anda
                 </h2>
 
-                <!-- ERROR LOGIN -->
-                <div
-                    id="loginError"
-                    class="mt-5 hidden rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
-                    role="alert"
-                    aria-live="polite"
-                >
-                    ✕ Email atau kata sandi tidak cocok.
-                </div>
+                @if ($errors->any())
+                    <div
+                        class="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
+                        role="alert"
+                        aria-live="polite"
+                    >
+                        {{ $errors->first() }}
+                    </div>
+                @endif
 
                 <!-- FORM -->
-                <form id="loginForm" class="mt-7 space-y-5" novalidate>
+                <form id="loginForm" action="{{ route('login.store') }}" method="POST" class="mt-7 space-y-5">
+                    @csrf
 
                     <!-- EMAIL -->
                     <div>
@@ -76,17 +77,17 @@
                             id="email"
                             name="email"
                             type="email"
+                            value="{{ old('email') }}"
                             autocomplete="email"
                             placeholder="nama@contoh.id"
+                            required
+                            autofocus
                             class="w-full rounded-xl border border-[#CEC5D8] bg-white px-4 py-3.5 text-sm outline-none transition focus:border-[#5B2887] focus:ring-2 focus:ring-[#5B2887]/15"
                         >
 
-                        <p
-                            id="emailError"
-                            class="mt-2 hidden text-xs text-red-600"
-                        >
-                            Masukkan alamat email yang valid.
-                        </p>
+                        @error('email')
+                            <p class="mt-2 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <!-- PASSWORD -->
@@ -101,15 +102,13 @@
                             type="password"
                             autocomplete="current-password"
                             placeholder="Masukkan kata sandi"
+                            required
                             class="w-full rounded-xl border border-[#CEC5D8] bg-white px-4 py-3.5 text-sm outline-none transition focus:border-[#5B2887] focus:ring-2 focus:ring-[#5B2887]/15"
                         >
 
-                        <p
-                            id="passwordError"
-                            class="mt-2 hidden text-xs text-red-600"
-                        >
-                            Kata sandi wajib diisi.
-                        </p>
+                        @error('password')
+                            <p class="mt-2 text-xs text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <!-- REMEMBER ME -->
@@ -117,6 +116,7 @@
                         <input
                             type="checkbox"
                             name="remember"
+                            value="1"
                             class="h-4 w-4 accent-[#5B2887]"
                         >
 
@@ -154,71 +154,5 @@
         </section>
 
     </main>
-
-    <script>
-        const loginForm = document.getElementById('loginForm');
-
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-
-        const loginError = document.getElementById('loginError');
-        const emailError = document.getElementById('emailError');
-        const passwordError = document.getElementById('passwordError');
-
-        const normalInputClass =
-            'w-full rounded-xl border border-[#CEC5D8] bg-white px-4 py-3.5 text-sm outline-none transition focus:border-[#5B2887] focus:ring-2 focus:ring-[#5B2887]/15';
-
-        const errorInputClass =
-            'w-full rounded-xl border border-red-500 bg-white px-4 py-3.5 text-sm outline-none focus:ring-2 focus:ring-red-100';
-
-        loginForm.addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-
-            // Reset tampilan error
-            loginError.classList.add('hidden');
-            emailError.classList.add('hidden');
-            passwordError.classList.add('hidden');
-
-            emailInput.className = normalInputClass;
-            passwordInput.className = normalInputClass;
-
-            let hasError = false;
-
-            // Validasi email
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-            if (!emailPattern.test(email)) {
-                emailInput.className = errorInputClass;
-                emailError.classList.remove('hidden');
-                hasError = true;
-            }
-
-            // Validasi password
-            if (password.length === 0) {
-                passwordInput.className = errorInputClass;
-                passwordError.textContent = 'Kata sandi wajib diisi.';
-                passwordError.classList.remove('hidden');
-                hasError = true;
-            }
-
-            if (hasError) {
-                return;
-            }
-
-            // SIMULASI LOGIN GAGAL SESUAI FIGMA
-            // Belum terhubung ke database / autentikasi Laravel
-
-            loginError.classList.remove('hidden');
-
-            passwordInput.className = errorInputClass;
-
-            passwordError.textContent = 'Kata sandi salah.';
-            passwordError.classList.remove('hidden');
-        });
-    </script>
-
 </body>
 </html>

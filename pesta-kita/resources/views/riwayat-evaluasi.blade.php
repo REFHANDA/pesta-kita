@@ -433,13 +433,9 @@
                 </div>
             </div>
 
-            <a href="{{ route('login') }}" class="logout">
-                Keluar
-            </a>
+            <x-logout />
 
-            <a href="{{ route('login') }}" class="logout">
-                Keluar
-            </a>
+            <x-logout />
 
         </div>
 

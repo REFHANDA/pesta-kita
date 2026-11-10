@@ -20,15 +20,32 @@
             </a>
 
             <div class="flex items-center gap-5 text-sm">
-                <a href="/login"
-                   class="font-medium text-[#211631] hover:text-[#5B2887]">
-                    Masuk
-                </a>
+                @auth
+                    @if (auth()->user()->role === 'client')
+                        <a href="{{ route('klien.dashboard') }}"
+                           class="font-medium text-[#211631] hover:text-[#5B2887]">
+                            Dashboard
+                        </a>
+                    @endif
 
-                <a href="/register"
-                   class="rounded-full bg-[#5B2887] px-5 py-2.5 font-semibold text-white hover:bg-[#48206C]">
-                    Daftar
-                </a>
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit"
+                                class="rounded-full border border-[#CEC5D8] px-5 py-2.5 font-semibold text-[#211631] hover:border-[#5B2887] hover:text-[#5B2887]">
+                            Keluar
+                        </button>
+                    </form>
+                @else
+                    <a href="{{ route('login') }}"
+                       class="font-medium text-[#211631] hover:text-[#5B2887]">
+                        Masuk
+                    </a>
+
+                    <a href="{{ route('register') }}"
+                       class="rounded-full bg-[#5B2887] px-5 py-2.5 font-semibold text-white hover:bg-[#48206C]">
+                        Daftar
+                    </a>
+                @endauth
             </div>
 
         </nav>
@@ -65,13 +82,15 @@
                             Mulai rencanakan acara
                         </a>
 
-                        <p class="text-xs text-[#756B80]">
-                            Sudah punya akun?
-                            <a href="/login"
-                               class="font-bold text-[#5B2887] underline">
-                                Masuk
-                            </a>
-                        </p>
+                        @guest
+                            <p class="text-xs text-[#756B80]">
+                                Sudah punya akun?
+                                <a href="{{ route('login') }}"
+                                   class="font-bold text-[#5B2887] underline">
+                                    Masuk
+                                </a>
+                            </p>
+                        @endguest
 
                     </div>
                 </div>

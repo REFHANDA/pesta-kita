@@ -71,7 +71,7 @@ body{font-family:Arial,sans-serif;background:#fbf9fd;color:#241a36;font-size:14p
             <div class="avatar">N</div>
             <div><b>Nadia Putri</b><small>nadia@contoh.id</small></div>
         </div>
-        <a href="{{ route('login') }}" class="logout">Keluar</a>
+        <x-logout />
     </div>
 </aside>
 

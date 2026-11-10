@@ -631,7 +631,7 @@ $inisial = strtoupper(substr($nama,0,1));
                 <small>{{ $email }}</small>
             </div>
         </div>
-        <a href="#" class="logout">Keluar</a>
+        <x-logout />
     </div>
 
 </aside>

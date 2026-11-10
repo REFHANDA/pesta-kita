@@ -214,7 +214,7 @@ body {
                 <small>nadia@contoh.id</small>
             </div>
         </div>
-        <a href="{{ route('login') }}" class="logout">Keluar</a>
+        <x-logout />
     </div>
 </aside>
 
