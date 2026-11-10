@@ -1,0 +1,7 @@
+@extends('layouts.klien')
+
+@section('title', 'Riwayat & evaluasi · Pesta Kita')
+
+@section('content')
+<main id="konten" class="content" tabindex="-1"><div class="page-head"><div><div class="crumbs"><a href="{{ url('/klien') }}">Beranda</a> / Riwayat &amp; evaluasi</div><h1>Riwayat &amp; evaluasi</h1><p class="sub">Acara yang sudah selesai, dinilai, atau dibatalkan.</p></div></div><section class="card"><div class="table-wrap"><table><thead><tr><th>Acara</th><th>Tanggal</th><th>Tamu</th><th>Status</th><th></th></tr></thead><tbody><tr><td><b>Ulang Tahun Kayla</b></td><td>24 Okt 2026</td><td>40 tamu</td><td><span class="badge b-ok">Selesai</span></td><td class="num"><a class="btn btn-sm" href="{{ url('/klien/evaluasi') }}">Beri penilaian</a></td></tr><tr><td><b>Ulang Tahun Bima ke-5</b></td><td>10 Okt 2026</td><td>35 tamu</td><td><span class="badge b-brand">Dinilai</span></td><td class="num"><a class="btn btn-o btn-sm" href="{{ url('/klien/evaluasi-selesai') }}">Lihat penilaian</a></td></tr><tr><td><b>Syukuran Mama</b></td><td>14 Sep 2026</td><td>60 tamu</td><td><span class="badge b-bad">Dibatalkan</span></td><td class="num"><a class="btn btn-o btn-sm" href="{{ url('/klien/acara-dibatalkan') }}">Lihat refund</a></td></tr></tbody></table></div><div class="pager"><span>Menampilkan 1–3</span><ul><li><span class="off">Sebelumnya</span></li><li><span aria-current="page">1</span></li><li><span class="off">Berikutnya</span></li></ul></div></section></main>
+@endsection

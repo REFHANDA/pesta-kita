@@ -1,0 +1,10 @@
+@extends('layouts.penyedia')
+
+@section('title', 'Pencairan · Panel Vendor Pesta Kita')
+
+@section('content')
+<main id="konten" class="content" tabindex="-1"><div class="page-head"><div><div class="crumbs"><a href="{{ url('/penyedia') }}">Beranda</a> / Pencairan</div><h1>Pencairan</h1><p class="sub">Dana dicairkan setelah acara ditandai selesai.</p></div></div>
+<div class="alert warn"><span class="ic i-info" aria-hidden="true"></span><span>Rekening Anda menunggu verifikasi Admin. <a href="{{ url('/penyedia/profil') }}">Periksa profil usaha</a></span></div>
+<div class="grid stats" style="grid-template-columns:repeat(2,minmax(0,1fr));max-width:720px"><div class="card stat"><span class="ic-box"><span class="ic i-wallet" aria-hidden="true"></span></span><div><div class="lbl">Menunggu dicairkan</div><div class="val">Rp 4.250.000</div></div></div><div class="card stat"><span class="ic-box"><span class="ic i-ok" aria-hidden="true"></span></span><div><div class="lbl">Sudah dicairkan</div><div class="val">Rp 12.800.000</div></div></div></div>
+<section class="card"><div class="table-wrap"><table><thead><tr><th>Jumlah</th><th>Jenis</th><th>Pesanan</th><th>Tanggal transfer</th><th>Status</th></tr></thead><tbody><tr><td><a href="{{ url('/penyedia/pencairan-detail') }}"><b>Rp 2.720.000</b></a></td><td>Hak atas pesanan</td><td>Katering prasmanan · PK-0398</td><td>-</td><td><span class="badge b-warn">Belum cair</span></td></tr><tr><td><b>Rp 1.530.000</b></td><td>Kompensasi pembatalan</td><td>Sound system ×2 · PK-0377</td><td>-</td><td><span class="badge b-warn">Belum cair</span></td></tr><tr><td><b>Rp 3.400.000</b></td><td>Hak atas pesanan</td><td>Katering prasmanan · PK-0361</td><td>28 Okt 2026</td><td><span class="badge b-ok">Sudah cair</span></td></tr></tbody></table></div><div class="pager"><span>Menampilkan 3 pencairan</span><ul><li><span class="off">Sebelumnya</span></li><li><span aria-current="page">1</span></li><li><a href="#">Berikutnya</a></li></ul></div></section></main>
+@endsection

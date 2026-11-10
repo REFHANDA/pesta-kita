@@ -1,0 +1,8 @@
+@extends('layouts.penyedia')
+
+@section('title', 'Pesanan · Panel Vendor Pesta Kita')
+
+@section('content')
+<main id="konten" class="content" tabindex="-1"><div class="page-head"><div><div class="crumbs"><a href="{{ url('/penyedia') }}">Beranda</a> / Pesanan</div><h1>Pesanan</h1><p class="sub">Nama klien tidak ditampilkan; komunikasi lewat Pesta Kita.</p></div></div>
+<section class="card"><div class="tabs" aria-label="Status pesanan"><a href="#" aria-current="page">Aktif</a><a href="#">Riwayat</a></div><div class="table-wrap"><table><thead><tr><th>Pesanan</th><th>Acara</th><th>Tanggal</th><th class=num>Tamu</th><th class=num>Hak Anda</th><th>Status</th></tr></thead><tbody><tr><td><a href="{{ url('/penyedia/pesanan-detail') }}"><b>Katering prasmanan</b></a></td><td>PK-0412</td><td>Sabtu, 14 Nov 2026</td><td class=num>45</td><td class=num>Rp 2.720.000</td><td><span class="badge b-ok">Disetujui</span></td></tr><tr><td><a href="{{ url('/penyedia/pesanan-detail') }}"><b>Paket kue ulang tahun</b></a></td><td>PK-0409</td><td>Sabtu, 14 Nov 2026</td><td class=num>30</td><td class=num>Rp 850.000</td><td><span class="badge b-ok">Disetujui</span></td></tr><tr><td><a href="{{ url('/penyedia/pesanan-detail') }}"><b>Katering prasmanan</b></a></td><td>PK-0398</td><td>Minggu, 8 Nov 2026</td><td class=num>60</td><td class=num>Rp 2.720.000</td><td><span class="badge b-ok">Terkonfirmasi</span></td></tr></tbody></table></div><div class="pager"><span>Menampilkan 3 pesanan</span><ul><li><span class="off">Sebelumnya</span></li><li><span aria-current="page">1</span></li><li><a href="#">Berikutnya</a></li></ul></div></section></main>
+@endsection

@@ -1,0 +1,13 @@
+@extends('layouts.klien')
+
+@section('title', 'Ajukan pembatalan · Pesta Kita')
+
+@section('content')
+<main id="konten" class="content" tabindex="-1"><div class="page-head"><div><div class="crumbs"><a href="{{ url('/klien') }}">Beranda</a> / <a href="{{ url('/klien/acara') }}">Rancang acara</a> / <a href="{{ url('/klien/acara-terkonfirmasi') }}">Ulang Tahun Dinda</a> / Ajukan pembatalan</div><h1>Ajukan pembatalan</h1></div></div>
+<div class="alert">Pembatalan berlaku untuk seluruh acara, bukan per item. Keputusan akhir ada pada Admin.</div>
+<div class="grid two"><div class="stack">
+<section class="card" aria-labelledby="est"><div class="card-h"><h2 id="est">Estimasi refund</h2><span class="chip">Sisa 19 hari</span></div><table class="sum"><tr><td>Total tagihan (tanpa kode unik)</td><td class="num">Rp 11.172.000</td></tr><tr><td>Refund 70%</td><td class="num">Rp 7.820.400</td></tr><tr><td>Kode unik dikembalikan penuh</td><td class="num">Rp 128</td></tr><tr class="t"><td>Estimasi diterima</td><td class="num">Rp 7.820.528</td></tr></table><div class="card-b"><p class="hint">Estimasi; dapat berbeda bila Admin mengubah persentase dengan alasan tertulis.</p></div></section>
+<form class="card" id="f-batal" onsubmit="return false"><div class="card-h"><h2>Alasan pembatalan</h2></div><div class="card-b"><div class="field"><label for="al">Alasan <span class="req" aria-hidden="true">*</span></label><textarea class="input" id="al" rows="4" required></textarea></div><div class="actions"><a class="btn btn-o" href="{{ url('/klien/acara-terkonfirmasi') }}">Kembali</a><button class="btn btn-bad" type="button" id="ajukan">Ajukan pembatalan</button></div></div></form></div>
+<section class="card" aria-labelledby="tier"><div class="card-h"><h2 id="tier">Aturan refund</h2></div><div class="table-wrap"><table><caption class="sr-only">Tabel: Refund berdasarkan sisa hari menuju acara</caption><thead><tr><th scope="col">Sisa waktu</th><th scope="col" class="num">Refund</th></tr></thead><tbody><tr><td>30 hari atau lebih</td><td class="num">90%</td></tr><tr class="tier-on"><td>14–29 hari <span class="chip">Berlaku</span></td><td class="num">70%</td></tr><tr><td>7–13 hari</td><td class="num">50%</td></tr><tr><td>3–6 hari</td><td class="num">25%</td></tr><tr><td>Kurang dari 3 hari</td><td class="num">0%</td></tr></tbody></table></div></section></div>
+<dialog id="dlg" aria-labelledby="dlg-t"><h2 id="dlg-t">Ajukan pembatalan acara?</h2><p>Estimasi refund Rp 7.820.528 (70% dari Rp 11.172.000 ditambah kode unik Rp 128). Admin akan meninjau pengajuan Anda.</p><div class="actions"><button class="btn btn-o" type="button" id="kembali">Kembali</button><button class="btn btn-bad" type="button" id="ya">Ajukan pembatalan</button></div></dialog></main>
+@endsection
