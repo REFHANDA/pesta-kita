@@ -7,11 +7,12 @@ use Illuminate\Support\Facades\Route;
 | Web Routes - Pesta Kita
 |--------------------------------------------------------------------------
 |
-| Rute untuk antarmuka UI/UX Pesta Kita:
+| Rute untuk antarmuka UI/UX Pesta Kita (Sesuai Rancangan EMS 4 Aktor):
 | 1. Publik / Landing page & Autentikasi
-| 2. Portal Klien (28 halaman)
-| 3. Portal Penyedia - Vendor & Venue (21 halaman)
-| 4. Panel Admin (35 halaman)
+| 2. Portal Klien (/klien)
+| 3. Portal Vendor (/vendor)
+| 4. Portal Pemilik Venue (/venue)
+| 5. Panel Admin (/admin)
 |
 */
 
@@ -33,7 +34,7 @@ Route::get('/logout', function () {
 })->name('logout');
 
 
-// --- Portal Klien ---
+// --- Portal Klien (Penyelenggara Acara) ---
 Route::prefix('klien')->name('klien.')->group(function () {
     Route::get('/', function () {
         return view('klien.index');
@@ -49,14 +50,14 @@ Route::prefix('klien')->name('klien.')->group(function () {
 });
 
 
-// --- Portal Penyedia (Vendor & Venue) ---
-Route::prefix('penyedia')->name('penyedia.')->group(function () {
+// --- Portal Vendor (Katering, Dekorasi, Hiburan, Peralatan) ---
+Route::prefix('vendor')->name('vendor.')->group(function () {
     Route::get('/', function () {
-        return view('penyedia.index');
+        return view('vendor.index');
     })->name('beranda');
 
     Route::get('/{page}', function ($page) {
-        $view = 'penyedia.' . $page;
+        $view = 'vendor.' . $page;
         if (view()->exists($view)) {
             return view($view);
         }
@@ -65,7 +66,48 @@ Route::prefix('penyedia')->name('penyedia.')->group(function () {
 });
 
 
-// --- Panel Admin ---
+// --- Portal Pemilik Venue (Gedung, Aula, Tempat Pertemuan) ---
+Route::prefix('venue')->name('venue.')->group(function () {
+    Route::get('/', function () {
+        return view('venue.index');
+    })->name('beranda');
+
+    Route::get('/{page}', function ($page) {
+        $view = 'venue.' . $page;
+        if (view()->exists($view)) {
+            return view($view);
+        }
+        abort(404);
+    })->where('page', '[a-zA-Z0-9_-]+')->name('page');
+});
+
+
+// --- Backward-compatibility Alias: /penyedia ---
+Route::prefix('penyedia')->name('penyedia.')->group(function () {
+    Route::get('/', function () {
+        return redirect()->route('vendor.beranda');
+    });
+
+    Route::get('/venue', function () {
+        return redirect()->route('venue.beranda');
+    });
+
+    Route::get('/{page}', function ($page) {
+        if (view()->exists('vendor.' . $page)) {
+            return redirect()->to('/vendor/' . $page);
+        }
+        if (view()->exists('venue.' . $page)) {
+            return redirect()->to('/venue/' . $page);
+        }
+        if (view()->exists('penyedia.' . $page)) {
+            return view('penyedia.' . $page);
+        }
+        abort(404);
+    })->where('page', '[a-zA-Z0-9_-]+');
+});
+
+
+// --- Panel Admin (Perusahaan Pesta Kita) ---
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/', function () {
         return view('admin.index');

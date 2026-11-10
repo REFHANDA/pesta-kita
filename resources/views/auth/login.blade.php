@@ -11,16 +11,23 @@
         </a>
 
         <div class="card" style="padding:32px">
-            <h1 style="font-size:24px;font-weight:800;margin-bottom:8px">Masuk ke akun Anda</h1>
-            <p style="color:var(--muted);font-size:14.5px;margin-bottom:24px">Pilih portal yang ingin Anda tuju:</p>
+            <h1 style="font-size:24px;font-weight:800;margin-bottom:6px">Masuk ke akun Anda</h1>
+            <p style="color:var(--muted);font-size:14px;margin-bottom:20px">Pilih peran akun untuk melihat antarmuka portal masing-masing:</p>
 
-            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:24px">
-                <button type="button" onclick="selectRole('klien')" id="role-klien-btn" class="pill" style="justify-content:center;background:var(--brand);color:#fff;border-color:var(--brand);cursor:pointer">Klien</button>
-                <button type="button" onclick="selectRole('penyedia')" id="role-penyedia-btn" class="pill" style="justify-content:center;cursor:pointer">Penyedia</button>
-                <button type="button" onclick="selectRole('admin')" id="role-admin-btn" class="pill" style="justify-content:center;cursor:pointer">Admin</button>
+            <!-- 4 Role Selector Tabs -->
+            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:20px">
+                <button type="button" onclick="selectRole('klien')" id="role-klien-btn" class="pill" style="justify-content:center;background:var(--brand);color:#fff;border-color:var(--brand);cursor:pointer;font-size:13.5px">👤 Klien</button>
+                <button type="button" onclick="selectRole('vendor')" id="role-vendor-btn" class="pill" style="justify-content:center;cursor:pointer;font-size:13.5px">🍴 Vendor</button>
+                <button type="button" onclick="selectRole('venue')" id="role-venue-btn" class="pill" style="justify-content:center;cursor:pointer;font-size:13.5px">🏛️ Pemilik Venue</button>
+                <button type="button" onclick="selectRole('admin')" id="role-admin-btn" class="pill" style="justify-content:center;cursor:pointer;font-size:13.5px">🛡️ Admin</button>
+            </div>
+
+            <div id="role-badge-info" style="margin-bottom:18px;padding:8px 12px;background:var(--brand-50);border-radius:10px;font-size:13px;color:var(--brand-d);font-weight:600">
+                Akses: Portal Klien (Penyelenggara Acara Ulang Tahun)
             </div>
 
             <form class="stack" style="gap:16px" onsubmit="handleLogin(event)">
+                @csrf
                 <div class="field">
                     <label for="email" style="font-weight:600;font-size:14px;margin-bottom:6px;display:block">Email</label>
                     <input class="input" id="email" type="email" placeholder="nama@email.com" autocomplete="email" required value="klien@pestakita.test">
@@ -51,23 +58,32 @@
 let currentRole = 'klien';
 const targetUrls = {
     klien: "{{ url('/klien') }}",
-    penyedia: "{{ url('/penyedia') }}",
+    vendor: "{{ url('/vendor') }}",
+    venue: "{{ url('/venue') }}",
     admin: "{{ url('/admin') }}"
 };
 const defaultEmails = {
     klien: "klien@pestakita.test",
-    penyedia: "vendor@pestakita.test",
+    vendor: "vendor@pestakita.test",
+    venue: "venue@pestakita.test",
     admin: "admin@pestakita.test"
 };
 const btnLabels = {
     klien: "Masuk ke Portal Klien",
-    penyedia: "Masuk ke Panel Penyedia",
+    vendor: "Masuk ke Panel Vendor",
+    venue: "Masuk ke Panel Pemilik Venue",
     admin: "Masuk ke Panel Admin"
+};
+const roleInfos = {
+    klien: "Akses: Portal Klien (Penyelenggara Acara Ulang Tahun)",
+    vendor: "Akses: Panel Vendor (Katering, Dekorasi, Hiburan & Peralatan)",
+    venue: "Akses: Panel Pemilik Venue (Manajemen Gedung & Denah Ruangan)",
+    admin: "Akses: Panel Admin Perusahaan (Operasional & Manajemen Transaksi)"
 };
 
 function selectRole(role) {
     currentRole = role;
-    ['klien', 'penyedia', 'admin'].forEach(r => {
+    ['klien', 'vendor', 'venue', 'admin'].forEach(r => {
         const btn = document.getElementById('role-' + r + '-btn');
         if (r === role) {
             btn.style.background = 'var(--brand)';
@@ -81,6 +97,7 @@ function selectRole(role) {
     });
     document.getElementById('email').value = defaultEmails[role];
     document.getElementById('submit-btn').textContent = btnLabels[role];
+    document.getElementById('role-badge-info').textContent = roleInfos[role];
 }
 
 function handleLogin(e) {

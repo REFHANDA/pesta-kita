@@ -65,37 +65,46 @@
         </div>
     </section>
 
-    <!-- Portal Switcher Section -->
+    <!-- Portal Switcher Section (4 Aktor Sesuai Rancangan) -->
     <section class="section-wrap">
         <div class="portal-switch-banner">
-            <h2>Eksplorasi 3 Panel Antarmuka Pesta Kita</h2>
-            <p style="opacity:0.9;font-size:16px;max-width:720px;margin:0 auto">Aplikasi dirancang lengkap dan terintegrasi untuk Klien, Penyedia Layanan (Vendor & Venue), serta Tim Administrator.</p>
+            <h2>Eksplorasi 4 Portal Pengguna Pesta Kita</h2>
+            <p style="opacity:0.9;font-size:16px;max-width:760px;margin:0 auto">Dirancang terpisah dan presisi sesuai perancangan sistem: Klien, Vendor Layanan, Pemilik Venue, dan Admin Perusahaan.</p>
             
-            <div class="portal-switch-grid">
+            <div class="portal-switch-grid" style="grid-template-columns:repeat(4,minmax(0,1fr))">
                 <a href="{{ url('/klien') }}" class="portal-switch-card">
                     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
                         <span class="ic-box" style="background:rgba(255,255,255,0.2);color:#ffffff"><span class="ic i-users"></span></span>
-                        <h3 style="font-size:19px;font-weight:800;margin:0">Portal Klien</h3>
+                        <h3 style="font-size:18px;font-weight:800;margin:0">Portal Klien</h3>
                     </div>
-                    <p style="font-size:14px;opacity:0.88;line-height:1.5;margin:0 0 14px">Susun acara, atur tata letak denah ruangan, pilih vendor, bayar dalam satu tagihan, dan pantau rundown.</p>
-                    <span style="font-weight:700;font-size:13px;text-decoration:underline">Buka Beranda Klien &rarr;</span>
+                    <p style="font-size:13.5px;opacity:0.88;line-height:1.5;margin:0 0 14px">Susun konsep acara, denah ruangan, pilih vendor &amp; venue, bayar 1 tagihan gabungan, dan susun rundown.</p>
+                    <span style="font-weight:700;font-size:13px;text-decoration:underline">Buka Portal Klien &rarr;</span>
                 </a>
 
-                <a href="{{ url('/penyedia') }}" class="portal-switch-card">
+                <a href="{{ url('/vendor') }}" class="portal-switch-card">
                     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
                         <span class="ic-box" style="background:rgba(255,255,255,0.2);color:#ffffff"><span class="ic i-box"></span></span>
-                        <h3 style="font-size:19px;font-weight:800;margin:0">Portal Penyedia</h3>
+                        <h3 style="font-size:18px;font-weight:800;margin:0">Panel Vendor</h3>
                     </div>
-                    <p style="font-size:14px;opacity:0.88;line-height:1.5;margin:0 0 14px">Kelola paket menu, data venue & peralatan, review pesanan masuk, pantau rundown acara, dan cek pencairan dana.</p>
-                    <span style="font-weight:700;font-size:13px;text-decoration:underline">Buka Panel Penyedia &rarr;</span>
+                    <p style="font-size:13.5px;opacity:0.88;line-height:1.5;margin:0 0 14px">Kelola paket menu katering, dekorasi, sewa peralatan, masa keberatan 24 jam, dan isi rundown miliknya.</p>
+                    <span style="font-weight:700;font-size:13px;text-decoration:underline">Buka Panel Vendor &rarr;</span>
+                </a>
+
+                <a href="{{ url('/venue') }}" class="portal-switch-card">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+                        <span class="ic-box" style="background:rgba(255,255,255,0.2);color:#ffffff"><span class="ic i-bank"></span></span>
+                        <h3 style="font-size:18px;font-weight:800;margin:0">Pemilik Venue</h3>
+                    </div>
+                    <p style="font-size:13.5px;opacity:0.88;line-height:1.5;margin:0 0 14px">Kelola spesifikasi gedung, kapasitas tamu, tinjau pesanan venue, pantau rundown &amp; pencairan dana.</p>
+                    <span style="font-weight:700;font-size:13px;text-decoration:underline">Buka Panel Venue &rarr;</span>
                 </a>
 
                 <a href="{{ url('/admin') }}" class="portal-switch-card">
                     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
                         <span class="ic-box" style="background:rgba(255,255,255,0.2);color:#ffffff"><span class="ic i-cog"></span></span>
-                        <h3 style="font-size:19px;font-weight:800;margin:0">Panel Admin</h3>
+                        <h3 style="font-size:18px;font-weight:800;margin:0">Panel Admin</h3>
                     </div>
-                    <p style="font-size:14px;opacity:0.88;line-height:1.5;margin:0 0 14px">Kendali operasional: validasi bukti transfer klien, mediasi keberatan, kelola katalog, pantau acara & pencairan.</p>
+                    <p style="font-size:13.5px;opacity:0.88;line-height:1.5;margin:0 0 14px">Review pesanan, validasi bukti transfer klien, mediasi keberatan, kelola katalog, dan log aktivitas.</p>
                     <span style="font-weight:700;font-size:13px;text-decoration:underline">Buka Panel Admin &rarr;</span>
                 </a>
             </div>
@@ -214,9 +223,10 @@
         <span style="color:var(--muted);font-size:14px;margin-left:10px">&copy; 2026 Pesta Kita. Seluruh hak cipta dilindungi.</span>
     </div>
     <div style="display:flex;gap:20px;font-size:14px">
-        <a href="{{ url('/klien') }}" style="color:var(--muted);text-decoration:none">Portal Klien</a>
-        <a href="{{ url('/penyedia') }}" style="color:var(--muted);text-decoration:none">Portal Penyedia</a>
-        <a href="{{ url('/admin') }}" style="color:var(--muted);text-decoration:none">Panel Admin</a>
+        <a href="{{ url('/klien') }}" style="color:var(--muted);text-decoration:none">Klien</a>
+        <a href="{{ url('/vendor') }}" style="color:var(--muted);text-decoration:none">Vendor</a>
+        <a href="{{ url('/venue') }}" style="color:var(--muted);text-decoration:none">Venue</a>
+        <a href="{{ url('/admin') }}" style="color:var(--muted);text-decoration:none">Admin</a>
     </div>
 </footer>
 @endsection

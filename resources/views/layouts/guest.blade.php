@@ -18,6 +18,8 @@
 
     @yield('content')
 
+    <script src="{{ asset('assets/js/app-ui.js') }}"></script>
     @stack('scripts')
 </body>
 </html>
+

@@ -15,27 +15,28 @@
             <p style="color:var(--muted);font-size:14.5px;margin-bottom:20px">Bergabung dengan ekosistem perencanaan acara Pesta Kita.</p>
 
             <form class="stack" style="gap:16px" onsubmit="handleRegister(event)">
+                @csrf
                 <fieldset class="role-opts" style="border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
                     <legend style="font-size:13px;font-weight:700;color:var(--muted);padding:0 6px">Saya mendaftar sebagai</legend>
                     <label style="cursor:pointer;display:flex;flex-direction:column;gap:3px">
-                        <input type="radio" name="role" value="klien" checked onchange="toggleVendorFields(false)">
+                        <input type="radio" name="role" value="klien" checked onchange="handleRoleChange('klien')">
                         <b>Klien</b>
-                        <small style="color:var(--muted)">Merencanakan acara</small>
+                        <small style="color:var(--muted)">Penyelenggara pesta</small>
                     </label>
                     <label style="cursor:pointer;display:flex;flex-direction:column;gap:3px">
-                        <input type="radio" name="role" value="vendor" onchange="toggleVendorFields(true)">
+                        <input type="radio" name="role" value="vendor" onchange="handleRoleChange('vendor')">
                         <b>Vendor</b>
-                        <small style="color:var(--muted)">Katering, dekorasi, dll</small>
+                        <small style="color:var(--muted)">Katering, dekorasi, MC</small>
                     </label>
                     <label style="cursor:pointer;display:flex;flex-direction:column;gap:3px">
-                        <input type="radio" name="role" value="venue" onchange="toggleVendorFields(true)">
+                        <input type="radio" name="role" value="venue" onchange="handleRoleChange('venue')">
                         <b>Pemilik venue</b>
                         <small style="color:var(--muted)">Menyewakan tempat</small>
                     </label>
                 </fieldset>
 
-                <p id="vendor-hint" class="hint" style="margin:0;display:none;background:var(--brand-50);padding:10px 14px;border-radius:10px;color:var(--brand-d)">
-                    Akun vendor dan pemilik venue aktif setelah diverifikasi Admin Pesta Kita.
+                <p id="vendor-hint" class="hint" style="margin:0;display:none;background:var(--brand-50);padding:10px 14px;border-radius:10px;color:var(--brand-d);font-weight:600">
+                    ℹ️ Akun mitra penyedia (vendor/venue) aktif setelah dokumen dan rekening diverifikasi oleh Admin Pesta Kita.
                 </p>
 
                 <div class="field">
@@ -55,26 +56,25 @@
 
                 <!-- Bagian Khusus Vendor / Venue -->
                 <div id="vendor-extra-fields" style="display:none;padding:16px;background:var(--bg);border:1px solid var(--line);border-radius:12px">
-                    <b style="display:block;font-size:14.5px;margin-bottom:12px;color:var(--brand)">Informasi Usaha (Khusus Vendor & Pemilik Venue)</b>
+                    <b id="extra-title" style="display:block;font-size:14.5px;margin-bottom:12px;color:var(--brand)">Informasi Usaha Vendor</b>
                     <div class="stack" style="gap:14px">
                         <div class="field">
-                            <label for="nu" style="font-weight:600;font-size:13.5px;margin-bottom:4px;display:block">Nama usaha / Venue</label>
-                            <input class="input" id="nu" type="text" placeholder="Contoh: Dapur Nusantara / Graha Melati">
+                            <label for="nu" id="label-nu" style="font-weight:600;font-size:13.5px;margin-bottom:4px;display:block">Nama usaha vendor</label>
+                            <input class="input" id="nu" type="text" placeholder="Contoh: Dapur Nusantara">
                         </div>
-                        <div class="field">
-                            <label for="ka" style="font-weight:600;font-size:13.5px;margin-bottom:4px;display:block">Kategori usaha</label>
+                        <div class="field" id="wrap-ka">
+                            <label for="ka" style="font-weight:600;font-size:13.5px;margin-bottom:4px;display:block">Kategori layanan</label>
                             <select class="input" id="ka">
-                                <option>Katering & F&B</option>
+                                <option>Katering &amp; F&amp;B</option>
                                 <option>Dekorasi Pesta</option>
-                                <option>Venue / Aula Pertemuan</option>
-                                <option>Sound System & Audio</option>
-                                <option>MC & Hiburan</option>
-                                <option>Fotografi & Videografi</option>
+                                <option>Sound System &amp; Audio</option>
+                                <option>MC &amp; Hiburan</option>
+                                <option>Fotografi &amp; Dokumentasi</option>
                             </select>
                         </div>
                         <div class="field">
-                            <label for="al" style="font-weight:600;font-size:13.5px;margin-bottom:4px;display:block">Alamat lengkap operasional</label>
-                            <input class="input" id="al" type="text" placeholder="Jl. Sudirman No. 12, Jakarta">
+                            <label for="al" style="font-weight:600;font-size:13.5px;margin-bottom:4px;display:block">Alamat operasional</label>
+                            <input class="input" id="al" type="text" placeholder="Jl. Sudirman No. 12, Kediri">
                         </div>
                     </div>
                 </div>
@@ -100,9 +100,29 @@
 </main>
 
 <script>
-function toggleVendorFields(isVendor) {
-    document.getElementById('vendor-extra-fields').style.display = isVendor ? 'block' : 'none';
-    document.getElementById('vendor-hint').style.display = isVendor ? 'block' : 'none';
+function handleRoleChange(role) {
+    const extra = document.getElementById('vendor-extra-fields');
+    const hint = document.getElementById('vendor-hint');
+    const title = document.getElementById('extra-title');
+    const labelNu = document.getElementById('label-nu');
+    const wrapKa = document.getElementById('wrap-ka');
+
+    if (role === 'klien') {
+        extra.style.display = 'none';
+        hint.style.display = 'none';
+    } else if (role === 'vendor') {
+        extra.style.display = 'block';
+        hint.style.display = 'block';
+        title.textContent = 'Informasi Usaha Vendor';
+        labelNu.textContent = 'Nama usaha vendor';
+        wrapKa.style.display = 'block';
+    } else if (role === 'venue') {
+        extra.style.display = 'block';
+        hint.style.display = 'block';
+        title.textContent = 'Informasi Gedung / Tempat Acara';
+        labelNu.textContent = 'Nama venue / gedung';
+        wrapKa.style.display = 'none';
+    }
 }
 
 function handleRegister(e) {
@@ -110,8 +130,10 @@ function handleRegister(e) {
     const role = document.querySelector('input[name="role"]:checked').value;
     if (role === 'klien') {
         window.location.href = "{{ url('/klien') }}";
-    } else {
-        window.location.href = "{{ url('/penyedia/verifikasi-penyedia') }}";
+    } else if (role === 'vendor') {
+        window.location.href = "{{ url('/vendor/verifikasi') }}";
+    } else if (role === 'venue') {
+        window.location.href = "{{ url('/venue/verifikasi') }}";
     }
 }
 </script>
