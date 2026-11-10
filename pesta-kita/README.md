@@ -53,6 +53,17 @@ In order to ensure that the Laravel community is welcoming to all, please review
 
 If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
+## API foundation and authentication
+
+The API uses the `/api/v1` prefix. Configure a MySQL database in `.env` (`DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD`), create that database, then run `php artisan migrate`.
+
+- `POST /api/v1/auth/register` — create an account with `name`, `email`, `password`, and `password_confirmation`.
+- `POST /api/v1/auth/login` — authenticate with `email` and `password`.
+- `GET /api/v1/auth/me` — return the authenticated user.
+- `POST /api/v1/auth/logout` — revoke the current bearer token.
+
+Register and login return a bearer token in `data.token`. Send it in the bearer authorization header for protected endpoints. Only a SHA-256 hash of each token is stored in the database; logging out revokes that token.
+
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
