@@ -540,7 +540,7 @@ $daftarKategori = array_unique(array_column(
             </div>
         </div>
 
-        <a href="#" class="logout">Keluar</a>
+        <x-logout />
     </div>
 
 </aside>

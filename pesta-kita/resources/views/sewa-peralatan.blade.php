@@ -487,7 +487,7 @@ $hasil = array_values(array_filter($peralatan,function($item) use ($keyword){
             </div>
         </div>
 
-        <a href="#" class="logout">Keluar</a>
+        <x-logout />
     </div>
 
 </aside>
