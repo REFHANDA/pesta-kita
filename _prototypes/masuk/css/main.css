@@ -1,219 +1,588 @@
-* {
-  box-sizing: border-box;
-}
+﻿/* Base pratinjau statis â€” menyamai dasar layouts/guest (admin.css). */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
 body {
-  font-size: 14px;
+  margin: 0;
+  background: #fbf9fe;
+  color: #1e1633;
+  font-family: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
 }
-.v8_334 {
-  width: 100%;
-  height: 900px;
-  background: rgba(251,249,254,1);
-  opacity: 1;
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  overflow: hidden;
+h1, h2, h3 { font-family: "Bricolage Grotesque", "Figtree", system-ui, sans-serif; margin: 0; letter-spacing: -0.01em; }
+a { color: #5b2a86; }
+:focus-visible { outline: 3px solid #5b2a86; outline-offset: 2px; }
+/* ============================================================
+   Auth Pesta Kita â€” desain split-panel "Selaras" (rujukan: UI
+   Pesta Kita/masuk, daftar-klien, daftar-vendor-venue).
+   Panel kiri ungu #5b2a86 (brand + pesan), panel kanan form
+   di atas halaman #fbf9fe. Font: Bricolage Grotesque + Figtree.
+   ============================================================ */
+
+.auth-split {
+    --au-brand: #5b2a86;
+    --au-brand-d: #3b1763;
+    --au-brand-l: #7b3fb0;
+    --au-lav: #f3eefa;
+    --au-page: #fbf9fe;
+    --au-ink: #1e1633;
+    --au-muted: #564f66;
+    --au-line: #e4deee;
+    --au-field: #8a7fa0;
+    --au-danger: #b42318;
+    display: grid;
+    grid-template-columns: minmax(420px, 45%) minmax(0, 1fr);
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--au-page);
+    color: var(--au-ink);
+    font-family: "Figtree", system-ui, sans-serif;
 }
-.v8_335 {
-  width: 655px;
-  height: 900px;
-  background: rgba(91,42,134,1);
-  padding: 56px 56px;
-  opacity: 1;
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  overflow: hidden;
+
+/* ---------- Panel brand (kiri) ---------- */
+.auth-brand {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: clamp(32px, 4vw, 56px);
+    background:
+        radial-gradient(
+            560px 420px at 100% 0%,
+            rgba(123, 63, 176, 0.85),
+            transparent 68%
+        ),
+        radial-gradient(
+            480px 380px at 0% 100%,
+            rgba(59, 23, 99, 0.9),
+            transparent 70%
+        ),
+        var(--au-brand);
+    color: #fff;
 }
-.v8_336 {
-  width: 117px;
-  color: rgba(255,255,255,1);
-  position: absolute;
-  top: 56px;
-  left: 56px;
-  font-family: Bricolage Grotesque;
-  font-weight: ExtraBold;
-  font-size: 24px;
-  opacity: 1;
-  text-align: left;
+.auth-orb {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    border: 1.5px solid rgba(255, 255, 255, 0.16);
+    animation: au-drift 11s ease-in-out infinite;
 }
-.v8_337 {
-  width: 543px;
-  height: 218px;
-  background: url("../images/v8_337.png");
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
-  margin: 20px;
-  opacity: 1;
-  position: absolute;
-  top: 347px;
-  left: 56px;
-  overflow: hidden;
+.auth-orb.o1 {
+    width: 220px;
+    height: 220px;
+    top: -70px;
+    right: -60px;
 }
-.name {
-  color: #fff;
+.auth-orb.o2 {
+    width: 120px;
+    height: 120px;
+    bottom: 16%;
+    left: -40px;
+    animation-delay: -4s;
 }
-.v8_342 {
-  width: 543px;
-  color: rgba(255,255,255,1);
-  position: absolute;
-  top: 44px;
-  left: 0px;
-  font-family: Bricolage Grotesque;
-  font-weight: ExtraBold;
-  font-size: 48px;
-  opacity: 1;
-  text-align: left;
+.auth-orb.o3 {
+    width: 16px;
+    height: 16px;
+    top: 30%;
+    right: 18%;
+    background: rgba(245, 184, 61, 0.7);
+    border: 0;
+    animation-delay: -2s;
 }
-.v8_343 {
-  width: 543px;
-  color: rgba(255,255,255,0.800000011920929);
-  position: absolute;
-  top: 160px;
-  left: 0px;
-  font-family: Figtree;
-  font-weight: Regular;
-  font-size: 18px;
-  opacity: 1;
-  text-align: left;
+.auth-orb.o4 {
+    width: 10px;
+    height: 10px;
+    bottom: 26%;
+    right: 30%;
+    background: rgba(255, 255, 255, 0.4);
+    border: 0;
+    animation-delay: -7s;
 }
-.v8_344 {
-  width: 114px;
-  color: rgba(255,255,255,0.800000011920929);
-  position: absolute;
-  top: 824px;
-  left: 56px;
-  font-family: Figtree;
-  font-weight: Regular;
-  font-size: 14px;
-  opacity: 1;
-  text-align: left;
+.auth-orb.o5 {
+    width: 12px;
+    height: 12px;
+    top: 18%;
+    left: 22%;
+    background: rgba(231, 154, 192, 0.65);
+    border: 0;
+    border-radius: 3px;
+    transform: rotate(18deg);
+    animation-delay: -5s;
 }
-.v8_345 {
-  width: 785px;
-  height: 900px;
-  background: url("../images/v8_345.png");
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
-  padding: 40px 48px;
-  opacity: 1;
-  position: absolute;
-  top: 0px;
-  left: 655px;
-  overflow: hidden;
+@keyframes au-drift {
+    0%,
+    100% {
+        translate: 0 0;
+    }
+    50% {
+        translate: 0 -18px;
+    }
 }
-.v8_346 {
-  width: 512px;
-  height: 384px;
-  background: url("../images/v8_346.png");
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
-  margin: 20px;
-  opacity: 1;
-  position: absolute;
-  top: 258px;
-  left: 136px;
-  overflow: hidden;
+
+.auth-brand-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    position: relative;
 }
-.v8_347 {
-  width: 512px;
-  color: rgba(30,22,51,1);
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  font-family: Bricolage Grotesque;
-  font-weight: ExtraBold;
-  font-size: 30px;
-  opacity: 1;
-  text-align: left;
+.auth-logo {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    flex: none;
+    background: #fff;
+    color: var(--au-brand);
+    display: grid;
+    place-items: center;
+    font:
+        800 20px "Bricolage Grotesque",
+        sans-serif;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
 }
-.name {
-  color: #fff;
+.auth-brand-line b {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 800;
+    font-size: 24px;
+    color: #fff;
+    letter-spacing: -0.01em;
 }
-.name {
-  color: #fff;
+
+.auth-brand-copy {
+    margin: auto 0;
+    padding: 40px 0;
+    position: relative;
+    animation: au-up 0.7s cubic-bezier(0.22, 0.8, 0.3, 1) both;
 }
-.v8_360 {
-  width: 512px;
-  height: 20px;
-  background: url("../images/v8_360.png");
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
-  margin: 12px;
-  opacity: 1;
-  position: absolute;
-  top: 244px;
-  left: 0px;
-  overflow: hidden;
+.auth-brand-copy h2 {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 800;
+    font-size: clamp(32px, 3.4vw, 48px);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: #fff;
+    margin: 0 0 18px;
+    max-width: 14ch;
 }
-.v8_361 {
-  width: 20px;
-  height: 20px;
-  background: rgba(255,255,255,1);
-  opacity: 1;
-  position: absolute;
-  top: 0px;
-  left: 0px;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
-  overflow: hidden;
+.auth-brand-copy p {
+    font-size: 18px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+    max-width: 46ch;
 }
-.v8_362 {
-  width: 163px;
-  color: rgba(30,22,51,1);
-  position: absolute;
-  top: 0px;
-  left: 32px;
-  font-family: Figtree;
-  font-weight: Regular;
-  font-size: 14px;
-  opacity: 1;
-  text-align: left;
+.auth-brand-points {
+    list-style: none;
+    margin: 26px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
 }
-.name {
-  color: #fff;
+.auth-brand-points li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.92);
 }
-.v8_365 {
-  width: 512px;
-  height: 24px;
-  background: url("../images/v8_365.png");
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
-  margin: 4px;
-  opacity: 1;
-  position: absolute;
-  top: 360px;
-  left: 0px;
-  overflow: hidden;
+.auth-brand-points li::before {
+    content: "âœ“";
+    flex: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    font-weight: 800;
+    color: #f5b83d;
 }
-.v8_366 {
-  width: 138px;
-  color: rgba(30,22,51,1);
-  position: absolute;
-  top: 0px;
-  left: 161px;
-  font-family: Figtree;
-  font-weight: Regular;
-  font-size: 16px;
-  opacity: 1;
-  text-align: left;
+.auth-brand-foot {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    position: relative;
 }
-.v8_367 {
-  width: 47px;
-  color: rgba(91,42,134,1);
-  position: absolute;
-  top: 0px;
-  left: 303px;
-  font-family: Figtree;
-  font-weight: Bold;
-  font-size: 16px;
-  opacity: 1;
-  text-align: left;
+
+/* ---------- Panel form (kanan) ---------- */
+.auth-panel {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(28px, 4vw, 48px) clamp(20px, 4vw, 48px);
+    overflow-y: auto;
+    background:
+        radial-gradient(
+            480px 320px at 100% 0%,
+            rgba(243, 238, 250, 0.9),
+            transparent 70%
+        ),
+        var(--au-page);
 }
+.auth-panel::-webkit-scrollbar {
+    width: 12px;
+}
+.auth-panel::-webkit-scrollbar-track {
+    background: var(--au-lav);
+}
+.auth-panel::-webkit-scrollbar-thumb {
+    background: #c9b8dd;
+    border-radius: 8px;
+    border: 3px solid var(--au-lav);
+}
+.auth-panel::-webkit-scrollbar-thumb:hover {
+    background: var(--au-brand);
+}
+.auth-panel {
+    scrollbar-color: #c9b8dd var(--au-lav);
+    scrollbar-width: thin;
+}
+
+.auth-form-wrap {
+    width: min(512px, 100%);
+    margin: auto;
+    animation: au-up 0.6s cubic-bezier(0.22, 0.8, 0.3, 1) both;
+}
+@keyframes au-up {
+    from {
+        opacity: 0;
+        transform: translateY(22px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.auth-title {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 800;
+    font-size: 30px;
+    letter-spacing: -0.01em;
+    color: var(--au-ink);
+    margin: 0 0 8px;
+}
+.auth-sub {
+    font-size: 15px;
+    color: var(--au-muted);
+    margin: 0 0 26px;
+    line-height: 1.55;
+}
+
+.auth-form {
+    display: grid;
+    gap: 18px;
+}
+.auth-field label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--au-ink);
+    margin-bottom: 6px;
+}
+.auth-input {
+    width: 100%;
+    min-height: 48px;
+    padding: 10px 16px;
+    background: #fff;
+    color: var(--au-ink);
+    border: 1.5px solid var(--au-line);
+    border-radius: 12px;
+    font:
+        500 15px "Figtree",
+        sans-serif;
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+.auth-input::placeholder {
+    color: var(--au-field);
+}
+.auth-input:hover {
+    border-color: #c9b8dd;
+}
+.auth-input:focus {
+    outline: none;
+    border-color: var(--au-brand);
+    box-shadow: 0 0 0 4px rgba(91, 42, 134, 0.12);
+}
+.auth-input[aria-invalid="true"] {
+    border-color: var(--au-danger);
+}
+.auth-input[aria-invalid="true"]:focus {
+    box-shadow: 0 0 0 4px rgba(180, 35, 24, 0.12);
+}
+select.auth-input {
+    appearance: none;
+    background-image:
+        linear-gradient(45deg, transparent 50%, var(--au-muted) 50%),
+        linear-gradient(135deg, var(--au-muted) 50%, transparent 50%);
+    background-position:
+        calc(100% - 21px) 50%,
+        calc(100% - 15px) 50%;
+    background-size: 6px 6px;
+    background-repeat: no-repeat;
+    padding-right: 40px;
+}
+.field-error {
+    color: var(--au-danger);
+    font-size: 13px;
+    font-weight: 600;
+    margin: 6px 0 0;
+}
+
+.auth-check {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--au-ink);
+    cursor: pointer;
+}
+.auth-check input {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    accent-color: var(--au-brand);
+    cursor: pointer;
+    flex: none;
+}
+
+.auth-submit {
+    width: 100%;
+    min-height: 50px;
+    background: var(--au-brand);
+    color: #fff;
+    border: 0;
+    border-radius: 12px;
+    font:
+        700 16px "Figtree",
+        sans-serif;
+    cursor: pointer;
+    box-shadow: 0 12px 22px -8px rgba(91, 42, 134, 0.55);
+    transition:
+        transform 0.18s ease,
+        background 0.18s ease,
+        box-shadow 0.18s ease;
+}
+.auth-submit:hover {
+    background: var(--au-brand-d);
+    transform: translateY(-2px);
+    box-shadow: 0 16px 28px -8px rgba(91, 42, 134, 0.6);
+}
+.auth-submit:active {
+    transform: translateY(0);
+}
+
+.auth-divider {
+    border: 0;
+    border-top: 1px solid var(--au-line);
+    margin: 26px 0 20px;
+}
+.auth-alt {
+    text-align: center;
+    font-size: 16px;
+    color: var(--au-ink);
+    margin: 0;
+}
+.auth-alt a {
+    color: var(--au-brand);
+    font-weight: 700;
+    text-decoration: none;
+}
+.auth-alt a:hover {
+    text-decoration: underline;
+}
+.auth-note {
+    font-size: 13.5px;
+    color: var(--au-muted);
+    text-align: center;
+    margin: 14px 0 0;
+}
+
+/* ---------- Kartu pilihan peran ---------- */
+.role-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--au-ink);
+    display: block;
+    margin-bottom: 10px;
+}
+.role-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+.role-card {
+    position: relative;
+    display: block;
+    cursor: pointer;
+    background: #fff;
+    border: 1.5px solid var(--au-line);
+    border-radius: 16px;
+    padding: 14px;
+    min-height: 84px;
+    transition:
+        border-color 0.15s ease,
+        background 0.15s ease,
+        box-shadow 0.15s ease;
+}
+.role-card:hover {
+    border-color: #c9b8dd;
+}
+.role-card input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+.role-card b {
+    display: block;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--au-ink);
+    margin-bottom: 3px;
+}
+.role-card small {
+    display: block;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--au-muted);
+}
+.role-card::after {
+    content: "âœ“";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    background: var(--au-brand);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+    font-weight: 800;
+    opacity: 0;
+    transform: scale(0.6);
+    transition:
+        opacity 0.15s ease,
+        transform 0.15s ease;
+}
+.role-card:has(input:checked),
+.role-card.is-selected {
+    background: var(--au-lav);
+    border-color: var(--au-brand);
+    box-shadow: 0 0 0 1px var(--au-brand);
+}
+.role-card:has(input:checked)::after,
+.role-card.is-selected::after {
+    opacity: 1;
+    transform: scale(1);
+}
+.role-card:has(input:focus-visible),
+.role-card:focus-within {
+    outline: 3px solid var(--au-brand);
+    outline-offset: 2px;
+}
+.role-note {
+    font-size: 14px;
+    color: var(--au-muted);
+    margin: 10px 0 0;
+    line-height: 1.5;
+}
+
+/* Kotak khusus penyedia */
+.provider-box {
+    background: var(--au-lav);
+    border: 1px solid var(--au-line);
+    border-radius: 16px;
+    padding: 20px;
+}
+.provider-box > b {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--au-brand-d);
+    margin-bottom: 14px;
+}
+.provider-box .auth-form {
+    gap: 14px;
+}
+.provider-hint {
+    background: var(--au-lav);
+    border: 1px solid var(--au-line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--au-brand-d);
+    font-weight: 600;
+    margin: 0;
+}
+
+/* ---------- Responsif ---------- */
+@media (max-width: 960px) {
+    .auth-split {
+        grid-template-columns: 1fr;
+    }
+    .auth-brand {
+        padding: 24px 20px 28px;
+    }
+    .auth-brand-copy {
+        margin: 0;
+        padding: 22px 0 0;
+    }
+    .auth-brand-copy h2 {
+        font-size: 27px;
+        max-width: none;
+        margin-bottom: 10px;
+    }
+    .auth-brand-copy p {
+        font-size: 15px;
+    }
+    .auth-brand-points {
+        display: none;
+    }
+    .auth-brand-foot {
+        display: none;
+    }
+    .auth-orb.o1 {
+        width: 140px;
+        height: 140px;
+    }
+    .auth-panel {
+        padding: 32px 20px 44px;
+        overflow: visible;
+    }
+    .auth-form-wrap {
+        margin: 0 auto;
+    }
+}
+@media (max-width: 560px) {
+    .role-cards {
+        grid-template-columns: 1fr;
+    }
+    .role-card {
+        min-height: 0;
+    }
+    .auth-title {
+        font-size: 26px;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .auth-orb,
+    .auth-brand-copy,
+    .auth-form-wrap {
+        animation: none;
+    }
+    .auth-submit,
+    .role-card,
+    .auth-input {
+        transition: none;
+    }
+}
+

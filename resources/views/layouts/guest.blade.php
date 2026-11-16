@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/klien.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/keselarasan.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/landing.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/auth.css') }}">
     @stack('styles')
 </head>
 <body>

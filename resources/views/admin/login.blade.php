@@ -1,7 +1,25 @@
 @extends('layouts.guest')
 
-@section('title', 'Masuk · Pesta Kita')
+@section('title', 'Masuk Panel Admin · Pesta Kita')
 
 @section('content')
-<main class="guest" id="konten" tabindex="-1"><div class="box"><a class="brand" href="{{ url('/login') }}"><span aria-hidden="true" class="logo"></span><span><b>Pesta Kita</b><small>Rencanakan pesta ulang tahun</small></span></a><div class="card"><h1>Masuk ke Panel Admin</h1><form class="stack gap-16" method="POST" action="{{ url('/login') }}">@csrf<div class="field"><label for="e">Email</label><input autocomplete="email" class="input" id="e" name="email" required type="email" value="{{ old('email') }}" @error('email') aria-invalid="true" @enderror/></div><div class="field"><label for="p">Kata sandi</label><input autocomplete="current-password" class="input" id="p" name="password" required type="password"/></div><label class="check fw-5"><input type="checkbox" name="remember" value="1"/> Ingat saya di perangkat ini</label><button class="btn" type="submit">Masuk</button>@error('email')<p class="field-error" role="alert">{{ $message }}</p>@enderror</form></div></div></main>
+<main id="konten" class="auth-split" tabindex="-1">
+    @include('auth.partials.brand-panel', [
+        'heading' => 'Operasional platform dalam kendali.',
+        'desc' => 'Verifikasi mitra, tinjau transaksi, dan mediasi keberatan dari satu panel.',
+    ])
+
+    <section class="auth-panel">
+        <div class="auth-form-wrap">
+            <h1 class="auth-title">Masuk ke Panel Admin</h1>
+            <p class="auth-sub">Khusus staf internal Pesta Kita.</p>
+
+            @include('auth.partials.login-form')
+
+            {{-- Tidak ada registrasi Admin publik (aturan terkunci). --}}
+            <hr class="auth-divider">
+            <p class="auth-note">Akun Admin dibuat oleh perusahaan. Tidak ada pendaftaran publik.</p>
+        </div>
+    </section>
+</main>
 @endsection

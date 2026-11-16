@@ -1,7 +1,24 @@
 @extends('layouts.guest')
 
-@section('title', 'Masuk · Pesta Kita')
+@section('title', 'Masuk Akun Penyedia · Pesta Kita')
 
 @section('content')
-<main class="guest" id="konten" tabindex="-1"><div class="box"><a class="brand" href="{{ url('/vendor/login') }}"><span aria-hidden="true" class="logo"></span><span><b>Pesta Kita</b><small>Rencanakan pesta ulang tahun</small></span></a><div class="card"><h1>Masuk ke akun penyedia</h1><form class="stack gap-16" method="POST" action="{{ url('/login') }}">@csrf<div class="field"><label for="e">Email</label><input autocomplete="email" class="input" id="e" name="email" required type="email" value="{{ old('email') }}" @error('email') aria-invalid="true" @enderror/></div><div class="field"><label for="p">Kata sandi</label><input autocomplete="current-password" class="input" id="p" name="password" required type="password"/></div><label class="check fw-5"><input type="checkbox" name="remember" value="1"/> Ingat saya di perangkat ini</label><button class="btn" type="submit">Masuk</button>@error('email')<p class="field-error" role="alert">{{ $message }}</p>@enderror</form><p class="mt-16">Belum punya akun? <a href="{{ url('/register') }}"><b>Daftar sebagai penyedia</b></a></p></div></div></main>
+<main id="konten" class="auth-split" tabindex="-1">
+    @include('auth.partials.brand-panel', [
+        'heading' => 'Kelola usaha Anda di satu tempat.',
+        'desc' => 'Katalog, pesanan, dan rundown dalam satu panel. Jadwal bentrok dicek otomatis.',
+    ])
+
+    <section class="auth-panel">
+        <div class="auth-form-wrap">
+            <h1 class="auth-title">Masuk ke akun penyedia</h1>
+            <p class="auth-sub">Untuk vendor layanan dan pemilik venue — portal mengikuti peran akun Anda.</p>
+
+            @include('auth.partials.login-form')
+
+            <hr class="auth-divider">
+            <p class="auth-alt">Belum punya akun? <a href="{{ url('/register') }}">Daftar sebagai penyedia</a></p>
+        </div>
+    </section>
+</main>
 @endsection
