@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/penyedia.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/klien.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/keselarasan.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/password-toggle.css') }}">
     @stack('styles')
 </head>
 <body>
@@ -106,6 +107,7 @@
     </div>
     <script src="{{ asset('assets/js/aksi.js') }}"></script>
     <script src="{{ asset('assets/js/app-ui.js') }}"></script>
+    <script src="{{ asset('assets/js/password-toggle.js') }}"></script>
     @stack('scripts')
 </body>
 </html>

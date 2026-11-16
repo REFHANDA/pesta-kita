@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/keselarasan.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/landing.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/auth.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/password-toggle.css') }}">
     @stack('styles')
 </head>
 <body>
@@ -21,6 +22,7 @@
 
     <script src="{{ asset('assets/js/aksi.js') }}"></script>
     <script src="{{ asset('assets/js/app-ui.js') }}"></script>
+    <script src="{{ asset('assets/js/password-toggle.js') }}"></script>
     @stack('scripts')
 </body>
 </html>
