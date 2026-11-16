@@ -6,15 +6,11 @@
 
 /* Butir 5 — font self-host (menggantikan Google Fonts). Lisensi: SIL OFL 1.1 */
 @font-face{font-family:"Figtree";font-style:normal;font-weight:300 900;font-display:swap;
-  src:url("fonts/figtree-latin-wght-normal.woff2") format("woff2");
+  src:url("../fonts/figtree-latin-wght-normal.woff2") format("woff2");
   unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:"Bricolage Grotesque";font-style:normal;font-weight:200 800;font-display:swap;
-  src:url("fonts/bricolage-grotesque-latin-wght-normal.woff2") format("woff2");
+  src:url("../fonts/bricolage-grotesque-latin-wght-normal.woff2") format("woff2");
   unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-
-/* Butir 4 — token ukuran: lebar konten 1440 px, padding kartu 24 px (16 px di ≤ 760 px) */
-:root{--content-max:1440px;--pad-card:24px;--pad-card-v:20px}
-@media (max-width:760px){:root{--pad-card:16px;--pad-card-v:16px}}
 
 .content,.page-refined,.event-detail-page,.cancellation-detail-page{max-width:var(--content-max)}
 
@@ -34,12 +30,14 @@
 .page-bank-accounts .account-card,.page-settings .settings-card{padding:0 var(--pad-card) var(--pad-card)}
 .page-bank-accounts .account-card .card-h{margin:0 calc(var(--pad-card) * -1) var(--pad-card-v);padding:18px var(--pad-card)}
 .users-table-card .toolbar{padding:var(--pad-card-v) var(--pad-card)}
-.users-table-card .table-wrap{padding:0 var(--pad-card)}
 .users-table-card .pager{padding:14px var(--pad-card) 18px}
 .stat,.page-payouts .stat{padding:var(--pad-card)}
 
 /* Butir 3 — tab/filter aktif: isi --brand, teks putih (menu samping tetap --brand-50) */
 .tabs a[aria-current=page],.tabs a[aria-current="page"]{background:var(--brand);color:#fff}
+
+/* Butir 4 (Tahap 4) — penanda aktor pada sidebar: satu pola untuk keempat panel */
+.sidebar .role-chip{display:inline-flex;align-items:center;gap:6px;margin:0 12px 12px;padding:2px 10px;border-radius:var(--pk-radius-pill);font-size:12px;font-weight:700;letter-spacing:.02em;background:var(--pk-color-brand-soft);color:var(--pk-color-brand)}
 
 /* Butir 6 — halaman masuk (login) dan kontrol centang yang dipakai lintas panel */
 .guest{min-height:100vh;display:grid;place-items:center;padding:32px 16px;background:var(--bg)}
@@ -50,6 +48,14 @@
 .check{display:flex;align-items:center;gap:10px;min-height:44px;cursor:pointer}
 .check input{width:20px;height:20px;accent-color:var(--brand)}
 .hint{margin:6px 0 0;color:var(--muted);font-size:13px}
+
+/* Butir 5 (Tahap 5–6) — penanda data prototipe/simulasi lintas panel.
+   Definisi asal ada di katalog.css; disalin ke lapisan lintas panel
+   agar halaman keuangan Admin, Vendor, dan Venue juga dapat memakainya. */
+.data-note{display:flex;gap:10px;align-items:flex-start;border:1px solid #fcd34d;background:#fffbeb;color:#78350f;border-radius:var(--pk-radius-soft);padding:12px var(--pk-space-4);font-size:14px;line-height:1.55}
+.data-note .ic{width:18px;height:18px;flex:none;margin-top:2px}
+.data-note p{margin:0}
+.data-note b{font-weight:800}
 
 /* Keputusan 7 — topbar ponsel: pencarian di baris kedua, kontrol 44 px (40 px di ≤ 360 px) */
 @media (max-width:560px){
@@ -70,7 +76,41 @@
 .is-next{border-left:5px solid var(--accent)}
 .deadline{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 12px}
 .tier-on td{font-weight:700;background:var(--brand-50)}
-dialog{border:0;border-radius:20px;padding:24px;width:calc(100% - 32px);max-width:480px;box-shadow:0 20px 50px rgba(38,24,61,.25)}
-dialog::backdrop{background:rgba(38,24,61,.5)}
+dialog{border:0;border-radius:var(--pk-radius-dialog);padding:24px;width:calc(100% - 32px);max-width:480px;box-shadow:var(--pk-shadow-dialog)}
+dialog::backdrop{background:var(--pk-color-dialog-backdrop)}
 dialog h2{margin:0 0 8px;font-size:19px}
 dialog .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+
+/* Konfirmasi aksi, alasan wajib, notifikasi hasil (dipakai aksi.js) */
+[hidden]{display:none!important}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,16px);opacity:0;pointer-events:none;background:var(--ink);color:#fff;padding:12px 18px;border-radius:var(--pk-radius-soft);font-weight:600;box-shadow:var(--pk-shadow-toast);transition:opacity var(--pk-motion-fast),transform var(--pk-motion-fast);z-index:var(--pk-z-notice);max-width:calc(100% - 32px)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.field-error{margin:6px 0 0;color:var(--pk-color-danger);font-size:13.5px;font-weight:600}
+input[aria-invalid=true],textarea[aria-invalid=true],select[aria-invalid=true]{border-color:var(--pk-color-danger);box-shadow:0 0 0 3px rgba(180,35,24,.15)}
+dialog.dlg .btn.is-bad{background:var(--pk-color-danger);border-color:var(--pk-color-danger);color:#fff}
+dialog.dlg .field{margin-top:14px}
+.menu-list a{display:block;min-height:40px;line-height:40px;padding:0 12px;border-radius:8px;font:600 14px "Figtree",sans-serif;color:var(--ink);text-decoration:none}
+.menu-list a:hover{background:var(--brand-50)}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+
+.req{color:#b42318;font-weight:800}
+
+@media (max-width:760px){
+ .preview-bar a{display:inline-flex;align-items:center;min-height:44px}
+ .topbar .icon-btn,.topbar .burger{width:44px;height:44px;min-width:44px;min-height:44px}
+ .topbar .user{min-width:44px;min-height:44px;justify-content:center}
+ .btn-sm{min-height:44px}
+ .tabs a,.menu-list button{min-height:44px}
+ details.menu summary{width:44px;height:44px}
+ .actions-table .menu summary{width:44px;height:44px}
+ .menu-list a{display:flex;align-items:center;min-height:44px;line-height:1.35}
+ .pager a,.pager span{min-width:44px;height:44px}
+}
+
+@media (max-width:360px){
+ .topbar .icon-btn,.topbar .burger{width:44px;height:44px;min-width:44px;min-height:44px}
+}
+
+@media (prefers-reduced-motion:reduce){
+ .app .sidebar{scroll-behavior:auto}
+}

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>@yield('title', 'Panel Pemilik Venue · Pesta Kita')</title>
     <link rel="icon" href="{{ asset('assets/favicon.svg') }}" type="image/svg+xml">
+    <link rel="stylesheet" href="{{ asset('assets/css/design-tokens.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/admin.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/penyedia.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/penyedia-lanjutan.css') }}">
@@ -12,18 +13,15 @@
     @stack('styles')
 </head>
 <body>
-    @include('partials.demo-bar', ['portalTitle' => 'Panel Pemilik Venue (Gedung, Aula, Tempat Acara)'])
     <a class="skip" href="#konten">Lewati ke konten</a>
-    <input type="checkbox" id="nav-toggle" class="sr-only" aria-label="Buka menu">
     <div class="app">
-        <aside class="sidebar" aria-label="Navigasi utama Pemilik Venue">
+        <aside class="sidebar" aria-label="Navigasi utama Pemilik Venue" id="main-navigation">
+            <button type="button" class="sidebar-close" aria-label="Tutup menu navigasi"><span aria-hidden="true">×</span></button>
             <a class="brand" href="{{ url('/venue') }}">
                 <span class="logo" aria-hidden="true"></span>
                 <span><b>Pesta Kita</b><small>Panel Pemilik Venue</small></span>
             </a>
-            <div style="padding:0 12px;margin:4px 0 10px">
-                <span class="role-chip" style="margin:0;background:#e0f2fe;color:#0c4a6e">Aktor: Pemilik Venue</span>
-            </div>
+            <span class="role-chip">Aktor: Pemilik Venue</span>
 
             <nav class="nav" aria-label="Menu utama">
                 <a href="{{ url('/venue') }}" @if(request()->is('venue') || request()->is('venue/beranda')) aria-current="page" @endif>
@@ -38,7 +36,9 @@
                 </a>
                 <a href="{{ url('/venue/pengajuan-harga') }}" @if(request()->is('venue/pengajuan-harga*')) aria-current="page" @endif>
                     <span class="ic i-tag" aria-hidden="true"></span>Pengajuan Harga
-                    <span class="n"><span class="sr-only">1 perlu tindakan</span><span aria-hidden="true">1</span></span>
+                </a>
+                <a href="{{ url('/venue/permintaan-penawaran') }}" @if(request()->is('venue/permintaan-penawaran*')) aria-current="page" @endif>
+                    <span class="ic i-bill" aria-hidden="true"></span>Permintaan Penawaran
                 </a>
             </nav>
 
@@ -46,7 +46,9 @@
             <nav class="nav" aria-label="Operasional venue">
                 <a href="{{ url('/venue/pesanan') }}" @if(request()->is('venue/pesanan*') || request()->is('venue/pesanan-detail*')) aria-current="page" @endif>
                     <span class="ic i-clip" aria-hidden="true"></span>Pesanan Venue
-                    <span class="n"><span class="sr-only">2 perlu tindakan</span><span aria-hidden="true">2</span></span>
+                </a>
+                <a href="{{ url('/venue/kalender-ketersediaan') }}" @if(request()->is('venue/kalender-ketersediaan*')) aria-current="page" @endif>
+                    <span class="ic i-cal" aria-hidden="true"></span>Kalender Ketersediaan
                 </a>
                 <a href="{{ url('/venue/keberatan') }}" @if(request()->is('venue/keberatan*')) aria-current="page" @endif>
                     <span class="ic i-alert" aria-hidden="true"></span>Keberatan (24 Jam)
@@ -69,35 +71,35 @@
                 </a>
                 <a href="{{ url('/venue/notifikasi') }}" @if(request()->is('venue/notifikasi*')) aria-current="page" @endif>
                     <span class="ic i-bell" aria-hidden="true"></span>Notifikasi
-                    <span class="n"><span class="sr-only">2 belum dibaca</span><span aria-hidden="true">2</span></span>
                 </a>
-                <a href="{{ url('/login') }}">
-                    <span class="ic i-out" aria-hidden="true"></span>Keluar
-                </a>
+                <form method="POST" action="{{ url('/logout') }}">@csrf
+                    <button type="submit" style="display:flex;align-items:center;gap:12px;min-height:44px;padding:0 12px;font-size:14.5px;border-radius:10px;color:#3a3150;font-weight:600;width:100%;background:none;border:0;cursor:pointer;font-family:inherit;text-align:left">
+                        <span class="ic i-out" aria-hidden="true"></span>Keluar
+                    </button>
+                </form>
             </nav>
         </aside>
 
-        <label class="overlay" for="nav-toggle"></label>
+        <div class="overlay" aria-hidden="true"></div>
 
         <div class="main">
             <header class="topbar">
-                <label class="burger" for="nav-toggle">
+                <button type="button" class="burger" id="nav-toggle" aria-label="Buka menu navigasi" aria-controls="main-navigation" aria-expanded="false">
                     <span class="ic i-menu" aria-hidden="true"></span>
-                    <span class="sr-only">Menu</span>
-                </label>
+                </button>
                 <div class="search" role="search">
                     <span class="ic i-search" aria-hidden="true"></span>
                     <label class="sr-only" for="cari">Cari</label>
                     <input id="cari" type="search" placeholder="Cari pesanan venue atau tanggal acara…">
                 </div>
                 <div class="top-right">
-                    <a class="icon-btn" href="{{ url('/venue/notifikasi') }}" aria-label="Notifikasi, 2 belum dibaca">
+                    <a class="icon-btn" href="{{ url('/venue/notifikasi') }}" aria-label="Notifikasi">
                         <span class="ic i-bell" aria-hidden="true"></span>
-                        <span class="dot"></span>
                     </a>
+                    @php($topbarName = auth()->user()->venueProfile?->business_name ?? auth()->user()->name)
                     <a class="user" href="{{ url('/venue/profil') }}">
-                        <span class="avatar" aria-hidden="true" style="background:#e0f2fe;color:#0369a1">G</span>
-                        <span class="t"><b>Graha Melati</b><small>venue@pestakita.test</small></span>
+                        <span class="avatar" aria-hidden="true" style="background:#e0f2fe;color:#0369a1">{{ mb_strtoupper(mb_substr($topbarName, 0, 1)) }}</span>
+                        <span class="t"><b>{{ $topbarName }}</b><small>{{ auth()->user()->email }}</small></span>
                     </a>
                 </div>
             </header>
@@ -105,6 +107,7 @@
             @yield('content')
         </div>
     </div>
+    <script src="{{ asset('assets/js/aksi.js') }}"></script>
     <script src="{{ asset('assets/js/app-ui.js') }}"></script>
     @stack('scripts')
 </body>

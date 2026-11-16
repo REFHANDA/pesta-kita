@@ -33,7 +33,20 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            // BE-3 (R1): serve=false menutup rute framework storage/{path}
+            // yang tanpa auth; root ini dipakai bersama disk private.
+            'serve' => false,
+            'throw' => false,
+            'report' => false,
+        ],
+
+        // BE-3 (B12): seluruh media aplikasi (foto & dokumen verifikasi).
+        // serve=false menutup rute framework storage/{path}; satu-satunya
+        // jalur baca adalah MediaController berotorisasi (GET /media/{media}).
+        'private' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private'),
+            'serve' => false,
             'throw' => false,
             'report' => false,
         ],

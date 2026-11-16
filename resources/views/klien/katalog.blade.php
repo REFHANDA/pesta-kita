@@ -1,8 +1,79 @@
 @extends('layouts.klien')
 
-@section('title', 'Vendor & venue · Pesta Kita')
+@section('title', 'Katalog venue · Pesta Kita')
+
+@push('styles')
+<link rel="stylesheet" href="{{ asset('assets/css/katalog.css') }}">
+@endpush
 
 @section('content')
-<main id="konten" class="content" tabindex="-1"><div class="page-head"><div><div class="crumbs"><a href="{{ url('/klien') }}">Beranda</a> / Vendor & venue</div><h1>Vendor & venue</h1><p class="sub">Harga sudah termasuk biaya layanan dan kebersihan.</p></div></div><section class="card" style="margin-bottom:20px"><div class="tabs"><a href="{{ url('/klien/katalog-vendor') }}">Vendor</a><a href="{{ url('/klien/katalog') }}" aria-current=page>Venue</a><a href="{{ url('/klien/katalog-peralatan') }}">Peralatan</a></div><div class="toolbar"><input class="input" type="search" aria-label="Cari nama" placeholder="Cari nama…" style="flex:1;max-width:300px"><input class="input" inputmode="numeric" aria-label="Harga maksimum" placeholder="Harga maks (Rp)"><button class="btn btn-o">Cari</button></div></section>
-<div class="cards"><a class="card cat" href="{{ url('/klien/katalog-detail') }}"><div class="ph"><span class="ic i-home" aria-hidden="true"></span></div><div class="bd"><h3>Graha Melati Ballroom</h3><p>Graha Melati · AC, panggung, parkir luas</p><p>kapasitas 250</p><div class="price">Rp 8.600.000 <small>per acara, harga akhir</small></div><p style="font-size:12.5px">termasuk biaya layanan</p></div></a><a class="card cat" href="{{ url('/klien/katalog-detail') }}"><div class="ph"><span class="ic i-home" aria-hidden="true"></span></div><div class="bd"><h3>Taman Belakang</h3><p>Graha Melati · Area terbuka dengan gazebo</p><p>kapasitas 80</p><div class="price">Rp 2.940.000 <small>per acara, harga akhir</small></div><p style="font-size:12.5px">termasuk biaya layanan</p></div></a><a class="card cat" href="{{ url('/klien/katalog-detail') }}"><div class="ph"><span class="ic i-home" aria-hidden="true"></span></div><div class="bd"><h3>Aula Kenanga</h3><p>Kenanga Hall · Sound system bawaan</p><p>kapasitas 150</p><div class="price">Rp 5.100.000 <small>per acara, harga akhir</small></div><p style="font-size:12.5px">termasuk biaya layanan</p></div></a></div></main>
+@php
+$venues = $venues ?? collect();
+$kinds = $kinds ?? collect();
+$filters = $filters ?? [];
+@endphp
+<main id="konten" class="content" tabindex="-1">
+    <div class="page-head">
+        <div>
+            <div class="crumbs"><a href="{{ url('/klien') }}">Beranda</a> / Vendor &amp; venue</div>
+            <h1>Katalog venue</h1>
+            <p class="sub">Hanya venue tayang dari penyedia terverifikasi yang tampil. Harga sewa dan biaya tambahan ditampilkan terpisah agar tidak mengejutkan pada tagihan. Total akhir ditetapkan sistem setelah pesanan disetujui Admin.</p>
+        </div>
+    </div>
+
+    <section class="card">
+        <div class="tabs">
+            <a href="{{ route('klien.katalog.vendor') }}">Vendor</a>
+            <a href="{{ route('klien.katalog.venue') }}" aria-current="page">Venue</a>
+            <a href="{{ route('klien.katalog.peralatan') }}">Peralatan</a>
+        </div>
+        <div class="pill-row pill-bar" role="group" aria-label="Filter jenis venue">
+            <a class="pill" href="{{ route('klien.katalog.venue') }}" @if(empty($filters['kind'])) aria-current="true" @endif>Semua</a>
+            @foreach($kinds as $kind)<a class="pill" href="{{ route('klien.katalog.venue', ['kind' => $kind]) }}" @if(($filters['kind'] ?? null) === $kind) aria-current="true" @endif>{{ $kind }}</a>@endforeach
+        </div>
+        <form class="toolbar" method="GET" action="{{ route('klien.katalog.venue') }}">
+            @if(! empty($filters['kind']))<input type="hidden" name="kind" value="{{ $filters['kind'] }}">@endif
+            <label class="sr-only" for="kat-cari">Cari nama venue</label>
+            <input class="input grow-300" id="kat-cari" name="q" type="search" value="{{ $filters['q'] ?? '' }}" placeholder="Cari nama…" autocomplete="off">
+            <label class="sr-only" for="kat-harga">Sewa maksimum</label>
+            <input class="input" id="kat-harga" name="max_price" inputmode="numeric" value="{{ $filters['max_price'] ?? '' }}" placeholder="Sewa maks (Rp)" autocomplete="off">
+            <button type="submit" class="btn btn-o">Cari</button>
+        </form>
+    </section>
+
+    <div class="cards">
+        @forelse($venues as $venue)
+        @php
+        $fee = intdiv($venue->rental_price * 10, 100);
+        $total = $venue->rental_price + $fee + ($venue->cleaning_fee ?? 0);
+        @endphp
+        <a class="card cat" href="{{ route('klien.katalog.venue.detail', $venue) }}">
+            <div class="ph"><span class="ic i-home" aria-hidden="true"></span><span class="status status-ok"><span class="dot" aria-hidden="true"></span>Terverifikasi</span></div>
+            <div class="bd">
+                <h2>{{ $venue->name }}</h2>
+                <p>{{ $venue->venueProfile?->business_name }} · {{ $venue->kind }}</p>
+                <ul class="meta">
+                    <li><span class="ic i-home" aria-hidden="true"></span>{{ $venue->address }}</li>
+                    <li><span class="ic i-users" aria-hidden="true"></span>Kapasitas {{ $venue->capacity }} orang</li>
+                </ul>
+                <p class="desc">{{ \Illuminate\Support\Str::limit($venue->description ?? '', 120) }}</p>
+                <div class="price-row"><div class="price">Rp {{ number_format($venue->rental_price, 0, ',', '.') }} <small>sewa / acara</small></div><span class="ptag ptag-fixed">Harga sewa</span></div>
+                <ul class="cost-list">
+                    <li><span>+ Biaya kebersihan</span><span>{{ $venue->cleaning_fee !== null ? 'Rp '.number_format($venue->cleaning_fee, 0, ',', '.') : 'Belum ditentukan' }}</span></li>
+                    <li><span>+ Biaya layanan Pesta Kita (10%)</span><span>Rp {{ number_format($fee, 0, ',', '.') }}</span></li>
+                    <li class="tot"><span>{{ $venue->cleaning_fee !== null ? 'Estimasi total' : 'Estimasi sementara' }}</span><span>Rp {{ number_format($total, 0, ',', '.') }}</span></li>
+                </ul>
+                <p class="fs-sm">Estimasi, belum termasuk fasilitas tambahan. Tagihan final ditetapkan sistem.</p>
+            </div>
+        </a>
+        @empty
+        <section class="card empty-state">
+            <span class="ic i-search" aria-hidden="true"></span>
+            <h2>Belum ada venue yang cocok</h2>
+            <p>Tidak ada venue tayang yang cocok dengan pencarian atau filter ini. Coba ubah kata kunci, naikkan sewa maksimum, atau pilih jenis venue lain.</p>
+            <a class="btn btn-o" href="{{ route('klien.katalog.venue') }}">Tampilkan semua venue</a>
+        </section>
+        @endforelse
+    </div>
+</main>
 @endsection

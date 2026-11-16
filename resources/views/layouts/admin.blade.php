@@ -5,21 +5,22 @@
     <meta content="width=device-width,initial-scale=1" name="viewport"/>
     <title>@yield('title', 'Admin · Admin Pesta Kita')</title>
     <link href="{{ asset('assets/favicon.svg') }}" rel="icon" type="image/svg+xml"/>
+    <link href="{{ asset('assets/css/design-tokens.css') }}" rel="stylesheet"/>
     <link href="{{ asset('assets/css/admin.css') }}" rel="stylesheet"/>
     <link href="{{ asset('assets/css/admin-pages.css') }}" rel="stylesheet"/>
     <link href="{{ asset('assets/css/keselarasan.css') }}" rel="stylesheet"/>
     @stack('styles')
 </head>
 <body>
-    @include('partials.demo-bar', ['portalTitle' => 'Panel Admin'])
     <a class="skip" href="#konten">Lewati ke konten</a>
-    <input aria-hidden="true" class="sr-only" id="nav-toggle" tabindex="-1" type="checkbox"/>
     <div class="app">
-        <aside aria-label="Navigasi utama Admin Pesta Kita" class="sidebar">
+        <aside aria-label="Navigasi utama Admin Pesta Kita" class="sidebar" id="main-navigation">
+            <button type="button" class="sidebar-close" aria-label="Tutup menu navigasi"><span aria-hidden="true">×</span></button>
             <a class="brand" href="{{ url('/admin') }}">
                 <span aria-hidden="true" class="logo"></span>
                 <span><b>Pesta Kita</b><small>Panel Admin</small></span>
             </a>
+            <span class="role-chip">Aktor: Admin</span>
             
             <nav aria-label="Menu utama" class="nav">
                 <a @if(request()->is('admin') || request()->is('admin/beranda')) aria-current="page" @endif href="{{ url('/admin') }}">
@@ -31,23 +32,18 @@
             <nav aria-label="Operasional" class="nav">
                 <a @if(request()->is('admin/pesanan*') || request()->is('admin/admin-pesanan-venue*')) aria-current="page" @endif href="{{ url('/admin/pesanan') }}">
                     <span aria-hidden="true" class="ic i-clip"></span>Review pesanan
-                    <span class="n"><span class="sr-only">3 perlu tindakan</span><span aria-hidden="true">3</span></span>
                 </a>
                 <a @if(request()->is('admin/pembayaran*') || request()->is('admin/tagihan-detail*')) aria-current="page" @endif href="{{ url('/admin/pembayaran') }}">
                     <span aria-hidden="true" class="ic i-bill"></span>Tagihan &amp; pembayaran
-                    <span class="n"><span class="sr-only">4 perlu tindakan</span><span aria-hidden="true">4</span></span>
                 </a>
                 <a @if(request()->is('admin/keberatan*')) aria-current="page" @endif href="{{ url('/admin/keberatan') }}">
                     <span aria-hidden="true" class="ic i-alert"></span>Keberatan
-                    <span class="n"><span class="sr-only">2 perlu tindakan</span><span aria-hidden="true">2</span></span>
                 </a>
                 <a @if(request()->is('admin/pembatalan*')) aria-current="page" @endif href="{{ url('/admin/pembatalan') }}">
                     <span aria-hidden="true" class="ic i-undo"></span>Pembatalan &amp; refund
-                    <span class="n"><span class="sr-only">2 perlu tindakan</span><span aria-hidden="true">2</span></span>
                 </a>
                 <a @if(request()->is('admin/pencairan*')) aria-current="page" @endif href="{{ url('/admin/pencairan') }}">
                     <span aria-hidden="true" class="ic i-wallet"></span>Pencairan penyedia
-                    <span class="n"><span class="sr-only">5 perlu tindakan</span><span aria-hidden="true">5</span></span>
                 </a>
             </nav>
 
@@ -55,15 +51,15 @@
             <nav aria-label="Penyedia &amp; katalog" class="nav">
                 <a @if(request()->is('admin/katalog*')) aria-current="page" @endif href="{{ url('/admin/katalog') }}">
                     <span aria-hidden="true" class="ic i-box"></span>Katalog penyedia
-                    <span class="n"><span class="sr-only">6 perlu tindakan</span><span aria-hidden="true">6</span></span>
                 </a>
                 <a @if(request()->is('admin/pengajuan-harga*')) aria-current="page" @endif href="{{ url('/admin/pengajuan-harga') }}">
                     <span aria-hidden="true" class="ic i-tag"></span>Pengajuan harga
-                    <span class="n"><span class="sr-only">2 perlu tindakan</span><span aria-hidden="true">2</span></span>
+                </a>
+                <a @if(request()->is('admin/permintaan-penawaran*')) aria-current="page" @endif href="{{ url('/admin/permintaan-penawaran') }}">
+                    <span aria-hidden="true" class="ic i-bill"></span>Peninjauan penawaran
                 </a>
                 <a @if(request()->is('admin/pengguna*') || request()->is('admin/admin-penyedia*') || request()->is('admin/mitra-detail*') || request()->is('admin/admin-venue-form*')) aria-current="page" @endif href="{{ url('/admin/pengguna') }}">
                     <span aria-hidden="true" class="ic i-users"></span>Penyedia &amp; pengguna
-                    <span class="n"><span class="sr-only">3 perlu tindakan</span><span aria-hidden="true">3</span></span>
                 </a>
                 <a @if(request()->is('admin/rekening*')) aria-current="page" @endif href="{{ url('/admin/rekening') }}">
                     <span aria-hidden="true" class="ic i-bank"></span>Rekening perusahaan
@@ -96,35 +92,34 @@
                 </a>
                 <a @if(request()->is('admin/notifikasi*')) aria-current="page" @endif href="{{ url('/admin/notifikasi') }}">
                     <span aria-hidden="true" class="ic i-bell"></span>Notifikasi
-                    <span class="n"><span class="sr-only">3 belum dibaca</span><span aria-hidden="true">3</span></span>
                 </a>
-                <a href="{{ url('/login') }}">
-                    <span aria-hidden="true" class="ic i-out"></span>Keluar
-                </a>
+                <form method="POST" action="{{ url('/logout') }}">@csrf
+                    <button type="submit" style="display:flex;align-items:center;gap:12px;min-height:44px;padding:0 12px;font-size:14.5px;border-radius:10px;color:#3a3150;font-weight:600;width:100%;background:none;border:0;cursor:pointer;font-family:inherit;text-align:left">
+                        <span aria-hidden="true" class="ic i-out"></span>Keluar
+                    </button>
+                </form>
             </nav>
         </aside>
 
-        <label class="overlay" for="nav-toggle"></label>
+        <div class="overlay" aria-hidden="true"></div>
 
         <div class="main">
             <header class="topbar">
-                <label class="burger" for="nav-toggle">
+                <button type="button" class="burger" id="nav-toggle" aria-label="Buka menu navigasi" aria-controls="main-navigation" aria-expanded="false">
                     <span aria-hidden="true" class="ic i-menu"></span>
-                    <span class="sr-only">Menu</span>
-                </label>
+                </button>
                 <div class="search" role="search">
                     <span aria-hidden="true" class="ic i-search"></span>
                     <label class="sr-only" for="cari">Cari</label>
                     <input id="cari" placeholder="Cari pesanan, acara, atau penyedia…" type="search"/>
                 </div>
                 <div class="top-right">
-                    <a aria-label="Notifikasi, 3 belum dibaca" class="icon-btn" href="{{ url('/admin/notifikasi') }}">
+                    <a aria-label="Notifikasi" class="icon-btn" href="{{ url('/admin/notifikasi') }}">
                         <span aria-hidden="true" class="ic i-bell"></span>
-                        <span class="dot"></span>
                     </a>
                     <a aria-label="Profil Admin" class="user" href="{{ url('/admin/profil') }}">
-                        <span aria-hidden="true" class="avatar">A</span>
-                        <span class="t"><b>Admin</b><small>admin@pestakita.test</small></span>
+                        <span aria-hidden="true" class="avatar">{{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</span>
+                        <span class="t"><b>{{ auth()->user()->name }}</b><small>{{ auth()->user()->email }}</small></span>
                     </a>
                 </div>
             </header>
@@ -132,6 +127,7 @@
             @yield('content')
         </div>
     </div>
+    <script src="{{ asset('assets/js/aksi.js') }}"></script>
     <script src="{{ asset('assets/js/app-ui.js') }}"></script>
     @stack('scripts')
 </body>

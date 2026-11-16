@@ -81,6 +81,9 @@ window.showToast = function (message, type = 'success') {
     }
 
     const toast = document.createElement('div');
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
+    toast.setAttribute('aria-atomic', 'true');
     toast.style.cssText = `
         pointer-events:auto;
         padding:14px 18px;
@@ -96,17 +99,26 @@ window.showToast = function (message, type = 'success') {
         font-weight:600;
         transform:translateY(20px);
         opacity:0;
-        transition:all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        transition:opacity 0.25s ease, transform 0.25s ease;
     `;
 
     const icon = type === 'success' ? '✓' : (type === 'error' ? '✕' : 'ℹ');
     const iconColor = type === 'success' ? '#10b981' : (type === 'error' ? '#ef4444' : '#f5b83d');
+    const iconElement = document.createElement('span');
+    iconElement.setAttribute('aria-hidden', 'true');
+    iconElement.style.cssText = `display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:${iconColor}20;color:${iconColor};font-weight:800;flex:none`;
+    iconElement.textContent = icon;
 
-    toast.innerHTML = `
-        <span style="display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:${iconColor}20;color:${iconColor};font-weight:800;flex:none">${icon}</span>
-        <span style="flex:1">${message}</span>
-        <button style="border:none;background:transparent;cursor:pointer;color:var(--muted,#5f5672);font-size:16px;padding:0 4px">&times;</button>
-    `;
+    const messageElement = document.createElement('span');
+    messageElement.style.flex = '1';
+    messageElement.textContent = message;
+
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.setAttribute('aria-label', 'Tutup notifikasi');
+    closeBtn.style.cssText = 'border:none;background:transparent;cursor:pointer;color:var(--muted,#5f5672);font-size:16px;min-width:44px;min-height:44px;padding:0 4px';
+    closeBtn.textContent = '×';
+    toast.append(iconElement, messageElement, closeBtn);
 
     container.appendChild(toast);
 
@@ -116,7 +128,6 @@ window.showToast = function (message, type = 'success') {
         toast.style.opacity = '1';
     });
 
-    const closeBtn = toast.querySelector('button');
     const dismiss = () => {
         toast.style.transform = 'translateY(20px)';
         toast.style.opacity = '0';
@@ -129,24 +140,11 @@ window.showToast = function (message, type = 'success') {
 
 // 4. Forms UX Feedback
 function initFormsFeedback() {
-    const forms = document.querySelectorAll('form[onsubmit*="return false"]');
+    const forms = document.querySelectorAll('form[onsubmit*="return false"]:not([data-form])');
     forms.forEach(form => {
         form.addEventListener('submit', function (e) {
             e.preventDefault();
-            const submitBtn = form.querySelector('button[type="submit"], button.btn:not([type="button"])');
-            if (submitBtn) {
-                const originalText = submitBtn.innerHTML;
-                submitBtn.disabled = true;
-                submitBtn.style.opacity = '0.75';
-                submitBtn.innerHTML = 'Memproses…';
-
-                setTimeout(() => {
-                    submitBtn.disabled = false;
-                    submitBtn.style.opacity = '1';
-                    submitBtn.innerHTML = originalText;
-                    window.showToast('Perubahan berhasil disimpan! (Pratinjau Frontend)', 'success');
-                }, 400);
-            }
+            window.showToast('Pratinjau frontend: formulir ini tidak mengirim atau menyimpan data.', 'info');
         });
     });
 }
@@ -239,21 +237,79 @@ function makeDraggable(el, container) {
 
 // 6. Mobile Drawer Navigation
 function initMobileDrawer() {
+    const app = document.querySelector('.app');
     const navToggle = document.getElementById('nav-toggle');
+    const sidebar = document.getElementById('main-navigation');
     const overlay = document.querySelector('.overlay');
+    const closeButton = sidebar?.querySelector('.sidebar-close');
+    const main = app?.querySelector('.main');
+    const pageChrome = [
+        document.querySelector('.preview-bar'),
+        document.querySelector('.skip')
+    ].filter(Boolean);
 
-    if (overlay && navToggle) {
-        overlay.addEventListener('click', () => {
-            navToggle.checked = false;
-        });
+    if (!app || !navToggle || !sidebar || !main || !overlay || !closeButton) {
+        return;
     }
 
+    const setDrawerOpen = (isOpen, restoreFocus = false) => {
+        app.classList.toggle('nav-open', isOpen);
+        navToggle.setAttribute('aria-expanded', String(isOpen));
+        main.inert = isOpen;
+        pageChrome.forEach(element => {
+            element.inert = isOpen;
+        });
+
+        if (isOpen) {
+            sidebar.setAttribute('role', 'dialog');
+            sidebar.setAttribute('aria-modal', 'true');
+            sidebar.querySelector('.nav a[href]')?.focus();
+            return;
+        }
+
+        sidebar.removeAttribute('role');
+        sidebar.removeAttribute('aria-modal');
+        if (restoreFocus) {
+            navToggle.focus();
+        }
+    };
+
+    navToggle.addEventListener('click', () => {
+        setDrawerOpen(navToggle.getAttribute('aria-expanded') !== 'true');
+    });
+
+    closeButton.addEventListener('click', () => setDrawerOpen(false, true));
+    overlay.addEventListener('click', () => setDrawerOpen(false, true));
+
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && navToggle && navToggle.checked) {
-            navToggle.checked = false;
+        if (!app.classList.contains('nav-open')) {
+            return;
+        }
+
+        if (e.key === 'Escape') {
+            setDrawerOpen(false, true);
+            return;
+        }
+
+        if (e.key !== 'Tab') {
+            return;
+        }
+
+        const focusable = [...sidebar.querySelectorAll('a[href], button:not([disabled])')]
+            .filter(element => element.getClientRects().length > 0);
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last?.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first?.focus();
         }
     });
 }
+
 
 // 7. Flash Messages from Laravel Session
 function initFlashMessages() {

@@ -26,21 +26,27 @@
                 Akses: Portal Klien (Penyelenggara Acara Ulang Tahun)
             </div>
 
-            <form class="stack" style="gap:16px" onsubmit="handleLogin(event)">
+            <form class="stack" style="gap:16px" method="POST" action="{{ url('/login') }}">
                 @csrf
                 <div class="field">
                     <label for="email" style="font-weight:600;font-size:14px;margin-bottom:6px;display:block">Email</label>
-                    <input class="input" id="email" type="email" placeholder="nama@email.com" autocomplete="email" required value="klien@pestakita.test">
+                    <input class="input" id="email" name="email" type="email" placeholder="nama@email.com" autocomplete="email" required value="{{ old('email') }}" @error('email') aria-invalid="true" @enderror>
+                    @error('email')
+                        <p class="field-error" role="alert">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="field">
                     <label for="password" style="font-weight:600;font-size:14px;margin-bottom:6px;display:block">Kata sandi</label>
-                    <input class="input" id="password" type="password" placeholder="••••••••" autocomplete="current-password" required value="rahasia123">
+                    <input class="input" id="password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required @error('password') aria-invalid="true" @enderror>
+                    @error('password')
+                        <p class="field-error" role="alert">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div style="display:flex;justify-content:space-between;align-items:center">
                     <label class="check" style="font-weight:500;font-size:14px;margin:0">
-                        <input type="checkbox" checked> Ingat saya di perangkat ini
+                        <input type="checkbox" name="remember" value="1" checked> Ingat saya di perangkat ini
                     </label>
                 </div>
 
@@ -55,19 +61,8 @@
 </main>
 
 <script>
-let currentRole = 'klien';
-const targetUrls = {
-    klien: "{{ url('/klien') }}",
-    vendor: "{{ url('/vendor') }}",
-    venue: "{{ url('/venue') }}",
-    admin: "{{ url('/admin') }}"
-};
-const defaultEmails = {
-    klien: "klien@pestakita.test",
-    vendor: "vendor@pestakita.test",
-    venue: "venue@pestakita.test",
-    admin: "admin@pestakita.test"
-};
+// Tab role hanya penanda visual (T1): otorisasi dan redirect ditentukan
+// server berdasarkan role akun di database, bukan pilihan tab.
 const btnLabels = {
     klien: "Masuk ke Portal Klien",
     vendor: "Masuk ke Panel Vendor",
@@ -82,7 +77,6 @@ const roleInfos = {
 };
 
 function selectRole(role) {
-    currentRole = role;
     ['klien', 'vendor', 'venue', 'admin'].forEach(r => {
         const btn = document.getElementById('role-' + r + '-btn');
         if (r === role) {
@@ -95,14 +89,8 @@ function selectRole(role) {
             btn.style.borderColor = 'var(--line)';
         }
     });
-    document.getElementById('email').value = defaultEmails[role];
     document.getElementById('submit-btn').textContent = btnLabels[role];
     document.getElementById('role-badge-info').textContent = roleInfos[role];
-}
-
-function handleLogin(e) {
-    e.preventDefault();
-    window.location.href = targetUrls[currentRole];
 }
 </script>
 @endsection

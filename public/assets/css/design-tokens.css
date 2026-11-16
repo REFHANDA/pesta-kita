@@ -1,0 +1,72 @@
+:root {
+  --pk-color-brand: #5b2a86;
+  --pk-color-brand-strong: #3b1763;
+  --pk-color-brand-soft: #f3eefa;
+  --pk-color-accent: #f5b83d;
+  --pk-color-text: #1e1633;
+  --pk-color-text-muted: #5f5672;
+  --pk-color-border: #e4deee;
+  --pk-color-field: #8a7fa0;
+  --pk-color-page: #f6f4fb;
+  --pk-color-surface: #fff;
+  --pk-color-focus: #9b7ac0;
+  --pk-color-danger: #b42318;
+  --pk-color-danger-soft: #fff0ef;
+  --pk-color-danger-border: #ffd3cf;
+  --pk-color-dialog-backdrop: rgba(38, 24, 61, .5);
+
+  --pk-status-success-bg: #d1fae5;
+  --pk-status-success-text: #064e3b;
+  --pk-status-success-badge-bg: #e8f7ef;
+  --pk-status-success-badge-text: #18794e;
+  --pk-status-warning-bg: #fef3c7;
+  --pk-status-warning-text: #78350f;
+  --pk-status-warning-badge-bg: #fff4df;
+  --pk-status-warning-badge-text: #9a6500;
+  --pk-status-info-bg: #e0f2fe;
+  --pk-status-info-text: #0c4a6e;
+  --pk-status-danger-bg: #fee2e2;
+  --pk-status-danger-text: #7f1d1d;
+  --pk-status-neutral-bg: #e4e4e7;
+  --pk-status-neutral-text: #27272a;
+
+  --pk-font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --pk-font-display: "Bricolage Grotesque", "Figtree", system-ui, sans-serif;
+
+  --pk-space-2: 8px;
+  --pk-space-3: 12px;
+  --pk-space-4: 16px;
+  --pk-space-5: 20px;
+  --pk-space-6: 24px;
+  --pk-content-max: 1440px;
+  --pk-pad-card: 24px;
+  --pk-pad-card-v: 20px;
+  --pk-gap-section: 24px;
+
+  --pk-radius-control: 10px;
+  --pk-radius-soft: 12px;
+  --pk-radius-card: 16px;
+  --pk-radius-dialog: 20px;
+  --pk-radius-pill: 999px;
+
+  --pk-z-menu: 20;
+  --pk-z-topbar: 30;
+  --pk-z-overlay: 35;
+  --pk-z-sidebar: 40;
+  --pk-z-notice: 100;
+  --pk-z-preview: 9999;
+
+  --pk-motion-fast: 200ms;
+  --pk-shadow-menu: 0 12px 32px -8px rgba(30, 22, 51, .25);
+  --pk-shadow-drawer: 0 0 40px rgba(30, 22, 51, .25);
+  --pk-shadow-toast: 0 12px 32px -8px rgba(30, 22, 51, .4);
+  --pk-shadow-dialog: 0 20px 50px rgba(38, 24, 61, .25);
+}
+
+@media (max-width: 760px) {
+  :root {
+    --pk-pad-card: 16px;
+    --pk-pad-card-v: 16px;
+    --pk-gap-section: 20px;
+  }
+}
