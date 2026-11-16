@@ -2,7 +2,32 @@
 
 @section('title', 'Rancang acara · Pesta Kita')
 
+@php
+$events = $events ?? collect();
+
+// Kelas & label badge status acara — sama dengan sumber data beranda.
+$badgeFor = fn ($status) => match ($status) {
+    \App\Enums\EventStatus::Draft => ['b-mute', 'Draft'],
+    \App\Enums\EventStatus::Diajukan => ['b-warn', 'Diajukan'],
+    \App\Enums\EventStatus::MenungguPembayaran => ['b-warn', 'Menunggu pembayaran'],
+    \App\Enums\EventStatus::Terkonfirmasi => ['b-ok', 'Terkonfirmasi'],
+    \App\Enums\EventStatus::Selesai => ['b-ok', 'Selesai'],
+    \App\Enums\EventStatus::Dinilai => ['b-ok', 'Dinilai'],
+    \App\Enums\EventStatus::Dibatalkan => ['b-mute', 'Dibatalkan'],
+};
+@endphp
+
 @section('content')
-<main id="konten" class="content" tabindex="-1"><div class="page-head"><div><div class="crumbs"><a href="{{ url('/klien') }}">Beranda</a> / Rancang acara</div><h1>Rancang acara</h1></div><a class="btn" href="{{ url('/klien/acara-baru') }}"><span class="ic i-plus" aria-hidden="true"></span>Buat konsep acara</a></div><div class="tabs card"><a href="{{ url('/klien/acara') }}" aria-current="page">Mendatang</a><a href="{{ url('/klien/riwayat') }}">Riwayat</a></div>
-<div class="cards"><a class="card ev" href="{{ url('/klien/acara-detail') }}"><div class="item-h"><h2>Ulang Tahun ke-7 Nadia</h2><span class="badge b-warn">Menunggu pembayaran</span></div><p>Sabtu, 14 November 2026</p><p>45 tamu · Kebun dongeng · 3 pesanan</p><div class="foot"><span class="btn btn-o btn-sm">Buka</span></div></a><a class="card ev" href="{{ url('/klien/acara-draft') }}"><div class="item-h"><h2>Pesta Kebun Raka</h2><span class="badge b-mute">Draft</span></div><p>Sabtu, 12 Desember 2026</p><p>30 tamu · 1 pesanan</p><div class="foot"><span class="btn btn-o btn-sm">Buka</span></div></a><a class="card ev" href="{{ url('/klien/acara-diajukan') }}"><div class="item-h"><h2>Syukuran Opa 70 Tahun</h2><span class="badge b-warn">Diajukan</span></div><p>Minggu, 20 Desember 2026</p><p>80 tamu · 4 pesanan</p><div class="foot"><span class="btn btn-o btn-sm">Buka</span></div></a></div><a class="card ev" href="{{ url('/klien/acara-terkonfirmasi') }}"><div class="item-h"><h2>Ulang Tahun Dinda</h2><span class="badge b-ok">Terkonfirmasi</span></div><p>Minggu, 22 November 2026</p><p>55 tamu · Putri salju · 4 pesanan</p><div class="foot"><span class="btn btn-o btn-sm">Buka</span></div></a></main>
+<main id="konten" class="content" tabindex="-1"><div class="page-head"><div><div class="crumbs"><a href="{{ url('/klien') }}">Beranda</a> / Rancang acara</div><h1>Rancang acara</h1><p class="sub">Acara milik akun Anda yang masih berjalan.</p></div><a class="btn" href="{{ url('/klien/katalog-vendor') }}"><span class="ic i-box" aria-hidden="true"></span>Jelajahi katalog</a></div>
+<div class="tabs card"><a href="{{ url('/klien/acara') }}" aria-current="page">Mendatang</a><a href="{{ url('/klien/riwayat') }}">Riwayat</a></div>
+<div class="data-note" role="note"><span class="ic i-info" aria-hidden="true"></span><p><b>Belum semua alur terhubung.</b> Daftar di halaman ini dibaca dari basis data acara milik akun Anda dan dapat dibuka untuk melihat detail tersimpan. Pembuatan konsep acara dan pesanan menyusul pada backend BE-4–BE-6.</p></div>
+<div class="cards">
+@forelse($events as $event)
+    @php([$badgeClass, $badgeLabel] = $badgeFor($event->status))
+    <div class="card ev"><div class="item-h"><h2><a class="link-plain" href="{{ url('/klien/acara-detail/'.$event->id) }}">{{ $event->name }}</a></h2><span class="badge {{ $badgeClass }}">{{ $badgeLabel }}</span></div><p>{{ $event->event_date?->translatedFormat('l, d F Y') ?? 'Tanggal belum diisi' }}</p><p>{{ $event->guest_count }} tamu{{ $event->theme ? ' · '.$event->theme : '' }}</p></div>
+@empty
+    <p class="hint" style="padding:16px">Belum ada acara mendatang tercatat untuk akun Anda. Pembuatan konsep acara tersedia setelah backend alur acara (BE-4/BE-5) terhubung; sementara itu Anda dapat menjelajahi katalog penyedia dan peralatan.</p>
+@endforelse
+</div>
+</main>
 @endsection

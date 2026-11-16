@@ -2,13 +2,41 @@
 
 @section('title', 'Detail katalog penyedia · Admin Pesta Kita')
 
+@php
+$item = $item ?? new \App\Models\CatalogItem();
+$profil = $item->vendorProfile;
+$rupiah = fn ($n) => 'Rp '.number_format((int) $n, 0, ',', '.');
+
+$itemBadge = fn ($status) => match ($status) {
+    \App\Enums\CatalogItemStatus::Aktif => ['b-ok', 'Aktif'],
+    \App\Enums\CatalogItemStatus::Nonaktif => ['b-mute', 'Nonaktif'],
+    default => ['b-warn', 'Menunggu'],
+};
+[$iClass, $iLabel] = $itemBadge($item->status);
+$verifClass = $profil?->verification_status === \App\Enums\VerificationStatus::Terverifikasi ? 'b-ok' : 'b-warn';
+@endphp
+
 @section('content')
 <main class="content page-refined detail-page" id="konten" tabindex="-1">
-<div class="page-head"><div><div class="crumbs"><a href="{{ url('/admin') }}">Admin</a> / <a href="{{ url('/admin/katalog') }}">Katalog penyedia</a> / Detail layanan</div><h1>Detail katalog penyedia</h1><p class="meta">Informasi layanan, harga, dan status publikasi katalog.</p></div><a class="btn btn-o" href="{{ url('/admin/katalog') }}">Kembali ke katalog</a></div>
+<div class="page-head"><div><div class="crumbs"><a href="{{ url('/admin') }}">Admin</a> / <a href="{{ url('/admin/katalog') }}">Katalog penyedia</a> / Detail item</div><h1>{{ $item->name ?: 'Detail katalog penyedia' }}</h1><p class="meta">{{ $profil?->business_name ?? 'Penyedia tidak diketahui' }} · {{ $item->kind?->name ?? '—' }} · kategori {{ $item->category ?: '—' }}</p></div><a class="btn btn-o" href="{{ url('/admin/katalog') }}">Kembali ke katalog</a></div>
+
+<div class="data-note" role="note"><span class="ic i-info" aria-hidden="true"></span><p><b>Halaman ini baca-saja.</b> Tidak ada persetujuan per item (keputusan Gate 4B butir 2). Status publikasi item dikelola vendor di portalnya, dan perubahan harga hanya berlaku lewat antrean pengajuan harga yang disetujui Admin.</p></div>
+
 <div class="detail-grid"><div class="detail-stack">
-<section class="card detail-card"><div class="card-h"><div class="split-head"><div><h2>Paket Catering Nusantara</h2><p class="meta">Dapur Nusantara · Katering · SKU: KAT-0018</p></div><span class="badge b-ok">Dipublikasikan</span></div></div><div class="card-body"><div class="catalog-hero"><div class="catalog-placeholder"><span class="ic i-box"></span><small>Foto layanan</small></div><div><span class="eyebrow">Harga aktif</span><h2 class="catalog-price">Rp 85.000 <small>/ pax</small></h2><p class="meta">Minimum pemesanan 100 pax · Estimasi layanan 4 jam</p><div class="detail-actions"><button class="btn btn-o">Lihat katalog</button><a class="btn btn-o" href="{{ url('/admin/katalog-form') }}">Edit informasi</a></div></div></div></div></section>
-<section class="card detail-card"><div class="card-h"><h2>Deskripsi layanan</h2></div><div class="card-body"><p class="body-copy">Paket katering prasmanan dengan pilihan menu nusantara untuk acara keluarga, pertemuan, dan perayaan. Paket mencakup persiapan, pengantaran, penataan meja, serta perlengkapan makan standar.</p><div class="detail-kv"><div class="kv"><span class="k">Kategori</span><span class="v">Katering</span></div><div class="kv"><span class="k">Area layanan</span><span class="v">Kediri dan sekitarnya</span></div><div class="kv"><span class="k">Kapasitas</span><span class="v">100–500 pax</span></div><div class="kv"><span class="k">Durasi</span><span class="v">4 jam</span></div></div></div></section>
-<section class="card detail-card"><div class="card-h"><h2>Rincian paket</h2><p class="meta">Item yang termasuk dalam layanan.</p></div><div aria-label="Rincian paket. Gulir horizontal untuk melihat seluruh kolom" class="table-wrap" role="region" tabindex="0"><table class="detail-table"><caption class="sr-only">Tabel: Rincian paket</caption><thead><tr><th scope="col">Komponen</th><th scope="col">Rincian</th><th scope="col">Status</th></tr></thead><tbody><tr><td><b>Menu utama</b></td><td>4 pilihan lauk, nasi, sayur</td><td><span class="badge b-ok">Termasuk</span></td></tr><tr><td><b>Perlengkapan</b></td><td>Piring, sendok, gelas</td><td><span class="badge b-ok">Termasuk</span></td></tr><tr><td><b>Petugas layanan</b></td><td>2 orang pramusaji</td><td><span class="badge b-ok">Termasuk</span></td></tr></tbody></table></div></section>
-</div><aside class="detail-side"><section class="card detail-card"><div class="card-h"><h2>Informasi penyedia</h2></div><div class="card-body"><div class="profile-head"><span class="avatar">D</span><div><b>Dapur Nusantara</b><p class="meta">MIT-2026-0018</p><span class="badge b-ok">Terverifikasi</span></div></div><div class="detail-list"><div class="dl-row"><span>Pemilik</span><strong>Dimas Pratama</strong></div><div class="dl-row"><span>Rating</span><strong>4,8 / 5</strong></div><div class="dl-row"><span>Total pesanan</span><strong>28</strong></div></div><a class="btn btn-o btn-block" href="{{ url('/admin/mitra-detail') }}">Lihat detail penyedia</a></div></section><section class="card detail-card"><div class="card-h"><h2>Status katalog</h2></div><div class="card-body"><div class="detail-list"><div class="dl-row"><span>Status publikasi</span><strong class="ok-t">Aktif</strong></div><div class="dl-row"><span>Dibuat</span><strong>12 Jan 2026</strong></div><div class="dl-row"><span>Diperbarui</span><strong>02 Nov 2026</strong></div><div class="dl-row"><span>Pengajuan harga</span><strong><a href="{{ url('/admin/pengajuan-harga-detail') }}">1 menunggu</a></strong></div></div><div class="detail-actions"><button class="btn btn-o">Sembunyikan katalog</button><button class="btn btn-danger" type="button" data-confirm="Nonaktifkan layanan ini?" data-text="Layanan tidak tampil di katalog. Pesanan yang sudah berjalan tidak berubah dan riwayatnya tetap tersimpan." data-label="Nonaktifkan" data-tone="bad" data-done="Layanan dinonaktifkan dan dicatat di log aktivitas.">Nonaktifkan layanan</button></div></div></section></aside></div>
-<div class="alert"><span class="ic i-info"></span><p>Perubahan katalog harus tetap mengikuti status verifikasi penyedia dan kebijakan harga. Catat alasan setiap perubahan status publikasi.</p></div></main>
+<section class="card detail-card"><div class="card-h"><div class="split-head"><div><h2>Informasi item</h2><p class="meta">Data yang tersimpan pada katalog penyedia.</p></div><span class="badge {{ $iClass }}">{{ $iLabel }}</span></div></div><div class="card-body"><div class="detail-kv"><div class="kv"><span class="k">Jenis</span><span class="v">{{ $item->kind?->name ?? '—' }}</span></div><div class="kv"><span class="k">Kategori</span><span class="v">{{ $item->category ?: '—' }}</span></div><div class="kv"><span class="k">Harga aktif</span><span class="v">{{ $item->pricing_mode === \App\Enums\PricingMode::PerluPenawaran ? 'Perlu penawaran' : $rupiah($item->catalog_price) }}</span></div>@if($item->max_per_day)<div class="kv"><span class="k">Maksimal per hari</span><span class="v">{{ $item->max_per_day }} unit</span></div>@endif<div class="kv"><span class="k">Dibuat</span><span class="v">{{ $item->created_at?->translatedFormat('d M Y') ?? '—' }}</span></div><div class="kv"><span class="k">Diperbarui</span><span class="v">{{ $item->updated_at?->translatedFormat('d M Y') ?? '—' }}</span></div></div>
+@if ($item->description)
+<p class="field-label mt-16">Deskripsi</p>
+<p class="body-copy">{{ $item->description }}</p>
+@endif
+@if ($item->policies)
+<p class="field-label">Kebijakan penyedia</p>
+<p class="body-copy">{{ $item->policies }}</p>
+@endif
+</div></section>
+</div>
+<aside class="detail-side">
+<section class="card detail-card"><div class="card-h"><h2>Informasi penyedia</h2></div><div class="card-body"><div class="detail-list"><div class="dl-row"><span>Usaha</span><strong>{{ $profil?->business_name ?? '—' }}</strong></div><div class="dl-row"><span>Kategori</span><strong>{{ $profil?->category ?? '—' }}</strong></div><div class="dl-row"><span>Verifikasi</span><strong><span class="badge {{ $verifClass }}">{{ $profil?->verification_status?->name ?? '—' }}</span></strong></div></div>@if($profil)<a class="btn btn-o btn-block" href="{{ url('/admin/penyedia/vendor_profile/'.$profil->id) }}">Lihat detail penyedia</a>@endif</div></section>
+<section class="card detail-card"><div class="card-h"><h2>Kelola terkait</h2></div><div class="card-body"><div class="detail-list"><div class="dl-row"><span>Perubahan harga item</span><strong><a href="{{ url('/admin/pengajuan-harga') }}">Antrean pengajuan harga</a></strong></div><div class="dl-row"><span>Status verifikasi penyedia</span><strong><a href="{{ url('/admin/admin-penyedia') }}">Antrean verifikasi</a></strong></div></div><div class="alert mt-16"><span class="ic i-info" aria-hidden="true"></span><p>Vendor menonaktifkan/menyalakan item sendiri di portal vendor; Admin cukup memutus jalur transaksi lewat penonaktifan verifikasi profil bila diperlukan.</p></div></div></section>
+</aside></div>
+</main>
 @endsection

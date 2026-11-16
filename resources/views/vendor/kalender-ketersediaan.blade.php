@@ -2,6 +2,26 @@
 
 @section('title', 'Kalender ketersediaan · Panel Vendor Pesta Kita')
 
+@php
+$items = $items ?? collect();
+$statusToKey = [
+    \App\Enums\AvailabilityStatus::Tersedia->value => 'tersedia',
+    \App\Enums\AvailabilityStatus::TidakTersedia->value => 'tidak',
+    \App\Enums\AvailabilityStatus::BelumDikonfirmasi->value => 'belum',
+];
+$datasets = $items->map(fn ($item) => [
+    'key' => (string) $item->id,
+    'nama' => $item->name,
+    'jenis' => $item->kind->value === 'layanan' ? 'Layanan' : 'Peralatan',
+    'days' => (object) $item->availabilityDays->mapWithKeys(fn ($day) => [$day->date->toDateString() => $statusToKey[$day->status->value] ?? 'belum'])->all(),
+])->all();
+$kalConfig = json_encode([
+    'editable' => true,
+    'start' => ['year' => (int) now()->format('Y'), 'month' => (int) now()->format('n')],
+    'datasets' => $datasets,
+], JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+@endphp
+
 @push('styles')
 <link rel="stylesheet" href="{{ asset('assets/css/kalender.css') }}">
 @endpush
@@ -12,20 +32,31 @@
         <div>
             <div class="crumbs"><a href="{{ url('/vendor') }}">Beranda</a> / Kalender ketersediaan</div>
             <h1>Kalender ketersediaan</h1>
-            <p class="sub">Lihat dan atur tampilan jadwal ketersediaan layanan Anda. Klien hanya melihat gambaran jadwal ini; ketersediaan tetap perlu dikonfirmasi sebelum pesanan disahkan Admin.</p>
+            <p class="sub">Lihat dan atur jadwal ketersediaan layanan dan peralatan Anda. Klien hanya melihat gambaran jadwal ini; ketersediaan tetap perlu dikonfirmasi sebelum pesanan disahkan Admin.</p>
         </div>
     </div>
 
-    <div class="alert"><span class="ic i-info" aria-hidden="true"></span><p><b>Fitur ini masih berupa prototipe frontend.</b> Data ketersediaan adalah contoh statis dan belum tersimpan di server. Perubahan status pada halaman ini tidak dikirim atau disimpan ke mana pun.</p></div>
+    @if(session('status'))<div class="alert" role="status">{{ session('status') }}</div>@endif
+    @error('date')<div class="alert warn" role="alert">{{ $message }}</div>@enderror
+    @error('status')<div class="alert warn" role="alert">{{ $message }}</div>@enderror
+
+    @if(count($datasets) === 0)
+    <div class="empty-state card mt-16">
+        <span class="ic i-cal" aria-hidden="true"></span>
+        <h2>Belum ada item untuk dijadwalkan</h2>
+        <p>Kalender menampilkan item katalog milik usaha Anda. Tambahkan layanan atau peralatan terlebih dahulu.</p>
+        <a class="btn mt-12" href="{{ url('/vendor/item-form') }}">Tambah layanan</a>
+    </div>
+    @else
 
     <div data-kalender>
         <section class="card" data-kal-controls>
             <div class="card-b">
                 <div class="kal-toolbar">
                     <div class="field">
-                        <label for="kal-picker">Layanan</label>
+                        <label for="kal-picker">Layanan atau peralatan</label>
                         <select class="input" id="kal-picker"></select>
-                        <p class="hint">Pilih layanan untuk melihat jadwal ketersediaannya. Daftar ini hanya berisi contoh.</p>
+                        <p class="hint">Pilih item untuk melihat dan menandai jadwal ketersediaannya.</p>
                     </div>
                 </div>
             </div>
@@ -43,7 +74,7 @@
                 </div>
                 <div class="card-b">
                     <table class="kal-table" aria-labelledby="kal-title">
-                        <caption class="sr-only">Kalender ketersediaan layanan pada bulan yang sedang ditampilkan</caption>
+                        <caption class="sr-only">Kalender ketersediaan item pada bulan yang sedang ditampilkan</caption>
                         <thead>
                             <tr>
                                 <th scope="col" abbr="Senin">Sen</th>
@@ -59,14 +90,14 @@
                     </table>
 
                     <ul class="kal-legend">
-                        <li><span class="kal-key kal-ok" aria-hidden="true">&#10003;</span>Tersedia (contoh)</li>
-                        <li><span class="kal-key kal-bad" aria-hidden="true">&#10005;</span>Tidak tersedia (contoh)</li>
+                        <li><span class="kal-key kal-ok" aria-hidden="true">&#10003;</span>Tersedia</li>
+                        <li><span class="kal-key kal-bad" aria-hidden="true">&#10005;</span>Tidak tersedia</li>
                         <li><span class="kal-key kal-warn" aria-hidden="true">?</span>Belum dikonfirmasi</li>
                     </ul>
 
                     <div class="kal-nodata" id="kal-nodata" hidden>
-                        <p><b>Belum ada jadwal yang ditandai untuk layanan ini.</b></p>
-                        <p class="hint">Tandai tanggal melalui panel kelola untuk menampilkan contoh jadwal pada prototipe ini.</p>
+                        <p><b>Belum ada jadwal yang ditandai untuk item ini.</b></p>
+                        <p class="hint">Pilih tanggal pada kalender, lalu tandai statusnya melalui panel kelola di samping.</p>
                     </div>
                 </div>
             </section>
@@ -75,22 +106,26 @@
                 <section class="card">
                     <div class="card-h"><h2>Detail tanggal</h2></div>
                     <div class="card-b" id="kal-detail-body" aria-live="polite">
-                        <p class="hint">Pilih tanggal pada kalender untuk melihat keterangan ketersediaannya.</p>
+                        <p class="hint">Pilih tanggal pada kalender untuk melihat dan mengubah ketersediaannya.</p>
                     </div>
                 </section>
 
                 <section class="card" data-kal-editable hidden>
-                    <div class="card-h"><h2>Kelola tampilan jadwal (prototipe)</h2></div>
+                    <div class="card-h"><h2>Kelola jadwal item</h2></div>
                     <div class="card-b">
-                        <p class="hint">Pilih tanggal pada kalender, lalu tandai statusnya. Interaksi ini hanya mengubah tampilan pada perangkat Anda selama halaman terbuka.</p>
-                        <div class="kal-edit">
-                            <div class="kal-edit-row">
-                                <button type="button" class="btn" data-kal-set="tersedia">Tandai tersedia</button>
-                                <button type="button" class="btn btn-o" data-kal-set="tidak">Tandai tidak tersedia</button>
-                                <button type="button" class="btn btn-o" data-kal-set="belum">Atur ulang ke belum dikonfirmasi</button>
+                        <p class="hint">Pilih item dan tanggal pada kalender, lalu tandai statusnya. Perubahan tersimpan ke server dan langsung terlihat oleh Klien di katalog.</p>
+                        <form method="POST" action="{{ route('vendor.kalender.update') }}" class="kal-edit">
+                            @csrf
+                            <input type="hidden" name="item_id" id="kal-form-item" value="{{ $selectedItemId }}">
+                            <div class="kal-edit-row mt-12">
+                                <button class="btn btn-o" type="submit" name="status" value="tersedia">Tandai tersedia</button>
+                                <button class="btn btn-o" type="submit" name="status" value="tidak_tersedia">Tandai tidak tersedia</button>
+                                <button class="btn btn-o" type="submit" name="status" value="belum_dikonfirmasi">Atur ulang ke belum dikonfirmasi</button>
                             </div>
-                            <div class="warn-box mt-12">Perubahan jadwal ini hanya berlaku pada tampilan prototype dan belum tersimpan ke server.</div>
-                        </div>
+                            <p class="hint mt-12">Tanggal terpilih: <span id="kal-form-date-view">—</span></p>
+                            <input type="hidden" name="date" id="kal-form-date" value="">
+                            <div class="warn-box mt-12">Status manual adalah gambaran jadwal, bukan jaminan. Konfirmasi final tetap lewat proses penawaran dan persetujuan Admin.</div>
+                        </form>
                     </div>
                 </section>
 
@@ -101,30 +136,41 @@
             </aside>
         </div>
 
-        <div class="empty-state card mt-16" id="kal-empty" hidden>
-            <span class="ic i-cal" aria-hidden="true"></span>
-            <h2>Kalender belum tersedia</h2>
-            <p>Belum ada data ketersediaan contoh yang dapat ditampilkan.</p>
-        </div>
     </div>
+    @endif
 </main>
 
-<script type="application/json" id="kal-config">
-{
-  "editable": true,
-  "start": { "year": 2026, "month": 11 },
-  "datasets": [
-    { "key": "katering-prasmanan", "nama": "Katering prasmanan", "jenis": "Layanan andalan",
-      "days": { "2026-11-06": "tersedia", "2026-11-07": "tersedia", "2026-11-12": "tidak", "2026-11-13": "tidak", "2026-11-20": "tersedia", "2026-11-21": "tersedia", "2026-11-27": "tersedia", "2026-12-04": "tersedia", "2026-12-05": "tersedia", "2026-12-12": "tidak", "2026-12-19": "tersedia", "2026-12-24": "tidak" } },
-    { "key": "paket-nasi-box", "nama": "Paket nasi box", "jenis": "Layanan tambahan",
-      "days": { "2026-11-08": "tersedia", "2026-11-15": "tersedia", "2026-11-22": "tersedia", "2026-11-29": "tersedia", "2026-12-06": "tersedia", "2026-12-13": "tersedia", "2026-12-20": "tersedia" } },
-    { "key": "prasmanan-premium", "nama": "Prasmanan premium", "jenis": "Layanan baru",
-      "days": {} }
-  ]
-}
-</script>
+@if(count($datasets) > 0)
+<script type="application/json" id="kal-config">{!! $kalConfig !!}</script>
+@endif
 @endsection
 
+@if(count($datasets) > 0)
 @push('scripts')
 <script src="{{ asset('assets/js/kalender.js') }}"></script>
+<script>
+/* Wiring BE-3b: salin tanggal terpilih pada kalender ke form kelola. */
+(function () {
+    'use strict';
+    var grid = document.getElementById('kal-grid');
+    var dateInput = document.getElementById('kal-form-date');
+    var dateView = document.getElementById('kal-form-date-view');
+    var picker = document.getElementById('kal-picker');
+    var formItem = document.getElementById('kal-form-item');
+    if (!grid || !dateInput) return;
+    function sync(date) {
+        dateInput.value = date || '';
+        if (dateView) dateView.textContent = date || '—';
+    }
+    grid.addEventListener('click', function (e) {
+        var btn = e.target.closest ? e.target.closest('.kal-day') : null;
+        sync(btn ? btn.getAttribute('data-date') : '');
+    });
+    if (picker && formItem) {
+        picker.addEventListener('change', function () { formItem.value = picker.value; sync(''); });
+        formItem.value = picker.value || formItem.value;
+    }
+})();
+</script>
 @endpush
+@endif

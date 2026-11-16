@@ -1,9 +1,20 @@
 @extends('layouts.klien')
 
-@section('title', 'Syukuran Mama · Pesta Kita')
+@section('title', 'Acara dibatalkan · Pesta Kita')
+
+@php
+$events = $events ?? collect();
+@endphp
 
 @section('content')
-<main id="konten" class="content" tabindex="-1"><div class="page-head"><div><div class="crumbs"><a href="{{ url('/klien') }}">Beranda</a> / <a href="{{ url('/klien/riwayat') }}">Riwayat &amp; evaluasi</a> / Detail</div><h1>Syukuran Mama</h1></div><span class="badge b-bad">Dibatalkan</span></div>
-<div class="data-note" role="note"><span class="ic i-info" aria-hidden="true"></span><p><b>Halaman ini masih berupa prototipe frontend.</b> Nominal refund, tanggal, dan status di bawah adalah contoh statis. Nominal refund final ditetapkan sistem dan keputusan Admin, bukan dihitung oleh halaman ini.</p></div>
-<section class="card"><ol class="steps" aria-label="Tahap pembatalan"><li class="done">Diajukan</li><li class="done">Ditinjau</li><li class="done">Refund diproses</li><li class="now" aria-current=step>Refund selesai</li></ol></section><div class="grid two"><div class="stack"><section class="card"><div class="card-h"><h2>Pembatalan</h2><span class="badge b-ok">Refund selesai</span></div><div class="card-b"><p class="m-0">Refund <b>50%</b> (H-9 saat diajukan): transfer balik <b class="pay" style="font-size:22px">Rp 4.125.245</b> termasuk kode unik 245.</p><table class="break mt-16 w-440"><tr><td>Total tagihan</td><td>Rp 8.250.000</td></tr><tr><td>Refund 50%</td><td>Rp 4.125.000</td></tr><tr><td>Kode unik dikembalikan penuh</td><td>Rp 245</td></tr><tr class="t"><td>Ditransfer balik</td><td>Rp 4.125.245</td></tr></table><div class="note"><b>Catatan Pesta Kita:</b> Pembatalan disetujui sesuai tabel refund berjenjang. Dana dikembalikan ke rekening pengirim.</div><div class="actions mt-16"><button class="btn btn-o" type="button" disabled aria-disabled="true">Lihat bukti transfer refund</button></div><p class="hint">Bukti transfer refund belum tersedia pada prototipe ini; dokumen muncul setelah sistem mencatat pengiriman dana.</p></div></section><section class="card"><div class="card-h"><h2>Alasan Anda</h2></div><div class="card-b"><p class="m-0">Nenek dirawat di rumah sakit, acara tidak bisa dilanjutkan.</p></div></section></div><div class="stack"><section class="card"><div class="card-h"><h2>Tabel refund (contoh)</h2></div><div class="card-b" style="padding:12px"><table class="tier"><caption class="sr-only">Tabel: Contoh tabel refund</caption><thead><tr><th scope="col">Sisa waktu sebelum acara</th><th scope="col" class="num">Refund dari total tagihan (contoh)</th></tr></thead><tbody><tr class=""><td>30 hari atau lebih</td><td class="num">90%</td></tr><tr class=""><td>14 – 29 hari</td><td class="num">70%</td></tr><tr class="cur"><td>7 – 13 hari</td><td class="num">50%</td></tr><tr class=""><td>3 – 6 hari</td><td class="num">25%</td></tr><tr class=""><td>Kurang dari 3 hari</td><td class="num">0%</td></tr></tbody></table><p class="hint" style="padding:0 8px">Angka dan persentase di atas adalah contoh tampilan. Refund resmi dihitung sistem berdasarkan kebijakan yang berlaku.</p></div></section></div></div></main>
+<main id="konten" class="content" tabindex="-1"><div class="page-head"><div><div class="crumbs"><a href="{{ url('/klien') }}">Beranda</a> / <a href="{{ url('/klien/riwayat') }}">Riwayat &amp; evaluasi</a> / Dibatalkan</div><h1>Acara dibatalkan</h1><p class="sub">Acara milik akun Anda yang berstatus dibatalkan.</p></div><a class="btn" href="{{ url('/klien/riwayat') }}"><span class="ic i-info" aria-hidden="true"></span>Semua riwayat</a></div>
+<div class="data-note" role="note"><span class="ic i-info" aria-hidden="true"></span><p><b>Nominal refund belum tersedia.</b> Daftar ini membaca status acara dari basis data. Pengajuan pembatalan, perhitungan refund, dan bukti transfer dikelola oleh backend BE-6 — halaman ini tidak menghitung nominal apa pun.</p></div>
+<div class="cards">
+@forelse($events as $event)
+    <div class="card ev"><div class="item-h"><h2><a class="link-plain" href="{{ url('/klien/acara-detail/'.$event->id) }}">{{ $event->name }}</a></h2><span class="badge b-bad">Dibatalkan</span></div><p>{{ $event->event_date?->translatedFormat('l, d F Y') ?? 'Tanggal belum diisi' }}</p><p>{{ $event->guest_count }} tamu{{ $event->theme ? ' · '.$event->theme : '' }}</p></div>
+@empty
+    <p class="hint" style="padding:16px">Belum ada acara yang dibatalkan oleh akun Anda.</p>
+@endforelse
+</div>
+</main>
 @endsection

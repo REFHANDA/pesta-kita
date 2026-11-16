@@ -13,7 +13,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 /**
  * Pengajuan perubahan harga katalog atau venue (morph subject). Selama
  * menunggu, harga lama tetap berlaku; harga aktif berubah hanya saat
- * disetujui Admin (aturan terkunci A11).
+ * disetujui Admin (aturan terkunci A11). decision_note berisi catatan
+ * keputusan Admin (BE-3b, wajib saat menolak).
  */
 #[Fillable([
     'subject_type',
@@ -22,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
     'new_price',
     'reason',
     'status',
+    'decision_note',
     'reviewed_by',
     'reviewed_at',
 ])]

@@ -2,11 +2,59 @@
 
 @section('title', 'Detail log aktivitas · Admin Pesta Kita')
 
+@php
+// Halaman ini dipakai dua jalur: rute eksplisit /admin/aktivitas/{auditLog}
+// mengirim $log, sedangkan jalur catch-all prototipe /admin/aktivitas-detail
+// tidak mengirim data — karena itu seluruh tampilan diberi null guard.
+$log = $log ?? null;
+$actionLabels = \App\Http\Controllers\Admin\ActivityLogController::ACTION_LABELS;
+
+$subjectModules = [
+    'vendor_profile' => 'Verifikasi vendor',
+    'venue_profile' => 'Verifikasi pemilik venue',
+    'venue' => 'Katalog venue',
+    'catalog_item' => 'Katalog vendor',
+    'price_change_request' => 'Pengajuan harga',
+];
+
+$badge = fn ($action) => match (true) {
+    str_ends_with((string) $action, '_rejected') => 'b-bad',
+    str_ends_with((string) $action, '_approved') => 'b-ok',
+    default => 'b-mute',
+};
+
+$module = $log === null
+    ? '—'
+    : ($subjectModules[$log->subject_type] ?? str_replace('_', ' ', (string) $log->subject_type));
+
+$subjectName = $log?->subject?->name ?? $log?->subject?->business_name;
+@endphp
+
 @section('content')
 <main class="content detail-page page-refined" id="konten" tabindex="-1">
-<div class="page-head"><div><div class="crumbs"><a href="{{ url('/admin') }}">Admin</a> / Pemantauan / <a href="{{ url('/admin/aktivitas') }}">Log aktivitas</a> / Detail aktivitas</div><h1>Detail log aktivitas</h1><p class="sub">Jejak audit tindakan penting Admin, termasuk aktor, objek yang berubah, waktu, dan rincian keputusan.</p></div><a class="btn btn-o" href="{{ url('/admin/aktivitas') }}">Kembali</a></div>
-<div class="grid two"><section class="card"><div class="card-h"><h2>Informasi aktivitas</h2><span class="badge b-ok">Berhasil</span></div><div class="card-b detail-kv"><p><span class="lbl">ID log</span><b>LOG-2026-1103-0042</b></p><p><span class="lbl">Waktu</span><b>03 Nov 2026 · 10:42:18 WIB</b></p><p><span class="lbl">Aktor</span><b>Admin Utama</b><small class="sub-t">admin@pestakita.test</small></p><p><span class="lbl">Aksi</span><b>Pembayaran divalidasi</b></p><p><span class="lbl">Objek</span><b>Tagihan PK/2026/11/0026</b></p><p><span class="lbl">Modul</span><b>Tagihan &amp; pembayaran</b></p></div></section><section class="card"><div class="card-h"><h2>Ringkasan perubahan</h2></div><div class="card-b"><div class="alert">Bukti transfer diperiksa dan nominal dinyatakan sesuai dengan tagihan serta mutasi rekening perusahaan.</div><div class="detail-kv"><p><span class="lbl">Nominal tervalidasi</span><b>Rp18.750.000</b></p><p><span class="lbl">Rekening tujuan</span><b>BRI · **** 8821</b></p><p><span class="lbl">Hasil</span><b><span class="badge b-ok">Valid</span></b></p></div></div></section></div>
-<section class="card mt-20"><div class="card-h"><h2>Rincian audit</h2></div><div class="card-b"><div class="timeline"><div class="timeline-item"><b>10:39:05 · Bukti pembayaran diunggah</b><p class="sub">Klien mengirim bukti transfer untuk tagihan PK/2026/11/0026.</p></div><div class="timeline-item"><b>10:41:12 · Pemeriksaan dimulai</b><p class="sub">Admin memeriksa nominal, tanggal transfer, dan rekening tujuan.</p></div><div class="timeline-item"><b>10:42:18 · Pembayaran dinyatakan valid</b><p class="sub">Status pembayaran berubah menjadi valid dan tagihan menjadi lunas.</p></div></div></div></section>
-<section class="card mt-20"><div class="card-h"><h2>Metadata</h2></div><div class="card-b detail-kv"><p><span class="lbl">Alamat IP</span><b>192.0.2.24</b></p><p><span class="lbl">Perangkat</span><b>Chrome · Windows</b></p><p><span class="lbl">Catatan audit</span><b>Log aktivitas bersifat append-only dan tidak dapat diubah melalui halaman ini.</b></p></div></section>
+<div class="page-head"><div><div class="crumbs"><a href="{{ url('/admin') }}">Admin</a> / Pemantauan / <a href="{{ url('/admin/aktivitas') }}">Log aktivitas</a> / Detail aktivitas</div><h1>Detail log aktivitas</h1><p class="sub">Aktor, objek yang berubah, waktu, dan alasan keputusan sebagaimana tercatat di basis data.</p></div><a class="btn btn-o" href="{{ url('/admin/aktivitas') }}">Kembali</a></div>
+
+@if($log === null)
+    <div class="data-note" role="note"><span class="ic i-info" aria-hidden="true"></span><p><b>Belum ada entri yang dipilih.</b> Detail aktivitas dibaca per entri log. Buka daftar <a href="{{ url('/admin/aktivitas') }}">Log aktivitas</a> lalu pilih entri yang ingin diperiksa.</p></div>
+@else
+<div class="grid two"><section class="card"><div class="card-h"><h2>Informasi aktivitas</h2><span class="badge {{ $badge($log->action) }}">{{ $actionLabels[$log->action] ?? ucwords(str_replace('_', ' ', (string) $log->action)) }}</span></div><div class="card-b detail-kv"><p><span class="lbl">ID log</span><b>#{{ $log->id }}</b></p><p><span class="lbl">Waktu</span><b>{{ $log->created_at?->translatedFormat('d M Y H:i:s') ?? '—' }}</b></p><p><span class="lbl">Aktor</span><b>{{ $log->actor?->name ?? 'Sistem (tanpa akun)' }}</b>@if($log->actor)<small class="sub-t">{{ $log->actor->email }}</small>@endif</p><p><span class="lbl">Modul</span><b>{{ $module }}</b></p><p><span class="lbl">Objek</span><b>{{ $subjectName ?? $module.' #'.$log->subject_id }}</b>@if($subjectName)<small class="sub-t">{{ $module }} #{{ $log->subject_id }}</small>@endif</p></div></section>
+<section class="card"><div class="card-h"><h2>Ringkasan perubahan</h2></div><div class="card-b"><div class="detail-kv"><p><span class="lbl">Status sebelum</span><b>{{ $log->from_status ? str_replace('_', ' ', $log->from_status) : '—' }}</b></p><p><span class="lbl">Status sesudah</span><b>{{ $log->to_status ? str_replace('_', ' ', $log->to_status) : '—' }}</b></p></div>@if($log->reason)<div class="alert">Alasan tercatat: {{ $log->reason }}</div>@else<div class="alert">Aksi ini dicatat tanpa alasan. Hanya penolakan yang mewajibkan alasan.</div>@endif</div></section></div>
+
+<section class="card mt-20"><div class="card-h"><h2>Subjek terkait</h2></div><div class="card-b">
+    @if($log->subject)
+        <div class="detail-kv"><p><span class="lbl">Tipe entri</span><b>{{ $module }}</b></p><p><span class="lbl">Dibuat subjek</span><b>{{ $log->subject->created_at?->translatedFormat('d M Y') ?? '—' }}</b></p><p><span class="lbl">Perubahan subjek terakhir</span><b>{{ $log->subject->updated_at?->translatedFormat('d M Y H:i') ?? '—' }}</b></p></div>
+        @if($log->subject instanceof \App\Models\PriceChangeRequest)
+            <div class="detail-kv"><p><span class="lbl">Harga lama</span><b>Rp {{ number_format((int) $log->subject->old_price, 0, ',', '.') }}</b></p><p><span class="lbl">Harga diajukan</span><b>Rp {{ number_format((int) $log->subject->new_price, 0, ',', '.') }}</b></p></div>
+        @endif
+        @if($log->subject instanceof \App\Models\CatalogItem || $log->subject instanceof \App\Models\Venue)
+            <div class="detail-kv"><p><span class="lbl">Harga aktif saat ini</span><b>Rp {{ number_format((int) ($log->subject->catalog_price ?? $log->subject->rental_price ?? 0), 0, ',', '.') }}</b></p></div>
+        @endif
+    @else
+        <div class="data-note" role="note"><span class="ic i-info" aria-hidden="true"></span><p>Entri merujuk <b>{{ $module }} #{{ $log->subject_id }}</b>, namun subjeknya sudah dihapus dari basis data. Log tetap tersimpan sebagai jejak audit dan tidak diubah.</p></div>
+    @endif
+</div></section>
+
+<section class="card mt-20"><div class="card-h"><h2>Metadata</h2></div><div class="card-b detail-kv"><p><span class="lbl">Alamat IP</span><b>{{ $log->ip ?? 'Tidak tercatat' }}</b></p><p><span class="lbl">Diproses pada</span><b>{{ $log->created_at?->translatedFormat('d M Y H:i') ?? '—' }}</b></p><p><span class="lbl">Catatan audit</span><b>Log aktivitas bersifat append-only dan tidak dapat diubah melalui halaman ini.</b></p></div></section>
+@endif
 </main>
 @endsection

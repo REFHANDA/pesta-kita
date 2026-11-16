@@ -1,18 +1,30 @@
 <?php
 
+use App\Http\Controllers\Admin\ActivityLogController as AdminActivityLogController;
+use App\Http\Controllers\Admin\CatalogController as AdminCatalogController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\PriceChangeController as AdminPriceChangeController;
 use App\Http\Controllers\Admin\ProviderVerificationController;
 use App\Http\Controllers\Admin\VenueController as AdminVenueController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Klien\CalendarController as KlienCalendarController;
 use App\Http\Controllers\Klien\CatalogController as KlienCatalogController;
 use App\Http\Controllers\Klien\DashboardController as KlienDashboardController;
+use App\Http\Controllers\Klien\EventController as KlienEventController;
+use App\Http\Controllers\Klien\QuoteRequestController as KlienQuoteRequestController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Vendor\AvailabilityController as VendorAvailabilityController;
 use App\Http\Controllers\Vendor\CatalogItemController;
 use App\Http\Controllers\Vendor\DashboardController as VendorDashboardController;
+use App\Http\Controllers\Vendor\PriceChangeController as VendorPriceChangeController;
+use App\Http\Controllers\Vendor\QuoteRequestController as VendorQuoteRequestController;
+use App\Http\Controllers\Venue\AvailabilityController as VenueAvailabilityController;
 use App\Http\Controllers\Venue\DashboardController as VenueDashboardController;
+use App\Http\Controllers\Venue\PriceChangeController as VenuePriceChangeController;
+use App\Http\Controllers\Venue\QuoteRequestController as VenueQuoteRequestController;
 use App\Http\Controllers\Venue\VenueController;
 use App\Http\Controllers\Venue\VenueRoomController;
 use App\Http\Controllers\VerificationController;
@@ -95,6 +107,25 @@ Route::prefix('klien')->name('klien.')->middleware(['auth', 'role:klien'])->grou
     Route::get('/penyedia-vendor/{profile}', [KlienCatalogController::class, 'penyediaVendor'])->name('penyedia.vendor');
     Route::get('/penyedia-venue/{profile}', [KlienCatalogController::class, 'penyediaVenue'])->name('penyedia.venue');
 
+    // BE-3b: kalender ketersediaan read-only (sebelum catch-all).
+    Route::get('/kalender-ketersediaan', [KlienCalendarController::class, 'index'])->name('kalender');
+
+    // Wiring read-only: daftar acara nyata milik akun login (sebelum catch-all).
+    // Halaman detail/pesanan/tagihan acara masih prototipe BE-4–BE-7.
+    Route::get('/acara', [KlienEventController::class, 'index'])->name('acara');
+    Route::get('/riwayat', [KlienEventController::class, 'riwayat'])->name('riwayat');
+
+    // Wiring read-only: halaman status per acara + detail satu acara nyata
+    // milik akun login, dan permintaan penawaran (quote_requests) milik
+    // sendiri. Alur tulis (buat acara, ajukan/putus penawaran) BE-4/BE-5.
+    Route::get('/acara-detail/{event}', [KlienEventController::class, 'show'])->name('acara.detail');
+    Route::get('/acara-draft', [KlienEventController::class, 'draft'])->name('acara.draft');
+    Route::get('/acara-diajukan', [KlienEventController::class, 'diajukan'])->name('acara.diajukan');
+    Route::get('/acara-terkonfirmasi', [KlienEventController::class, 'terkonfirmasi'])->name('acara.terkonfirmasi');
+    Route::get('/acara-dibatalkan', [KlienEventController::class, 'dibatalkan'])->name('acara.dibatalkan');
+    Route::get('/permintaan-penawaran', [KlienQuoteRequestController::class, 'index'])->name('penawaran');
+    Route::get('/permintaan-penawaran-detail/{quoteRequest}', [KlienQuoteRequestController::class, 'show'])->name('penawaran.detail');
+
     Route::get('/{page}', function ($page) {
         $view = 'klien.'.$page;
         if (view()->exists($view)) {
@@ -126,6 +157,17 @@ Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'role:vendor'])->g
     // BE-3 (B14): halaman verifikasi penyedia.
     Route::get('/verifikasi', [VerificationController::class, 'show'])->name('verifikasi');
 
+    // BE-3b: kalender ketersediaan item + pengajuan harga (sebelum catch-all).
+    Route::get('/kalender-ketersediaan', [VendorAvailabilityController::class, 'index'])->name('kalender');
+    Route::post('/kalender-ketersediaan', [VendorAvailabilityController::class, 'update'])->name('kalender.update');
+    Route::get('/pengajuan-harga', [VendorPriceChangeController::class, 'index'])->name('pengajuan-harga');
+    Route::post('/pengajuan-harga', [VendorPriceChangeController::class, 'store'])->name('pengajuan-harga.store');
+
+    // Wiring read-only: permintaan penawaran masuk atas item katalog milik
+    // vendor login (sebelum catch-all). Alur tulis usulan harga BE-4.
+    Route::get('/permintaan-penawaran', [VendorQuoteRequestController::class, 'index'])->name('penawaran');
+    Route::get('/permintaan-penawaran-detail/{quoteRequest}', [VendorQuoteRequestController::class, 'show'])->name('penawaran.detail');
+
     Route::get('/{page}', function ($page) {
         $view = 'vendor.'.$page;
         if (view()->exists($view)) {
@@ -156,6 +198,17 @@ Route::prefix('venue')->name('venue.')->middleware(['auth', 'role:venue'])->grou
     // BE-3 (B14): halaman verifikasi penyedia.
     Route::get('/verifikasi', [VerificationController::class, 'show'])->name('verifikasi');
 
+    // BE-3b: kalender ketersediaan ruangan + pengajuan harga venue (sebelum catch-all).
+    Route::get('/kalender-ketersediaan', [VenueAvailabilityController::class, 'index'])->name('kalender');
+    Route::post('/kalender-ketersediaan', [VenueAvailabilityController::class, 'update'])->name('kalender.update');
+    Route::get('/pengajuan-harga', [VenuePriceChangeController::class, 'index'])->name('pengajuan-harga');
+    Route::post('/pengajuan-harga', [VenuePriceChangeController::class, 'store'])->name('pengajuan-harga.store');
+
+    // Wiring read-only: permintaan penawaran masuk atas ruangan venue milik
+    // login (sebelum catch-all). Alur tulis usulan harga BE-4.
+    Route::get('/permintaan-penawaran', [VenueQuoteRequestController::class, 'index'])->name('penawaran');
+    Route::get('/permintaan-penawaran-detail/{quoteRequest}', [VenueQuoteRequestController::class, 'show'])->name('penawaran.detail');
+
     Route::get('/{page}', function ($page) {
         $view = 'venue.'.$page;
         if (view()->exists($view)) {
@@ -181,6 +234,23 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         ->whereIn('type', ['vendor_profile', 'venue_profile'])->name('penyedia.verifikasi.approve');
     Route::post('/penyedia/{type}/{id}/verifikasi/tolak', [ProviderVerificationController::class, 'reject'])
         ->whereIn('type', ['vendor_profile', 'venue_profile'])->name('penyedia.verifikasi.reject');
+
+    // BE-3b: antrean dan keputusan pengajuan harga (sebelum catch-all).
+    Route::get('/pengajuan-harga', [AdminPriceChangeController::class, 'index'])->name('pengajuan-harga');
+    Route::get('/pengajuan-harga/{priceChange}', [AdminPriceChangeController::class, 'show'])->name('pengajuan-harga.detail');
+    Route::post('/pengajuan-harga/{priceChange}/{action}', [AdminPriceChangeController::class, 'decide'])
+        ->whereIn('action', ['approve', 'reject'])->name('pengajuan-harga.decide');
+
+    // Wiring read-only: log aktivitas membaca `audit_logs` yang sudah ditulis
+    // backend. Append-only — tidak ada rute tulis dari halaman ini.
+    Route::get('/aktivitas', [AdminActivityLogController::class, 'index'])->name('aktivitas');
+    Route::get('/aktivitas/{auditLog}', [AdminActivityLogController::class, 'show'])->name('aktivitas.detail');
+
+    // Wiring read-only: tinjauan katalog nyata (item + venue). Tidak ada
+    // persetujuan per item (keputusan Gate 4B butir 2) — status item dikelola
+    // penyedia, harga lewat pengajuan harga, venue lewat formulir venue.
+    Route::get('/katalog', [AdminCatalogController::class, 'index'])->name('katalog');
+    Route::get('/katalog-detail/{item}', [AdminCatalogController::class, 'show'])->name('katalog.detail');
 
     Route::get('/{page}', function ($page) {
         $view = 'admin.'.$page;

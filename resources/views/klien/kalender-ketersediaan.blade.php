@@ -2,6 +2,38 @@
 
 @section('title', 'Kalender ketersediaan · Pesta Kita')
 
+@php
+$items = $items ?? collect();
+$venues = $venues ?? collect();
+$statusToKey = [
+    \App\Enums\AvailabilityStatus::Tersedia->value => 'tersedia',
+    \App\Enums\AvailabilityStatus::TidakTersedia->value => 'tidak',
+    \App\Enums\AvailabilityStatus::BelumDikonfirmasi->value => 'belum',
+];
+$toDays = fn ($days) => (object) $days->mapWithKeys(fn ($day) => [$day->date->toDateString() => $statusToKey[$day->status->value] ?? 'belum'])->all();
+$datasets = collect($items
+    ->map(fn ($item) => [
+        'key' => 'item-'.$item->id,
+        'kategori' => 'vendor',
+        'nama' => $item->vendorProfile?->business_name ?? 'Vendor',
+        'jenis' => $item->name.' ('.($item->kind->value === 'layanan' ? 'Layanan' : 'Peralatan').')',
+        'days' => $toDays($item->availabilityDays),
+    ])->all())
+    ->merge($venues->flatMap(fn ($venue) => $venue->rooms->map(fn ($room) => [
+        'key' => 'room-'.$room->id,
+        'kategori' => 'venue',
+        'nama' => $venue->name,
+        'jenis' => $room->name.' · kapasitas '.$room->capacity,
+        'days' => $toDays($room->availabilityDays),
+    ]))->all())
+    ->all();
+$kalConfig = json_encode([
+    'editable' => false,
+    'start' => ['year' => (int) now()->format('Y'), 'month' => (int) now()->format('n')],
+    'datasets' => $datasets,
+], JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+@endphp
+
 @push('styles')
 <link rel="stylesheet" href="{{ asset('assets/css/katalog.css') }}">
 <link rel="stylesheet" href="{{ asset('assets/css/kalender.css') }}">
@@ -20,8 +52,16 @@
 
     <div class="data-note" role="note">
         <span class="ic i-info" aria-hidden="true"></span>
-        <p><b>Data contoh (prototipe).</b> Jadwal pada kalender ini adalah contoh statis untuk pratinjau UI, bukan ketersediaan sebenarnya. Belum ada kalender yang tersimpan di server, dan tanggal contoh tidak boleh disimpulkan sebagai sudah dipesan.</p>
+        <p><b>Jadwal diisi manual oleh penyedia.</b> Status tersedia/tidak tersedia pada kalender ini adalah gambaran dari penyedia, bukan jaminan dan bukan berarti tanggal sudah dipesan. Konfirmasi final tetap lewat proses permintaan penawaran dan persetujuan Admin Pesta Kita.</p>
     </div>
+
+    @if(count($datasets) === 0)
+    <div class="empty-state card mt-16">
+        <span class="ic i-cal" aria-hidden="true"></span>
+        <h2>Belum ada jadwal yang dapat ditampilkan</h2>
+        <p>Vendor dan venue yang tampil di katalog belum menandai tanggal ketersediaan. Silakan ajukan permintaan penawaran untuk mendapatkan konfirmasi.</p>
+    </div>
+    @else
 
     <div data-kalender>
         <section class="card mt-16" data-kal-controls>
@@ -38,7 +78,7 @@
                     <div class="field">
                         <label for="kal-picker">Vendor atau venue</label>
                         <select class="input" id="kal-picker"></select>
-                        <p class="hint">Daftar ini hanya berisi contoh.</p>
+                        <p class="hint">Hanya penyedia terverifikasi dengan katalog tayang yang muncul di sini.</p>
                     </div>
                 </div>
             </div>
@@ -72,14 +112,14 @@
                     </table>
 
                     <ul class="kal-legend">
-                        <li><span class="kal-key kal-ok" aria-hidden="true">&#10003;</span>Tersedia (contoh)</li>
-                        <li><span class="kal-key kal-bad" aria-hidden="true">&#10005;</span>Tidak tersedia (contoh)</li>
+                        <li><span class="kal-key kal-ok" aria-hidden="true">&#10003;</span>Tersedia</li>
+                        <li><span class="kal-key kal-bad" aria-hidden="true">&#10005;</span>Tidak tersedia</li>
                         <li><span class="kal-key kal-warn" aria-hidden="true">?</span>Belum dikonfirmasi</li>
                     </ul>
 
                     <div class="kal-nodata" id="kal-nodata" hidden>
                         <p><b>Informasi ketersediaan belum tersedia untuk pilihan ini.</b></p>
-                        <p class="hint">Silakan hubungi Admin melalui proses permintaan penawaran untuk mendapatkan konfirmasi.</p>
+                        <p class="hint">Penyedia ini belum menandai tanggal. Silakan ajukan permintaan penawaran untuk mendapatkan konfirmasi.</p>
                     </div>
                 </div>
             </section>
@@ -95,43 +135,23 @@
                 <section class="card">
                     <div class="card-h"><h2>Ajukan permintaan penawaran</h2></div>
                     <div class="card-b">
-                        <p class="hint">Tanggal yang Anda pilih dapat dibawa ke pengajuan permintaan penawaran. Status ketersediaan tetap perlu dikonfirmasi dan bukan jaminan.</p>
-                        <a class="btn mt-12" id="kal-quote-link" data-base="{{ url('/klien/permintaan-penawaran') }}" href="{{ url('/klien/permintaan-penawaran') }}">Ajukan permintaan penawaran</a>
+                        <p class="hint">Status ketersediaan di atas adalah gambaran dari penyedia dan tetap perlu dikonfirmasi. Proses permintaan penawaran sedang dikembangkan (BE-4); untuk saat ini halaman tersebut masih prototipe.</p>
+                        <a class="btn mt-12" id="kal-quote-link" data-base="{{ url('/klien/permintaan-penawaran') }}" href="{{ url('/klien/permintaan-penawaran') }}">Lihat prototipe permintaan penawaran</a>
                     </div>
                 </section>
             </aside>
         </div>
-
-        <div class="empty-state card mt-16" id="kal-empty" hidden>
-            <span class="ic i-cal" aria-hidden="true"></span>
-            <h2>Kalender belum tersedia</h2>
-            <p>Belum ada data ketersediaan contoh yang dapat ditampilkan. Silakan hubungi Admin melalui proses permintaan penawaran untuk mendapatkan konfirmasi.</p>
-        </div>
     </div>
+    @endif
 </main>
 
-<script type="application/json" id="kal-config">
-{
-  "editable": false,
-  "start": { "year": 2026, "month": 11 },
-  "datasets": [
-    { "key": "dapur-nusantara", "kategori": "vendor", "nama": "Dapur Nusantara", "jenis": "Katering prasmanan",
-      "days": { "2026-11-06": "tersedia", "2026-11-07": "tersedia", "2026-11-12": "tidak", "2026-11-13": "tidak", "2026-11-20": "tersedia", "2026-11-21": "tersedia", "2026-11-27": "tersedia", "2026-12-04": "tersedia", "2026-12-05": "tersedia", "2026-12-12": "tidak", "2026-12-19": "tersedia", "2026-12-24": "tidak" } },
-    { "key": "balon-ceria", "kategori": "vendor", "nama": "Balon Ceria", "jenis": "Dekorasi balon",
-      "days": { "2026-11-08": "tersedia", "2026-11-15": "tersedia", "2026-11-22": "tersedia", "2026-11-29": "tersedia", "2026-12-06": "tersedia", "2026-12-13": "tersedia", "2026-12-20": "tersedia", "2026-12-25": "tidak" } },
-    { "key": "harmoni-band", "kategori": "vendor", "nama": "Harmoni Band", "jenis": "Hiburan / musik",
-      "days": { "2026-11-01": "tersedia", "2026-11-14": "tersedia", "2026-11-28": "tersedia", "2026-12-05": "tersedia", "2026-12-12": "tersedia", "2026-12-31": "tersedia" } },
-    { "key": "graha-melati-ballroom", "kategori": "venue", "nama": "Graha Melati Ballroom", "jenis": "Ballroom",
-      "days": { "2026-11-07": "tersedia", "2026-11-14": "tidak", "2026-11-15": "tersedia", "2026-11-21": "tersedia", "2026-11-28": "tidak", "2026-12-05": "tersedia", "2026-12-12": "tersedia", "2026-12-19": "tidak", "2026-12-31": "tersedia" } },
-    { "key": "graha-melati-aula", "kategori": "venue", "nama": "Graha Melati Aula", "jenis": "Aula",
-      "days": { "2026-11-08": "tersedia", "2026-11-16": "tersedia", "2026-11-30": "tersedia", "2026-12-06": "tersedia", "2026-12-20": "tersedia" } },
-    { "key": "taman-sakura", "kategori": "venue", "nama": "Taman Sakura", "jenis": "Area taman (luar ruang)",
-      "days": { "2026-11-02": "tersedia", "2026-11-18": "tersedia", "2026-12-08": "tersedia", "2026-12-15": "tersedia" } }
-  ]
-}
-</script>
+@if(count($datasets) > 0)
+<script type="application/json" id="kal-config">{!! $kalConfig !!}</script>
+@endif
 @endsection
 
+@if(count($datasets) > 0)
 @push('scripts')
 <script src="{{ asset('assets/js/kalender.js') }}"></script>
 @endpush
+@endif
