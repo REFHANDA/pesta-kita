@@ -121,3 +121,17 @@ Frontend Tahap 6 (halaman keuangan 8 fokus, laporan `tahap-6-...md`) sudah dirap
 ---
 
 **Penegasan:** seluruh klaim pada laporan ini diverifikasi dari `git log`/`git show` repository, laporan tahap sebelumnya, dan kode aktual di working tree. Tidak ada hasil yang dikarang; angka tes dikutip dari hasil run aktual sesi wiring BE (2026-11-16).
+
+## 8. Addendum wiring BE-5–BE-7 (2026-11-17)
+
+Bagian 1–7 di atas adalah snapshot per 2026-11-16. Addendum ini menggantikan status tahap dan rekomendasi lama yang menyebut BE-5–BE-7 belum dimulai.
+
+| Tahap | Status | Cakupan yang kini terhubung |
+|---|---|---|
+| BE-5 | Selesai | Draft/pengajuan acara, item pesanan, keputusan Admin, keberatan penyedia 24 jam sejak persetujuan, banyak venue per acara, dan pemantauan acara. |
+| BE-6 | Selesai dengan batas refund | Invoice snapshot/versi, kode 3 digit dalam total, komisi 10% dari harga penyedia, bukti transfer privat, verifikasi Admin, rekening perusahaan, pencairan satu kali per item, dan retensi bukti lima tahun. Refund hanya mencatat permohonan; keputusan dan nominal final ditunda. |
+| BE-7 | Selesai | Rundown Klien/Vendor dapat dikelola; Venue/Admin read-only. Ulasan tersedia setelah acara selesai dan invoice lunas; agregat penyedia anonim. |
+
+Verifikasi setelah perbaikan: **315 tes / 1.609 assertions lulus** pada PHPUnit menggunakan SQLite in-memory; Pint lulus. Migrasi tidak dijalankan terhadap database lokal. Deadline invoice setelah H-7 memakai 24 jam sejak penerbitan dan dibatasi akhir tanggal acara karena skema belum mencatat jam acara.
+
+Pekerjaan tersisa: keputusan B1 untuk kebijakan refund final dan deployment/verifikasi migration pada lingkungan yang disetujui. Di luar alur BE-5–BE-7, yang masih belum terhubung mencakup notifikasi, rekomendasi Klien, unduh invoice/nota PDF, pengelolaan rekening payout Vendor/Venue, manajemen pengguna serta ringkasan pendapatan/rating Admin, checklist terpisah, dan editor layout venue.

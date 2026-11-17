@@ -1,11 +1,32 @@
 @extends('layouts.venue')
 
-@section('title', 'Pencairan · Panel Pemilik Venue Pesta Kita')
+@section('title', 'Riwayat pencairan · Panel Pemilik Venue Pesta Kita')
 
 @section('content')
-<main id="konten" class="content" tabindex="-1"><div class="page-head"><div><div class="crumbs"><a href="{{ url('/venue') }}">Beranda</a> / Pencairan</div><h1>Pencairan</h1><p class="sub">Dana dicairkan setelah acara ditandai selesai.</p></div></div>
-<div class="data-note" role="note"><span class="ic i-info" aria-hidden="true"></span><p><b>Halaman ini masih berupa prototipe frontend.</b> Nominal, jadwal, dan status pencairan di bawah adalah contoh statis. Perhitungan hak penyedia dan status pencairan final mengikuti sistem setelah backend tersedia.</p></div>
-<div class="alert warn"><span class="ic i-info" aria-hidden="true"></span><span>Rekening Anda menunggu verifikasi Admin. <a href="{{ url('/venue/profil') }}">Periksa profil usaha</a></span></div>
-<div class="grid stats stats-2 w-720"><div class="card stat"><span class="ic-box"><span class="ic i-wallet" aria-hidden="true"></span></span><div><div class="lbl">Menunggu dicairkan</div><div class="val">Rp 4.250.000</div></div></div><div class="card stat"><span class="ic-box"><span class="ic i-ok" aria-hidden="true"></span></span><div><div class="lbl">Sudah dicairkan</div><div class="val">Rp 12.800.000</div></div></div></div>
-<section class="card"><div class="table-wrap" role="region" tabindex="0" aria-label="Daftar pencairan. Gulir horizontal untuk melihat seluruh kolom"><table class="t-wide"><caption class="sr-only">Tabel: Daftar pencairan</caption><thead><tr><th scope="col">Jumlah</th><th scope="col">Jenis</th><th scope="col">Pesanan</th><th scope="col">Tanggal transfer</th><th scope="col">Status</th></tr></thead><tbody><tr><td><a href="{{ url('/venue/pencairan-detail') }}"><b>Rp 2.720.000</b></a></td><td>Hak atas pesanan</td><td>Graha Melati Ballroom · PK-0398</td><td>-</td><td><span class="badge b-warn">Belum cair</span></td></tr><tr><td><b>Rp 1.530.000</b></td><td>Kompensasi pembatalan</td><td>Taman Belakang · PK-0377</td><td>-</td><td><span class="badge b-warn">Belum cair</span></td></tr><tr><td><b>Rp 3.400.000</b></td><td>Hak atas pesanan</td><td>Graha Melati Ballroom · PK-0361</td><td>28 Okt 2026</td><td><span class="badge b-ok">Sudah cair</span></td></tr></tbody></table></div><div class="pager"><span>Menampilkan 3 pencairan</span><ul><li><span class="off">Sebelumnya</span></li><li><span aria-current="page">1</span></li><li><span aria-disabled="true">Berikutnya</span></li></ul></div></section></main>
+<main class="content" id="konten" tabindex="-1">
+    <div class="page-head"><div><div class="crumbs"><a href="{{ route('venue.beranda') }}">Beranda</a> / Riwayat pencairan</div><h1>Riwayat pencairan</h1></div></div>
+    <p class="hint">Daftar ini hanya menampilkan transfer yang telah dicatat Admin untuk venue milik Anda. Hak penyedia mengikuti harga final pesanan.</p>
+    <section class="card">
+        <div class="table-wrap" role="region" tabindex="0" aria-label="Riwayat pencairan">
+            <table class="t-wide">
+                <caption class="sr-only">Riwayat pencairan untuk pesanan venue</caption>
+                <thead><tr><th scope="col">Tanggal transfer</th><th scope="col">Acara</th><th scope="col">Item venue</th><th scope="col" class="num">Nominal</th><th scope="col"></th></tr></thead>
+                <tbody>
+                @forelse ($payouts as $payout)
+                    <tr>
+                        <td>{{ $payout->transferred_at->translatedFormat('d M Y') }}</td>
+                        <td>{{ $payout->orderItem->event->name }}</td>
+                        <td>{{ $payout->orderItem->subject?->name ?? 'Item tidak tersedia' }}</td>
+                        <td class="num">Rp {{ number_format($payout->amount, 0, ',', '.') }}</td>
+                        <td><a class="btn btn-o btn-sm" href="{{ route('venue.pencairan.detail', $payout) }}">Detail</a></td>
+                    </tr>
+                @empty
+                    <tr><td class="hint" colspan="5">Belum ada pencairan yang dicatat untuk venue Anda.</td></tr>
+                @endforelse
+                </tbody>
+            </table>
+        </div>
+        <div class="card-b">{{ $payouts->links() }}</div>
+    </section>
+</main>
 @endsection

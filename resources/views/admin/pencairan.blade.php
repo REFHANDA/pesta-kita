@@ -3,9 +3,55 @@
 @section('title', 'Pencairan penyedia · Admin Pesta Kita')
 
 @section('content')
-<main class="content page-refined" id="konten" tabindex="-1">
-<div class="page-head"><div><div class="crumbs"><a href="{{ url('/admin') }}">Admin</a> / Pencairan penyedia</div><h1>Pencairan penyedia</h1></div></div>
-<div class="data-note" role="note"><span class="ic i-info" aria-hidden="true"></span><p><b>Halaman ini masih berupa prototipe frontend.</b> Ringkasan, daftar pencairan, dan data rekening di bawah adalah contoh statis dengan nomor rekening disamarkan. Pencatatan transfer tidak mengubah status di server sampai backend keuangan tersedia.</p></div>
-<div class="grid stats three"><div class="card stat"><span class="ic-box"><span aria-hidden="true" class="ic i-wallet"></span></span><div><div class="lbl">Total belum cair</div><div class="val">Rp 9.350.000</div></div></div><div class="card stat"><span class="ic-box"><span aria-hidden="true" class="ic i-clip"></span></span><div><div class="lbl">Menunggu dicatat</div><div class="val">5</div></div></div><div class="card stat"><span class="ic-box"><span aria-hidden="true" class="ic i-ok"></span></span><div><div class="lbl">Sudah cair bulan ini</div><div class="val">Rp 6.100.000</div></div></div></div><section class="card workflow-card"><div aria-label="Status pencairan" class="tabs" role="navigation"><a href="{{ url('/admin/pencairan') }}" aria-current="page">Belum cair</a><a href="{{ url('/admin/pencairan') }}?status=sudah-cair">Sudah cair</a></div><div class="item workflow-item"><div class="item-h"><div><h2><a class="no-ul" href="{{ url('/admin/pencairan-detail') }}">Rp 2.720.000</a></h2><p class="meta">Hak penyedia · Katering prasmanan · Ulang Tahun ke-7 Nadia</p></div><span class="badge b-warn">Belum cair</span></div><p class="mt-12"><b>Dapur Nusantara</b> · BCA ···· 7890 a.n. Dapur Nusantara <span class="ok-t">(terverifikasi)</span></p><div class="form-row workflow-form"><div class="field"><label for="d1">Tanggal transfer</label><input aria-label="Tanggal transfer" class="input" id="d1" type="date" value="2026-11-03"/></div><div class="field"><label for="f1">Bukti transfer (opsional)</label><input class="input pt-8" id="f1" type="file"/></div><button class="btn" type="button" data-confirm="Catat pencairan sudah ditransfer?" data-text="Status pencairan menjadi cair dan tercatat di log aktivitas." data-label="Catat" data-done="Pencairan dicatat dan dicatat di log aktivitas.">Catat sudah ditransfer</button></div></div><div class="item workflow-item"><div class="item-h"><div><h3><a class="no-ul" href="{{ url('/admin/pencairan-detail') }}">Rp 1.530.000</a></h3><p class="meta">Hak penyedia · Sound system ×2 · Pesta Kebun Raka</p></div><span class="badge b-warn">Belum cair</span></div><p class="mt-12"><b>Sewa Audio Jaya</b> · <span class="bad-t">rekening belum diisi</span></p><div class="form-row workflow-form"><div class="field"><label for="d2">Tanggal transfer</label><input aria-label="Tanggal transfer" class="input" id="d2" type="date" value="2026-11-03"/></div><div class="field"><label for="f2">Bukti transfer (opsional)</label><input class="input pt-8" id="f2" type="file"/></div><button class="btn" type="button" data-confirm="Catat pencairan sudah ditransfer?" data-text="Status pencairan menjadi cair dan tercatat di log aktivitas." data-label="Catat" data-done="Pencairan dicatat dan dicatat di log aktivitas.">Catat sudah ditransfer</button></div></div><div class="pager"><span>Menampilkan 1–2 dari 5 pencairan</span><ul tabindex="0" aria-label="Navigasi halaman pencairan"><li><span class="off">Sebelumnya</span></li><li><span aria-current="page"><span class="sr-only">Halaman </span>1</span></li><li><a href="{{ url('/admin/pencairan') }}?halaman=2">2</a></li><li><a href="{{ url('/admin/pencairan') }}?halaman=3">3</a></li><li><a href="{{ url('/admin/pencairan') }}?halaman=2">Berikutnya</a></li></ul></div></section>
+<main class="content" id="konten" tabindex="-1">
+    <div class="page-head"><div><div class="crumbs"><a href="{{ route('admin.beranda') }}">Admin</a> / Keuangan / Pencairan</div><h1>Pencairan penyedia</h1></div></div>
+    <p class="hint">Hak penyedia adalah harga final penuh; komisi platform ditagihkan kepada Klien. Setiap item hanya dapat dicatat cair satu kali.</p>
+    <section class="card">
+        <div class="card-h"><div><h2>Siap dicairkan</h2><p class="meta">Acara selesai, tagihan lunas, dan belum ada transfer tercatat.</p></div></div>
+        <div class="table-wrap" role="region" tabindex="0" aria-label="Item siap dicairkan">
+            <table class="t-wide">
+                <caption class="sr-only">Item penyedia yang memenuhi syarat pencairan</caption>
+                <thead><tr><th scope="col">Acara</th><th scope="col">Item</th><th scope="col">Penyedia</th><th scope="col" class="num">Hak penyedia</th><th scope="col"></th></tr></thead>
+                <tbody>
+                @forelse ($eligibleItems as $orderItem)
+                    <tr>
+                        <td>{{ $orderItem->event->name }}</td>
+                        <td>{{ $orderItem->subject?->name ?? 'Item tidak tersedia' }}</td>
+                        <td>{{ $orderItem->provider?->business_name ?? 'Penyedia tidak tersedia' }}</td>
+                        <td class="num">Rp {{ number_format($orderItem->final_price, 0, ',', '.') }}</td>
+                        <td><a class="btn btn-o btn-sm" href="{{ route('admin.pencairan.detail', $orderItem) }}">Tinjau dan catat</a></td>
+                    </tr>
+                @empty
+                    <tr><td class="hint" colspan="5">Belum ada item yang siap dicairkan.</td></tr>
+                @endforelse
+                </tbody>
+            </table>
+        </div>
+        <div class="card-b">{{ $eligibleItems->links() }}</div>
+    </section>
+    <section class="card mt-16">
+        <div class="card-h"><div><h2>Transfer tercatat</h2><p class="meta">Riwayat pencairan yang sudah dicatat Admin.</p></div></div>
+        <div class="table-wrap" role="region" tabindex="0" aria-label="Riwayat transfer">
+            <table class="t-wide">
+                <caption class="sr-only">Riwayat pencairan penyedia</caption>
+                <thead><tr><th scope="col">Tanggal transfer</th><th scope="col">Acara</th><th scope="col">Item</th><th scope="col">Penyedia</th><th scope="col" class="num">Nominal</th><th scope="col"></th></tr></thead>
+                <tbody>
+                @forelse ($payouts as $payout)
+                    <tr>
+                        <td>{{ $payout->transferred_at->translatedFormat('d M Y') }}</td>
+                        <td>{{ $payout->orderItem->event->name }}</td>
+                        <td>{{ $payout->orderItem->subject?->name ?? 'Item tidak tersedia' }}</td>
+                        <td>{{ $payout->orderItem->provider?->business_name ?? 'Penyedia tidak tersedia' }}</td>
+                        <td class="num">Rp {{ number_format($payout->amount, 0, ',', '.') }}</td>
+                        <td><a class="btn btn-o btn-sm" href="{{ route('admin.pencairan.detail', $payout->order_item_id) }}">Detail</a></td>
+                    </tr>
+                @empty
+                    <tr><td class="hint" colspan="6">Belum ada transfer yang dicatat.</td></tr>
+                @endforelse
+                </tbody>
+            </table>
+        </div>
+        <div class="card-b">{{ $payouts->links() }}</div>
+    </section>
 </main>
 @endsection

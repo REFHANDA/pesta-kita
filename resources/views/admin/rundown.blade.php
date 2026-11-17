@@ -4,14 +4,33 @@
 
 @section('content')
 <main class="content" id="konten" tabindex="-1">
-<div class="page-head"><div><div class="crumbs"><a href="{{ url('/admin') }}">Admin</a> / Pemantauan / Monitoring rundown</div><h1>Monitoring rundown</h1><p class="sub">Pemantauan jadwal acara untuk membantu Admin melihat kesiapan koordinasi. Admin hanya memiliki akses lihat.</p></div></div>
-<div class="alert"><span aria-hidden="true" class="ic i-alert"></span><span>Rundown dikelola oleh klien dan vendor terkait. Admin dan pemilik venue hanya melihat; bentrok waktu ditampilkan sebagai peringatan dan tidak memblokir penyimpanan.</span></div>
-<section class="card"><div class="toolbar"><input class="input" aria-label="Cari ID atau nama acara" placeholder="Cari ID acara / nama acara"/><select aria-label="Filter status acara" class="input"><option>Semua status</option><option>Terkonfirmasi</option><option>Selesai</option></select><input aria-label="Filter tanggal acara" class="input" type="date" value="2026-11-12"/><button class="btn btn-o" type="button">Terapkan</button></div>
-<div aria-label="Monitoring rundown. Gulir horizontal untuk melihat seluruh kolom" class="table-wrap" role="region" tabindex="0"><table class="t-wide"><caption class="sr-only">Tabel: Monitoring rundown</caption><thead><tr><th scope="col">Waktu</th><th scope="col">Agenda</th><th scope="col">Penanggung jawab</th><th scope="col">Acara</th><th scope="col">Status</th><th scope="col">Catatan</th></tr></thead><tbody>
-<tr><td>08.00–09.00</td><td><b>Persiapan venue</b></td><td>Grand Garden Hall</td><td>PK-028 · Pesta Kebun Raka</td><td><span class="badge b-ok">Terjadwal</span></td><td>-</td></tr>
-<tr><td>09.00–10.00</td><td><b>Setup dekorasi</b></td><td>Kreasi Pesta</td><td>PK-028 · Pesta Kebun Raka</td><td><span class="badge b-ok">Terjadwal</span></td><td>-</td></tr>
-<tr><td>10.00–10.30</td><td><b>Sound check</b></td><td>Sewa Audio Jaya</td><td>PK-028 · Pesta Kebun Raka</td><td><span class="badge b-warn">Potensi bentrok</span></td><td>Beririsan dengan persiapan hiburan</td></tr>
-<tr><td>10.30–11.00</td><td><b>Kedatangan tamu</b></td><td>Klien</td><td>PK-028 · Pesta Kebun Raka</td><td><span class="badge b-ok">Terjadwal</span></td><td>-</td></tr>
-</tbody></table></div><div class="pager"><span>4 item rundown</span><a href="{{ url('/admin/acara-detail') }}">Lihat detail acara PK-028 →</a></div></section>
+    <div class="page-head"><div><div class="crumbs"><a href="{{ route('admin.beranda') }}">Admin</a> / Pemantauan / Rundown</div><h1>Monitoring rundown</h1><p class="sub">Admin hanya dapat melihat jadwal acara.</p></div></div>
+    @forelse ($events as $event)
+        <section class="card mt-16">
+            <div class="card-h"><div><h2><a href="{{ route('admin.acara.detail', $event) }}">{{ $event->name }}</a></h2><p class="meta">{{ $event->event_date?->translatedFormat('l, d F Y') }}</p></div><span class="badge b-ok">{{ ucfirst(str_replace('_', ' ', $event->status->value)) }}</span></div>
+            <div class="table-wrap" role="region" tabindex="0" aria-label="Rundown {{ $event->name }}">
+                <table class="t-wide">
+                    <caption class="sr-only">Segmen rundown {{ $event->name }}</caption>
+                    <thead><tr><th scope="col">Waktu</th><th scope="col">Agenda</th><th scope="col">Item pesanan</th><th scope="col">Durasi</th><th scope="col">Catatan</th></tr></thead>
+                    <tbody>
+                    @forelse ($event->rundownItems->sortBy('starts_at') as $segment)
+                        <tr>
+                            <td>{{ $segment->starts_at?->format('H:i') ?? '—' }}</td>
+                            <td>{{ $segment->title }}</td>
+                            <td>{{ $segment->orderItem?->subject?->name ?? 'Dikelola Klien' }}</td>
+                            <td>{{ $segment->duration_minutes ? $segment->duration_minutes.' menit' : '—' }}</td>
+                            <td>{{ $segment->notes ?: '—' }}</td>
+                        </tr>
+                    @empty
+                        <tr><td class="hint" colspan="5">Belum ada segmen rundown.</td></tr>
+                    @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    @empty
+        <section class="card"><p class="hint" style="padding:16px">Belum ada acara untuk dipantau.</p></section>
+    @endforelse
+    <div class="card-b">{{ $events->links() }}</div>
 </main>
 @endsection

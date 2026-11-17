@@ -1,6 +1,6 @@
 # Kontrak Integrasi Frontend–Backend — Pesta Kita
 
-Status: kontrak diperbarui pada 2026-11-17. Aplikasi memakai form dan route web Blade, bukan API JSON publik. BE-1, BE-3, BE-3b, dan BE-4 sudah memiliki route aktif; rincian endpoint penawaran BE-4 dicatat di bawah. Kontrak BE-5 dan seterusnya tetap rancangan.
+Status: diperbarui pada 2026-11-17. Aplikasi memakai form dan route web Blade, bukan API JSON publik. BE-1 sampai BE-7 memiliki route aktif. Refund masih terbatas pada penerimaan permohonan; keputusan dan nominal final belum tersedia.
 
 Kontrak ini memakai form POST dan Blade, sesuai aplikasi saat ini. Bukan API JSON publik. Kalender tetap membaca JSON yang diletakkan controller di halaman yang sama (`#kal-config`), karena `kalender.js` sudah bekerja seperti itu.
 
@@ -22,6 +22,29 @@ Setiap aksi tulis menolak peran yang salah dengan 403. Halaman milik peran lain 
 | GET | `/admin/permintaan-penawaran` | Antrean Admin dengan filter status |
 | GET | `/admin/permintaan-penawaran-detail`, `/admin/permintaan-penawaran-detail/{quoteRequest}` | Empty state kompatibilitas dan detail quote |
 | POST | `/admin/permintaan-penawaran/{quoteRequest}/{action}` | Keputusan `approve` atau `reject` |
+| POST | `/klien/acara`, `/klien/acara/{event}/items`, `/klien/acara/{event}/submit` | Buat draft, tambahkan item, dan ajukan acara |
+| GET | `/klien/acara-detail/{event}`, `/klien/acara-draft`, `/klien/acara-diajukan`, `/klien/acara-terkonfirmasi`, `/klien/acara-dibatalkan` | Detail dan daftar acara milik Klien |
+| GET/POST | `/vendor/pesanan-detail/{orderItem}`, `/vendor/pesanan-detail/{orderItem}/keberatan` | Detail item milik Vendor dan ajukan keberatan |
+| GET/POST | `/venue/pesanan-detail/{orderItem}`, `/venue/pesanan-detail/{orderItem}/keberatan` | Detail item milik Venue dan ajukan keberatan |
+| GET | `/admin/pesanan`, `/admin/keberatan`, `/admin/pesanan-detail/{orderItem}`, `/admin/keberatan-detail/{orderObjection}` | Antrean dan detail pesanan/keberatan |
+| POST | `/admin/pesanan/{orderItem}/{action}`, `/admin/keberatan/{orderObjection}/{action}` | Keputusan item dan keberatan oleh Admin |
+| POST | `/admin/acara/{event}/tagihan` | Terbitkan invoice setelah seluruh item dan masa keberatan selesai |
+| GET | `/klien/tagihan/{invoice}` | Lihat invoice milik Klien |
+| POST | `/klien/tagihan/{invoice}/pembayaran` | Unggah bukti pembayaran |
+| GET | `/admin/pembayaran/{invoice}` | Tinjau pembayaran invoice |
+| POST | `/admin/pembayaran-bukti/{payment}/{action}` | Verifikasi bukti dan nominal oleh Admin |
+| GET/POST | `/klien/acara/{event}/refund` | Catat permohonan refund |
+| GET | `/admin/pembatalan/{refundRequest}` | Tinjau permohonan tanpa keputusan final |
+| GET/POST | `/admin/pencairan/{orderItem}` | Catat pencairan satu kali per item dan akses bukti |
+| GET | `/admin/rekening`, `/admin/rekening-form`, `/admin/rekening-form/{companyBankAccount}` | Daftar, form rekening baru, dan form edit |
+| POST/PUT | `/admin/rekening`, `/admin/rekening/{companyBankAccount}`, `/admin/rekening/{companyBankAccount}/status` | Simpan atau ubah rekening perusahaan |
+| GET | `/admin/acara`, `/admin/acara/{event}` | Pantau daftar dan detail acara |
+| POST | `/admin/acara/{event}/selesai` | Tandai acara selesai setelah syarat terpenuhi |
+| GET | `/vendor/pencairan/{payout}`, `/venue/pencairan/{payout}` | Riwayat dan bukti pencairan milik penyedia |
+| GET/POST | `/klien/acara/{event}/rundown`, `/vendor/rundown/{event}` | Baca dan tambah segmen rundown sesuai kepemilikan |
+| PUT/DELETE | `/klien/acara/{event}/rundown/{rundownItem}`, `/vendor/rundown/{event}/{rundownItem}` | Ubah atau hapus segmen milik pengguna |
+| GET | `/venue/rundown`, `/admin/rundown`, `/vendor/ulasan`, `/venue/ulasan` | Rundown read-only dan agregat ulasan anonim |
+| POST | `/klien/acara/{event}/ulasan/{orderItem}` | Ulasan Klien setelah acara selesai dan invoice lunas |
 | GET | `/up` | Health Laravel |
 
 Route portal memakai middleware autentikasi dan role terkait. Route tulis eksplisit didaftarkan sebelum catch-all Blade. Route katalog, kalender, ketersediaan, dan pengajuan harga BE-3/BE-3b juga aktif; rincian tahap itu ada di laporan implementasinya.
@@ -33,18 +56,18 @@ Route portal memakai middleware autentikasi dan role terkait. Route tulis ekspli
 | Katalog Vendor | Klien | Daftar dan detail: usaha, kategori, area, mode harga tetap vs penawaran, verifikasi, paket, kebijakan, galeri. | Backend BE-3: data publik hanya dari penyedia terverifikasi. | Sebagian filter dan fitur lanjutan masih di luar tahap. |
 | Katalog Venue | Klien | Jenis, lokasi, kapasitas, fasilitas, sewa, kebersihan, aturan, kebijakan, ketersediaan perlu konfirmasi. | Backend BE-3: venue/ruangan publik mengikuti verifikasi penyedia. | Status ketersediaan tetap perlu konfirmasi; bukan jaminan booking. |
 | Peralatan | Klien, Vendor | Katalog sewa dan form alat. | Terhubung melalui struktur katalog bersama dengan atribut `kind` (B15). | Fitur inventori/stok belum ada. |
-| Profil | Semua | Profil usaha, portofolio, verifikasi Admin, ganti sandi. Publik tanpa kontak pribadi. | Profil, kata sandi, verifikasi, dan media terhubung sesuai role (BE-1/BE-3). | UI rekening bank dan beberapa fitur lanjutan belum terhubung. |
+| Profil | Semua | Profil usaha, portofolio, verifikasi Admin, ganti sandi. Publik tanpa kontak pribadi. | Profil, kata sandi, verifikasi, dan media terhubung sesuai role (BE-1/BE-3). | Pengelolaan rekening payout Vendor/Venue belum memiliki workflow UI/route. |
 | Request Quote | Empat role | Klien mengajukan. Penyedia mengusulkan. Admin memutuskan. Tiga nominal terpisah. | BE-4 aktif untuk Klien, Vendor, Venue, Admin; snapshot harga katalog, proposal, keputusan, dan audit disimpan server. | Tidak membuat acara baru; tautan acara draft opsional. Keputusan final tidak dapat diulang. |
 | Kalender | Klien, Vendor, Venue | Status per tanggal. Venue per ruangan. Klien dapat meneruskan tanggal ke penawaran. | BE-3b aktif: penyedia mengubah ketersediaan; Klien membaca jadwal. | Status dipesan tetap berasal dari pesanan, belum ada booking/lock tanggal. |
-| Pesanan | Semua | Tahap acara, setujui atau tolak Admin, keberatan penyedia, tanpa nama Klien di sisi penyedia. | BE-3 menyediakan baca-saja daftar/detail acara Klien; BE-4 dapat menautkan quote ke draft. Belum ada route tulis acara/pesanan. | State machine dan masa keberatan setelah B7. |
-| Tagihan | Klien, Admin | Satu invoice per acara: harga penyedia, komisi, kebersihan, kode unik, total, versi. | Tidak ada. | Hitung di server. Versi setelah B8. |
-| Pembayaran | Klien, Admin | Pilih rekening perusahaan, unggah bukti, validasi Admin, nota hanya jika lunas. | Tidak ada. | Disk privat, cocokkan nominal, status. |
-| Refund | Klien, Admin | Alasan pengajuan, keputusan, bukti transfer refund. Tanpa hitung lokal. | Tidak ada. | Snapshot kebijakan. Nominal setelah B1. |
-| Pencairan | Vendor, Venue, Admin | Hak penuh penyedia, kompensasi, rekening tersamar, bukti cair. | Tidak ada. | Unique per item, hanya setelah acara selesai. |
-| Koordinasi | Semua | Rundown, evaluasi setelah selesai. Checklist belum punya view terpisah. | Tidak ada. | Hak tulis rundown. Ulasan tanpa identitas ke penyedia. |
-| Rekening perusahaan | Admin | Daftar dan form rekening tujuan transfer. | Tidak ada. | CRUD Admin. |
+| Pesanan | Semua | Tahap acara, keputusan Admin, keberatan penyedia, tanpa nama Klien di sisi penyedia. | BE-5 aktif: draft dan item pesanan, keputusan Admin, keberatan 24 jam sejak persetujuan, banyak venue per acara. | Notifikasi belum ada; invoice menunggu seluruh keputusan dan masa keberatan. |
+| Tagihan | Klien, Admin | Invoice gabungan: harga penyedia, komisi, kebersihan, kode unik, total, versi. | BE-6 aktif: kode unik 3 digit masuk total; komisi 10% dari harga penyedia; versi baru menggantikan versi lama. | Deadline H-7 pukul 23.59 WIB atau 24 jam setelah penerbitan; waktu acara belum tersedia dalam skema. Unduh PDF/nota belum tersedia. |
+| Pembayaran | Klien, Admin | Pilih rekening perusahaan, unggah bukti, validasi Admin, nota hanya jika lunas. | BE-6 aktif: bukti privat; Admin harus mencocokkan nominal. | Invoice kedaluwarsa menolak pembayaran baru, tetapi tidak membatalkan acara otomatis. |
+| Refund | Klien, Admin | Ajukan alasan dan tinjau status; tanpa hitung lokal. | BE-6 menerima permohonan dan menampilkan antrean/tinjauan. | Keputusan, persentase, nominal final, dan transfer ditunda sampai kebijakan B1 disetujui. |
+| Pencairan | Vendor, Venue, Admin | Hak penyedia, rekening tersamar, bukti cair. | BE-6 aktif: satu pencairan per item setelah acara selesai; penyedia hanya mengakses bukti miliknya. | Workflow pengelolaan rekening payout Vendor/Venue dan kompensasi refund belum tersedia. |
+| Koordinasi | Semua | Rundown dan ulasan setelah selesai. Checklist belum punya view terpisah. | BE-7 aktif: Klien/Vendor mengelola rundown; Venue/Admin read-only; penyedia melihat agregat ulasan anonim. | Tidak ada notifikasi, checklist terpisah, atau editor layout. |
+| Rekening perusahaan | Admin | Daftar dan form rekening tujuan transfer. | BE-6 CRUD Admin aktif dengan validasi dan masking. | Integrasi payment gateway tidak ada. |
 | Pengajuan harga | Vendor, Venue, Admin | Harga lama berlaku sampai disetujui. | BE-3b aktif; keputusan Admin dan perubahan harga tercatat. | Tidak mengubah pesanan lama. |
-| Pengguna dan audit | Admin | Mitra, nonaktifkan, log aktivitas. | Audit log tersedia; halaman aktivitas Admin bersifat baca-saja. | Manajemen pengguna Admin belum terhubung penuh. |
+| Pengguna dan audit | Admin | Mitra, nonaktifkan, log aktivitas. | Audit log tersedia; halaman aktivitas Admin bersifat baca-saja. | Manajemen pengguna Admin dan ringkasan pendapatan/rating dashboard belum terhubung penuh. |
 
 ## 3. Field yang sudah terlihat di form
 
@@ -65,7 +88,7 @@ Route portal memakai middleware autentikasi dan role terkait. Route tulis ekspli
 
 ## 4. Route implementasi dan usulan
 
-Route POST eksplisit harus didaftarkan sebelum catch-all `/{page}`. Rute BE-1, BE-3, BE-3b, dan BE-4 sudah dibuat; BE-5–BE-7 tetap rancangan.
+Route POST eksplisit harus didaftarkan sebelum catch-all `/{page}`. Rute BE-1 sampai BE-7 sudah dibuat; detail resource memakai route dengan parameter ID, bukan catch-all view.
 
 ### BE-1
 
@@ -78,7 +101,7 @@ Route POST eksplisit harus didaftarkan sebelum catch-all `/{page}`. Rute BE-1, B
 ### BE-3
 
 - GET katalog/detail terverifikasi, CRUD katalog/venue, media privat, verifikasi, kalender, dan pengajuan harga sudah aktif (BE-3/BE-3b).
-- Penambahan item ke acara draft belum tersedia; alur acara/pesanan masuk tahap BE-5.
+- Penambahan item ke acara draft kini aktif melalui route BE-5 yang didokumentasikan di bawah.
 
 ### BE-4
 
@@ -89,24 +112,25 @@ Route POST eksplisit harus didaftarkan sebelum catch-all `/{page}`. Rute BE-1, B
 
 ### BE-5
 
-- POST ajukan acara.
-- POST setujui atau tolak item oleh Admin, alasan wajib saat tolak.
-- POST keberatan oleh penyedia di dalam masa yang disepakati.
-- Transisi ke menunggu pembayaran hanya jika seluruh item sudah berstatus akhir.
+- Aktif: `POST /klien/acara` membuat draft; `PUT /klien/acara/{event}` memperbarui draft; `POST /klien/acara/{event}/items` dan `DELETE /klien/acara/{event}/items/{orderItem}` mengelola item.
+- Aktif: `POST /klien/acara/{event}/submit` mengajukan acara; Admin memakai `POST /admin/pesanan/{orderItem}/approve|reject`, alasan wajib saat menolak.
+- Aktif: Vendor/Venue mengirim keberatan melalui `POST /{role}/pesanan-detail/{orderItem}/keberatan`; Admin memutuskan melalui `POST /admin/keberatan/{orderObjection}/approve|reject`.
+- Batas keberatan 24 jam sejak persetujuan Admin. Invoice hanya dapat diterbitkan setelah seluruh item dan keberatan berstatus final. Satu acara dapat mempunyai beberapa venue.
 
 ### BE-6
 
-- POST terbitkan tagihan. Server menghitung komisi, kebersihan, kode unik, dan total.
-- POST unggah bukti oleh Klien pemilik acara.
-- POST sahkan atau tolak oleh Admin. Sahkan gagal jika nominal tidak sama dengan total.
-- POST ajukan pembatalan. POST putuskan refund. POST catat transfer refund.
-- POST catat pencairan. Constraint menolak pencairan hak kedua.
+- Aktif: `POST /admin/acara/{event}/tagihan` menghitung snapshot harga, komisi 10% dari harga penyedia, kebersihan, kode unik 3 digit, dan total.
+- Aktif: Klien pemilik invoice mengunggah bukti melalui `POST /klien/tagihan/{invoice}/pembayaran`; Admin menyetujui/menolak bukti. Persetujuan gagal jika nominal tidak sama dengan total invoice.
+- Invoice baru menonaktifkan versi sebelumnya. Deadline H-7 pukul 23.59 WIB atau 24 jam setelah penerbitan bila lewat H-7, dibatasi akhir tanggal acara karena jam acara belum tersimpan. Invoice kedaluwarsa tidak membatalkan pesanan otomatis.
+- Bukti bayar disimpan privat selama lima tahun sejak acara ditutup; setelahnya file dihapus dan path dibersihkan.
+- Refund hanya menerima permohonan Klien serta antrean tinjauan Admin. Tidak ada endpoint keputusan, nominal final, atau transfer refund sampai B1 disepakati.
+- Aktif: Admin mencatat pencairan melalui `/admin/pencairan/{orderItem}`; unique constraint menolak pencairan kedua. Vendor/Venue hanya dapat mengakses riwayat dan bukti miliknya.
 
 ### BE-7
 
-- POST rundown oleh Klien atau Vendor pemilik item.
-- POST ulasan setelah acara selesai dan tagihan lunas.
-- GET agregat untuk penyedia tanpa identitas penulis.
+- Aktif: Klien dan Vendor pemilik pesanan mengelola rundown melalui `POST/PUT/DELETE` pada route acara masing-masing. Venue dan Admin hanya membaca.
+- Aktif: Klien mengirim ulasan melalui `POST /klien/acara/{event}/ulasan/{orderItem}` setelah acara selesai dan invoice lunas.
+- Aktif: Vendor/Venue membaca agregat tanpa identitas penulis.
 
 ## 5. Validasi saat implementasi
 
@@ -119,6 +143,6 @@ Route POST eksplisit harus didaftarkan sebelum catch-all `/{page}`. Rute BE-1, B
 
 ## 6. Cara halaman terhubung
 
-Controller mengirim data ke Blade yang sudah ada. BE-4 mengganti data contoh pada delapan view quote untuk alur Klien, Vendor, Venue, dan Admin tanpa redesign. Halaman lain yang belum masuk tahap wiring tetap dapat berupa prototipe.
+Controller mengirim data ke Blade yang sudah ada. BE-4 sampai BE-7 mengganti data contoh pada alur quote, acara/pesanan, tagihan, refund intake, pencairan, rundown, dan ulasan tanpa redesign. Halaman yang belum masuk tahap wiring tetap dapat berupa prototipe.
 
 `aksi.js` tetap untuk halaman yang belum POST. Halaman yang sudah menyimpan tidak memakai pesan sukses palsu.

@@ -5,8 +5,8 @@ namespace App\Enums;
 /**
  * Status item pesanan (BACKEND_BUSINESS_RULES bagian C):
  * menunggu_admin -> disetujui atau ditolak; jika disetujui,
- * masa_keberatan -> mengikat. Masa keberatan (B7) belum dihitung pada
- * BE-2; kolom objection_deadline hanya tersedia nullable.
+ * masa_keberatan -> mengikat. BE-5 menetapkan deadline keberatan 24 jam
+ * setelah persetujuan Admin dan mengikat item setelah tenggat berakhir.
  */
 enum OrderItemStatus: string
 {

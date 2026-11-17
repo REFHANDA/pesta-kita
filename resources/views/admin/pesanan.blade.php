@@ -2,9 +2,64 @@
 
 @section('title', 'Review pesanan · Admin Pesta Kita')
 
+@php
+    $orderItems = $orderItems ?? collect();
+    $statusFilter = $statusFilter ?? 'menunggu_admin';
+    $labels = [
+        'menunggu_admin' => 'Menunggu review',
+        'masa_keberatan' => 'Masa keberatan',
+        'mengikat' => 'Mengikat',
+        'ditolak' => 'Ditolak',
+        'semua' => 'Semua',
+    ];
+@endphp
+
 @section('content')
 <main class="content" id="konten" tabindex="-1">
-<div class="page-head"><div><div class="crumbs"><a href="{{ url('/admin') }}">Admin</a> / Review pesanan</div><h1>Review pesanan</h1><p class="sub">Pesanan dari acara yang sudah diajukan klien. Acara draft belum perlu direview.</p></div><a class="btn btn-o" href="{{ url('/admin/admin-pesanan-venue') }}">Pesanan venue</a></div>
-<p class="deadline"><span class="chip">SLA review 24 jam</span> 3 pesanan menunggu review. Pesanan yang melewati batas ditandai <span class="badge b-bad">Mendesak</span>.</p><div class="alert"><span class="ic i-info" aria-hidden="true"></span><span>Buka tiap pesanan untuk melihat objek, nilai, dan konsekuensinya sebelum menyetujui atau menolak.</span></div><section class="card"><div aria-label="Filter status" class="tabs" role="navigation"><a href="{{ url('/admin/pesanan') }}" aria-current="page">Semua diajukan</a><a href="{{ url('/admin/pesanan') }}?status=menunggu-review">Menunggu review<span class="n">3</span></a><a href="{{ url('/admin/pesanan') }}?status=disetujui">Disetujui<span class="n">5</span></a><a href="{{ url('/admin/pesanan') }}?status=terkonfirmasi">Terkonfirmasi<span class="n">8</span></a><a href="{{ url('/admin/pesanan') }}?status=selesai">Selesai</a><a href="{{ url('/admin/pesanan') }}?status=ditolak">Ditolak</a><a href="{{ url('/admin/pesanan') }}?status=dialihkan">Dialihkan</a><a href="{{ url('/admin/pesanan') }}?status=dibatalkan">Dibatalkan</a></div><form class="toolbar" onsubmit="return false"><label class="sr-only" for="q">Cari nama acara</label><input class="input" id="q" placeholder="Cari nama acara…"/><label class="sr-only" for="j">Jenis</label><select aria-label="Jenis" class="input" id="j"><option>Semua jenis</option><option>Layanan vendor</option><option>Venue</option><option>Peralatan</option></select><button class="btn btn-o">Terapkan</button></form><div aria-label="Tabel pesanan" class="table-wrap" role="region" tabindex="0"><table class="t-wide"><caption class="sr-only">Pesanan dari acara yang sudah diajukan</caption><thead><tr><th scope="col">Item &amp; penyedia</th><th scope="col">Acara &amp; klien</th><th scope="col">Tanggal</th><th class="num" scope="col">Harga penyedia</th><th scope="col">Status</th></tr></thead><tbody><tr><td><a class="fw-7 no-ul" href="{{ url('/admin/pesanan-detail') }}">Katering prasmanan ×1</a><span class="sub-t">Dapur Nusantara</span></td><td>Ulang Tahun ke-7 Nadia<span class="sub-t">Dewi Lestari</span></td><td>12 Nov 2026</td><td class="num">Rp 3.200.000</td><td><span class="badge b-warn">Menunggu review</span></td></tr><tr><td><a class="fw-7 no-ul" href="{{ url('/admin/pesanan-detail') }}">Aula serbaguna</a><span class="sub-t">Gedung Serbaguna Melati</span></td><td>Ulang Tahun ke-7 Nadia<span class="sub-t">Dewi Lestari</span></td><td>12 Nov 2026</td><td class="num">Rp 4.500.000</td><td><span class="badge b-warn">Menunggu review</span></td></tr><tr><td><a class="fw-7 no-ul" href="{{ url('/admin/pesanan-detail') }}">Sound system ×2</a><span class="sub-t">Sewa Audio Jaya</span></td><td>Pesta Kebun Raka<span class="sub-t">Andi Pratama</span></td><td>20 Nov 2026</td><td class="num">Rp 1.800.000</td><td><span class="badge b-ok">Disetujui</span></td></tr><tr><td><a class="fw-7 no-ul" href="{{ url('/admin/pesanan-detail') }}">Dekorasi balon dan backdrop</a><span class="sub-t">Kreasi Pesta</span></td><td>Pesta Kebun Raka<span class="sub-t">Andi Pratama</span></td><td>20 Nov 2026</td><td class="num">Rp 2.100.000</td><td><span class="badge b-ok">Terkonfirmasi</span></td></tr><tr><td><a class="fw-7 no-ul" href="{{ url('/admin/pesanan-detail') }}">Photo booth</a><span class="sub-t">Foto Ceria</span></td><td>Syukuran Lulus Kuliah Sari<span class="sub-t">Sari Wulandari</span></td><td>28 Nov 2026</td><td class="num">Rp 1.500.000</td><td><span class="badge b-warn">Menunggu review</span></td></tr><tr><td><a class="fw-7 no-ul" href="{{ url('/admin/pesanan-detail') }}">Katering prasmanan ×1</a><span class="sub-t">Dapur Nusantara</span></td><td>Ulang Tahun Bima<span class="sub-t">Rina Kusuma</span></td><td>03 Des 2026</td><td class="num">Rp 2.900.000</td><td><span class="badge b-bad">Ditolak</span></td></tr><tr><td><a class="fw-7 no-ul" href="{{ url('/admin/pesanan-detail') }}">Meja bundar ×10</a><span class="sub-t">Sewa Audio Jaya</span></td><td>Ulang Tahun Bima<span class="sub-t">Rina Kusuma</span></td><td>03 Des 2026</td><td class="num">Rp 750.000</td><td><span class="badge b-ok">Terkonfirmasi</span></td></tr></tbody></table></div><div class="pager"><span>Menampilkan 1–7 dari 21 pesanan</span><ul><li><span class="off">Sebelumnya</span></li><li><span aria-current="page"><span class="sr-only">Halaman </span>1</span></li><li><a href="{{ url('/admin/pesanan') }}?halaman=2">2</a></li><li><a href="{{ url('/admin/pesanan') }}?halaman=3">3</a></li><li><a href="{{ url('/admin/pesanan') }}?halaman=2">Berikutnya</a></li></ul></div></section>
+    <div class="page-head">
+        <div>
+            <div class="crumbs"><a href="{{ route('admin.beranda') }}">Admin</a> / Review pesanan</div>
+            <h1>Review pesanan</h1>
+            <p class="sub">Setiap item diputuskan terpisah. Harga final diambil dari snapshot server.</p>
+        </div>
+        <a class="btn btn-o" href="{{ route('admin.keberatan') }}">Keberatan penyedia</a>
+    </div>
+    @if (session('status'))<div class="alert" role="status">{{ session('status') }}</div>@endif
+    <section class="card">
+        <nav aria-label="Filter status" class="tabs">
+            @foreach ($labels as $value => $label)
+                <a href="{{ route('admin.pesanan', ['status' => $value]) }}" @if ($statusFilter === $value) aria-current="page" @endif>{{ $label }}</a>
+            @endforeach
+        </nav>
+        <div class="table-wrap" role="region" tabindex="0" aria-label="Daftar item pesanan">
+            <table class="t-wide">
+                <caption class="sr-only">Item pesanan acara</caption>
+                <thead><tr><th scope="col">Item &amp; penyedia</th><th scope="col">Acara &amp; klien</th><th scope="col">Tanggal</th><th scope="col" class="num">Harga</th><th scope="col">Status</th></tr></thead>
+                <tbody>
+                @forelse ($orderItems as $orderItem)
+                    @php
+                        $provider = $orderItem->provider;
+                        $providerName = $provider?->business_name ?? 'Penyedia tidak tersedia';
+                        $subjectName = $orderItem->subject?->name ?? 'Item tidak tersedia';
+                        if ($orderItem->subject instanceof \App\Models\VenueRoom) {
+                            $subjectName = $orderItem->subject->venue?->name.' — '.$subjectName;
+                        }
+                        $amount = $orderItem->final_price ?? $orderItem->proposed_price_snapshot ?? $orderItem->catalog_price_snapshot;
+                    @endphp
+                    <tr>
+                        <td><a class="fw-7 no-ul" href="{{ route('admin.pesanan.detail', $orderItem) }}">{{ $subjectName }}</a><span class="sub-t">{{ $providerName }}</span></td>
+                        <td>{{ $orderItem->event?->name }}<span class="sub-t">{{ $orderItem->event?->client?->name }}</span></td>
+                        <td>{{ $orderItem->event?->event_date?->translatedFormat('d M Y') }}</td>
+                        <td class="num">Rp {{ number_format((int) $amount, 0, ',', '.') }}</td>
+                        <td>{{ $labels[$orderItem->status->value] ?? $orderItem->status->value }}</td>
+                    </tr>
+                @empty
+                    <tr><td colspan="5" class="hint">Belum ada item pesanan untuk filter ini.</td></tr>
+                @endforelse
+                </tbody>
+            </table>
+        </div>
+        @if (method_exists($orderItems, 'links'))<div class="card-b">{{ $orderItems->links() }}</div>@endif
+    </section>
 </main>
 @endsection

@@ -8,14 +8,19 @@ use App\Models\CatalogItem;
 use App\Models\ClientProfile;
 use App\Models\CompanyBankAccount;
 use App\Models\Event;
+use App\Models\EventReview;
+use App\Models\Invoice;
 use App\Models\Media;
 use App\Models\OrderItem;
 use App\Models\OrderObjection;
+use App\Models\Payment;
+use App\Models\Payout;
 use App\Models\PriceChangeRequest;
 use App\Models\ProviderBankAccount;
 use App\Models\QuoteDecision;
 use App\Models\QuoteProposal;
 use App\Models\QuoteRequest;
+use App\Models\RefundRequest;
 use App\Models\User;
 use App\Models\VendorProfile;
 use App\Models\Venue;
@@ -63,6 +68,11 @@ class AppServiceProvider extends ServiceProvider
             'price_change_request' => PriceChangeRequest::class,
             'availability_day' => AvailabilityDay::class,
             'event' => Event::class,
+            'invoice' => Invoice::class,
+            'payment' => Payment::class,
+            'refund_request' => RefundRequest::class,
+            'payout' => Payout::class,
+            'event_review' => EventReview::class,
             'quote_request' => QuoteRequest::class,
             'quote_proposal' => QuoteProposal::class,
             'quote_decision' => QuoteDecision::class,

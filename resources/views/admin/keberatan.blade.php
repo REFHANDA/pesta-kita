@@ -2,9 +2,50 @@
 
 @section('title', 'Keberatan penyedia · Admin Pesta Kita')
 
+@php
+    $objections = $objections ?? collect();
+    $statusFilter = $statusFilter ?? 'diajukan';
+    $filters = ['diajukan' => 'Terbuka', 'diputuskan' => 'Diputuskan', 'semua' => 'Semua'];
+@endphp
+
 @section('content')
 <main class="content page-refined" id="konten" tabindex="-1">
-<div class="page-head"><div><div class="crumbs"><a href="{{ url('/admin') }}">Admin</a> / Keberatan</div><h1>Keberatan penyedia</h1></div></div>
-<div class="alert" role="note"><span aria-hidden="true" class="ic i-info"></span><span>Keberatan menahan terbitnya tagihan sampai diputuskan. Keputusan tidak otomatis mengubah pesanan; tindak lanjut (tolak atau alihkan) dilakukan di halaman pesanan.</span></div><section class="card workflow-card"><div aria-label="Filter keberatan" class="tabs" role="navigation"><a href="{{ url('/admin/keberatan') }}" aria-current="page">Terbuka</a><a href="{{ url('/admin/keberatan') }}">Semua</a></div><div class="item urgent workflow-item"><div class="item-h"><div><h2>Sound system ×2</h2><p class="meta">Sewa Audio Jaya · Jadwal bentrok · <b class="bad-t">DARURAT</b></p></div><span class="badge b-warn">Diajukan</span></div><p class="mt-12">Venue yang dipesan klien tidak punya daya listrik cukup untuk dua unit speaker.</p><p class="meta">Acara: Pesta Kebun Raka · diajukan 02/11 09:14 · batas tinjau 03/11 09:14 · <button class="link-btn" type="button">lihat bukti</button></p><div class="form-row workflow-form"><div class="field"><label for="kSo">Keputusan</label><select aria-label="Keputusan" class="input" id="kSo"><option>Diterima</option><option>Ditolak</option></select></div><div class="field"><label for="cSo">Alasan keputusan (wajib)</label><input class="input" id="cSo"/></div><a class="btn" href="{{ url('/admin/keberatan-detail') }}">Putuskan</a></div></div><div class="item workflow-item"><div class="item-h"><div><h3>Katering prasmanan ×1</h3><p class="meta">Dapur Nusantara · Kapasitas</p></div><span class="badge b-info">Ditinjau</span></div><p class="mt-12">Jumlah tamu pada acara melebihi kapasitas paket yang tersedia.</p><p class="meta">Acara: Ulang Tahun ke-7 Nadia · diajukan 01/11 16:40</p><div class="form-row workflow-form"><div class="field"><label for="kKa">Keputusan</label><select aria-label="Keputusan" class="input" id="kKa"><option>Diterima</option><option>Ditolak</option></select></div><div class="field"><label for="cKa">Alasan keputusan (wajib)</label><input class="input" id="cKa"/></div><a class="btn" href="{{ url('/admin/keberatan-detail') }}">Putuskan</a></div></div><div class="pager"><span>Menampilkan 1–2 dari 2 keberatan</span><ul><li><span class="off">Sebelumnya</span></li><li><span aria-current="page"><span class="sr-only">Halaman </span>1</span></li><li><a href="{{ url('/admin/keberatan') }}?halaman=2">2</a></li><li><a href="{{ url('/admin/keberatan') }}?halaman=3">3</a></li><li><a href="{{ url('/admin/keberatan') }}?halaman=2">Berikutnya</a></li></ul></div></section>
+    <div class="page-head"><div><div class="crumbs"><a href="{{ route('admin.beranda') }}">Admin</a> / Keberatan</div><h1>Keberatan penyedia</h1><p class="sub">Persetujuan keberatan mengeluarkan item dari pesanan; tidak menetapkan refund.</p></div></div>
+    @if (session('status'))<div class="alert" role="status">{{ session('status') }}</div>@endif
+    <section class="card">
+        <nav class="tabs" aria-label="Filter keberatan">
+            @foreach ($filters as $value => $label)
+                <a href="{{ route('admin.keberatan', ['status' => $value]) }}" @if ($statusFilter === $value) aria-current="page" @endif>{{ $label }}</a>
+            @endforeach
+        </nav>
+        <div class="table-wrap" role="region" tabindex="0" aria-label="Daftar keberatan penyedia">
+            <table class="t-wide">
+                <caption class="sr-only">Keberatan yang diajukan penyedia</caption>
+                <thead><tr><th scope="col">Pesanan</th><th scope="col">Penyedia</th><th scope="col">Acara</th><th scope="col">Diajukan</th><th scope="col">Status</th></tr></thead>
+                <tbody>
+                @forelse ($objections as $objection)
+                    @php
+                        $item = $objection->orderItem;
+                        $subject = $item?->subject;
+                        $subjectName = $subject?->name ?? 'Item tidak tersedia';
+                        if ($subject instanceof \App\Models\VenueRoom) {
+                            $subjectName = ($subject->venue?->name ? $subject->venue->name.' — ' : '').$subjectName;
+                        }
+                    @endphp
+                    <tr>
+                        <td><a href="{{ route('admin.keberatan.detail', $objection) }}">#{{ $item?->id }} · {{ $subjectName }}</a></td>
+                        <td>{{ $objection->providerUser?->name ?? 'Akun penyedia' }}</td>
+                        <td>{{ $item?->event?->name }}</td>
+                        <td>{{ $objection->created_at?->translatedFormat('d M Y H:i') }}</td>
+                        <td>{{ ucfirst($objection->admin_decision ?? $objection->status) }}</td>
+                    </tr>
+                @empty
+                    <tr><td class="hint" colspan="5">Tidak ada keberatan untuk filter ini.</td></tr>
+                @endforelse
+                </tbody>
+            </table>
+        </div>
+        @if (method_exists($objections, 'links'))<div class="card-b">{{ $objections->links() }}</div>@endif
+    </section>
 </main>
 @endsection

@@ -28,6 +28,16 @@ class ProjectPortalPagesTest extends TestCase
                     continue;
                 }
 
+                // Resource-bound templates are covered through workflow routes with their required IDs.
+                if (str_ends_with($page, '-detail')
+                    || in_array($page, ['acara-batalkan', 'acara-form', 'rundown-index', 'tagihan'])) {
+                    continue;
+                }
+
+                if ($role === 'klien' && $page === 'rundown') {
+                    continue;
+                }
+
                 $path = $page === 'index' ? "/{$role}" : "/{$role}/{$page}";
 
                 $this->assertDoesNotMatchRegularExpression(

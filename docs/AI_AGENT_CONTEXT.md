@@ -127,9 +127,9 @@ Status berikut berasal dari laporan pekerjaan sebelumnya. Verifikasi repository 
 | 2     | Design system dan reusable components          | Selesai bersyarat                                                                                               | Token utama dan dokumentasi design system; belum semua view dimigrasikan                                                           |
 | 3     | Responsiveness dan UI states                   | Selesai bersyarat                                                                                               | Perbaikan responsif dan penghapusan feedback demo palsu                                                                            |
 | 4     | Penyempurnaan portal per role                  | Selesai bersyarat                                                                                               | Navigasi (4 layout), 4 dashboard, halaman inti tiap role; rincian pada 6.5 dan `docs/reports/`                                     |
-| 5     | Katalog, profil, availability                  | Selesai bersyarat — 5.1–5.5 selesai bersyarat; **5.6 evaluasi selesai (2026-11-15), hasil: Diterima Bersyarat** | Lihat 6.6–6.11, dan `docs/reports/`; penomoran final diselaraskan 2026-11-15; jangan lanjut ke Tahap 6 sebelum instruksi           |
-| 6     | Transaksi, invoice, pembayaran, refund, payout | **Selesai bersyarat (2026-11-15)** — frontend selesai; backend transaksi/keuangan belum tersedia                | Lihat 6.12 dan `docs/reports/tahap-6-transaksi-tagihan-pembayaran-refund-pencairan.md`; jangan lanjut ke Tahap 7 sebelum instruksi |
-| 7     | Koordinasi event dan evaluasi                  | Belum dikerjakan menurut catatan                                                                                | Jangan dikerjakan sebelum instruksi                                                                                                |
+| 5     | Katalog, profil, availability                  | Frontend 5.1–5.6 selesai bersyarat; backend BE-3/3b/4 aktif                         | Rincian FE historis di 6.6–6.11; status backend di 6.15–6.17                                                                 |
+| 6     | Transaksi, invoice, pembayaran, refund, payout | Frontend selesai bersyarat; BE-6 aktif per 2026-11-17, dengan refund intake saja    | Lihat 6.12, 6.17, dan laporan update; keputusan refund final B1 masih ditunda                                                |
+| 7     | Koordinasi event dan evaluasi                  | Backend BE-7 aktif per 2026-11-17; evaluasi frontend roadmap tetap historis         | Rundown dan ulasan terhubung; lihat 6.17                                                                                     |
 | 8     | Fitur lanjutan dan optimasi                    | Belum dikerjakan menurut catatan                                                                                | Jangan dikerjakan sebelum instruksi                                                                                                |
 
 ### 6.1 Temuan historis Tahap 0
@@ -579,6 +579,16 @@ Rincian: `docs/reports/BE-3_Implementation_Report_Pesta_Kita.md`.
 
 Tes BE-4 dan regresi portal terarah: **40 tests / 454 assertions lulus**; suite penuh **289 tests / 1536 assertions lulus** pada 2026-11-17. `view:cache` berhasil lalu cache dibersihkan; `route:list` menampilkan 13 route quote. Pint dan `git diff --check` lulus. Rincian perubahan dan batasan ada di `docs/reports/BE-4_Implementation_Report_Pesta_Kita.md`.
 
+### 6.17 Hasil BE-5–BE-7 — Acara, transaksi, rundown, dan ulasan (2026-11-17)
+
+**Status: selesai — terverifikasi di working tree.** BE-5 menghubungkan draft/pengajuan acara, pesanan, keputusan Admin, keberatan penyedia 24 jam sejak persetujuan, banyak venue per acara, dan pemantauan/penutupan acara. BE-6 menghubungkan invoice snapshot/versi, pembayaran transfer manual, verifikasi nominal, rekening perusahaan, pencairan per item, dan retensi bukti privat lima tahun. BE-7 menghubungkan rundown Klien/Vendor (Venue/Admin read-only) dan ulasan pasca-acara yang hanya tampil sebagai agregat anonim bagi penyedia.
+
+Keputusan yang diterapkan: kode unik 3 digit masuk total; komisi 10% dari harga penyedia; versi invoice baru menggantikan versi lama; kedaluwarsa tidak membatalkan pesanan otomatis; jatuh tempo H-7 pukul 23.59 WIB atau 24 jam setelah penerbitan jika sudah lewat H-7. Karena skema belum mencatat jam acara, deadline dibatasi akhir tanggal acara.
+
+**Batas refund:** backend hanya menyimpan permohonan dan menampilkan antrean/tinjauan. Keputusan final, nominal, persentase, kompensasi, dan transfer refund belum tersedia sampai kebijakan B1 disetujui. Notifikasi juga belum termasuk.
+
+**Pengujian:** suite penuh **315 tests / 1.609 assertions lulus**; Pint lulus; `view:cache` berhasil lalu cache dibersihkan; `route:list --except-vendor` dan route acara Admin terfilter berhasil; `git diff --check` lulus. Tes menggunakan SQLite in-memory; migration tidak dijalankan pada database lokal. Rincian ada di `docs/reports/Laporan_Update_Terbaru_Frontend_Backend_Pesta_Kita.md` addendum §8.
+
 ## 7. Panduan Tahap 4 — Penyempurnaan Portal per Role
 
 > **Status: selesai bersyarat (2026-11-15).** Lihat 6.5 untuk hasil aktual dan keterbatasan. Panduan di bawah dipertahankan sebagai lingkup dan batasan tahap.
@@ -792,14 +802,14 @@ Jika roadmap tidak tersedia atau lingkupnya ambigu, jangan menebak—laporkan ba
 
 ## 14. Dokumentasi backend
 
-Audit BE-0 (2026-11-15) memeriksa repository dan tidak mengubah kode aplikasi. Frontend Tahap 4, 5.1–5.6, dan 6 tetap acuan kebutuhan tampilan. **Per 2026-11-17, BE-1 (auth/role), BE-2 (skema domain), BE-3 (media/katalog/verifikasi), BE-3b (kalender/pengajuan harga), dan BE-4 (alur quote) telah diimplementasikan dan terverifikasi sesuai laporan masing-masing.** BE-5 (acara/pesanan) dan BE-6–BE-7 (keuangan, rundown, ulasan) belum dilaksanakan. Lihat 6.13–6.16.
+Audit BE-0 (2026-11-15) memeriksa repository dan tidak mengubah kode aplikasi. Frontend Tahap 4, 5.1–5.6, dan 6 tetap acuan kebutuhan tampilan; beberapa status frontend di bagian historis belum diperbarui saat backend bertambah. **Per 2026-11-17, BE-1 sampai BE-7 sudah diimplementasikan dan diuji di working tree.** BE-6 hanya menerima permohonan refund; keputusan dan nominal final B1 tetap ditunda. Lihat 6.13–6.17.
 
 | Kebutuhan                                           | Dokumen                                                 |
 | --------------------------------------------------- | ------------------------------------------------------- |
 | Kondisi server, auth, dan database yang terbukti    | `docs/BACKEND_AGENT_CONTEXT.md`                         |
 | Aturan terkunci dan keputusan yang belum dijawab    | `docs/BACKEND_BUSINESS_RULES.md`                        |
-| Skema domain (BE-2 sudah dimigrasi; keuangan belum) | `docs/BACKEND_DATABASE_DESIGN.md`                       |
-| Data per halaman dan route usulan                   | `docs/BACKEND_API_CONTRACT.md`                          |
+| Skema domain (gunakan migration aktual; verifikasi deployment terpisah) | `docs/BACKEND_DATABASE_DESIGN.md`             |
+| Data per halaman dan route aktif                    | `docs/BACKEND_API_CONTRACT.md`                          |
 | Urutan BE-1 sampai BE-8                             | `docs/BACKEND_IMPLEMENTATION_PLAN.md`                   |
 | Hasil implementasi BE-1 + Gate 2 (2026-11-16)       | `docs/reports/BE-1_Implementation_Report_Pesta_Kita.md` |
 | Hasil implementasi BE-2 + Gate 3 (2026-11-16)       | `docs/reports/BE-2_Implementation_Report_Pesta_Kita.md` |
@@ -807,5 +817,6 @@ Audit BE-0 (2026-11-15) memeriksa repository dan tidak mengubah kode aplikasi. F
 | Hasil implementasi BE-3 + Gate 4B (2026-11-16)      | `docs/reports/BE-3_Implementation_Report_Pesta_Kita.md` |
 | Hasil implementasi BE-3b (2026-11-16)               | `docs/reports/BE-3b_Wiring_Report_Pesta_Kita.md`        |
 | Hasil implementasi BE-4 (2026-11-17)                | `docs/reports/BE-4_Implementation_Report_Pesta_Kita.md` |
+| Addendum implementasi BE-5–BE-7 (2026-11-17)         | `docs/reports/Laporan_Update_Terbaru_Frontend_Backend_Pesta_Kita.md` §8 |
 
-BE-1, BE-2, BE-3, BE-3b, dan BE-4 sudah dilaksanakan; jangan mengulang implementasinya. Tahap berikutnya adalah BE-5, yang tetap menunggu instruksi eksplisit pengguna dan konfirmasi keputusan B7. Jangan memperlakukan route usulan BE-5+ sebagai endpoint yang sudah terpasang.
+BE-1 sampai BE-7 sudah dilaksanakan; jangan mengulang implementasinya. BE-8 berisi stabilisasi dan deployment migration melalui proses yang disetujui. Jangan menambah keputusan final refund tanpa persetujuan B1.

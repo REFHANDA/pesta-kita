@@ -9,13 +9,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Acara milik Klien. B6: tanpa events.venue_id; venue direpresentasikan
  * lewat order_items yang mengacu ke venue_room, sehingga satu acara dapat
  * memuat beberapa venue. Transisi status menyusul BE-5.
  */
-#[Fillable(['client_id', 'name', 'event_date', 'guest_count', 'theme', 'description', 'status'])]
+#[Fillable(['client_id', 'name', 'event_date', 'guest_count', 'theme', 'description', 'status', 'closed_at'])]
 class Event extends Model
 {
     /** @use HasFactory<EventFactory> */
@@ -32,6 +33,7 @@ class Event extends Model
             'event_date' => 'date:Y-m-d',
             'guest_count' => 'integer',
             'status' => EventStatus::class,
+            'closed_at' => 'datetime',
         ];
     }
 
@@ -63,5 +65,55 @@ class Event extends Model
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * Immutable invoice versions for this event.
+     *
+     * @return HasMany<Invoice, $this>
+     */
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class);
+    }
+
+    /**
+     * Most recently issued invoice version.
+     *
+     * @return HasOne<Invoice, $this>
+     */
+    public function latestInvoice(): HasOne
+    {
+        return $this->hasOne(Invoice::class)->latestOfMany('version');
+    }
+
+    /**
+     * One refund-intake request is accepted while refund policy is unresolved.
+     *
+     * @return HasOne<RefundRequest, $this>
+     */
+    public function refundRequest(): HasOne
+    {
+        return $this->hasOne(RefundRequest::class);
+    }
+
+    /**
+     * Rundown segments visible to the event's participants.
+     *
+     * @return HasMany<RundownItem, $this>
+     */
+    public function rundownItems(): HasMany
+    {
+        return $this->hasMany(RundownItem::class);
+    }
+
+    /**
+     * Provider ratings submitted after completion.
+     *
+     * @return HasMany<EventReview, $this>
+     */
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(EventReview::class);
     }
 }

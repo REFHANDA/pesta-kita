@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
@@ -100,5 +101,45 @@ class OrderItem extends Model
     public function objections(): HasMany
     {
         return $this->hasMany(OrderObjection::class);
+    }
+
+    /**
+     * Immutable invoice snapshots containing this item.
+     *
+     * @return HasMany<InvoiceLine, $this>
+     */
+    public function invoiceLines(): HasMany
+    {
+        return $this->hasMany(InvoiceLine::class);
+    }
+
+    /**
+     * Single provider payout allowed for this item.
+     *
+     * @return HasOne<Payout, $this>
+     */
+    public function payout(): HasOne
+    {
+        return $this->hasOne(Payout::class);
+    }
+
+    /**
+     * Client review for this item.
+     *
+     * @return HasOne<EventReview, $this>
+     */
+    public function review(): HasOne
+    {
+        return $this->hasOne(EventReview::class);
+    }
+
+    /**
+     * Rundown segments tied to this provider's order.
+     *
+     * @return HasMany<RundownItem, $this>
+     */
+    public function rundownItems(): HasMany
+    {
+        return $this->hasMany(RundownItem::class);
     }
 }

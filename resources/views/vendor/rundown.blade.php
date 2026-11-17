@@ -1,7 +1,64 @@
 @extends('layouts.vendor')
 
-@section('title', 'Rundown acara · Panel Vendor Pesta Kita')
+@section('title', 'Rundown · '.$event->name.' · Panel Vendor Pesta Kita')
 
 @section('content')
-<main id="konten" class="content" tabindex="-1"><div class="page-head"><div><div class="crumbs"><a href="{{ url('/vendor') }}">Beranda</a> / Rundown acara</div><h1>Rundown acara</h1><p class="sub">Vendor dapat menambah dan mengubah item rundown miliknya untuk pesanan yang sudah terkonfirmasi. Pemilik venue hanya dapat melihat rundown dan layout acara.</p></div></div><section class="card"><div class="toolbar"><div class="field min-220"><label for="pilih-acara">Pilih acara</label><select class="input" id="pilih-acara"><option>PK-0398 · 08 Nov 2026</option><option>PK-0405 · 21 Nov 2026</option><option>PK-0412 · 14 Nov 2026</option></select></div><span class="badge b-ok">Terkonfirmasi</span><span class="spacer"></span><button class="btn" type="button">＋ Tambah item rundown</button></div><div class="table-wrap" role="region" tabindex="0" aria-label="Susunan run down. Gulir horizontal untuk melihat seluruh kolom"><table class="t-wide"><caption class="sr-only">Tabel: Susunan run down</caption><thead><tr><th scope="col">Waktu</th><th scope="col">Agenda</th><th scope="col">Penanggung jawab</th><th scope="col">Catatan</th><th scope="col"></th></tr></thead><tbody><tr><td><b>10.00–10.30</b></td><td>Kedatangan tamu</td><td>Klien</td><td>Area penerima tamu dibuka</td><td><span class="badge b-mute">Lihat</span></td></tr><tr><td><b>10.30–11.00</b></td><td>Persiapan prasmanan</td><td>Dapur Nusantara</td><td>Pastikan menu siap sebelum tamu makan</td><td><div class="actions"><a class="btn btn-o btn-sm" href="#form-rundown">Ubah</a><button class="btn btn-o btn-sm" type="button" data-confirm="Hapus item rundown ini?" data-text="Item milik Anda dihapus dari rundown acara. Klien dan penyedia terkait tidak lagi melihat item ini." data-label="Hapus" data-tone="bad" data-done="Item rundown dihapus." data-remove="tr">Hapus</button></div></td></tr><tr><td><b>11.00–11.30</b></td><td>Makan bersama</td><td>Dapur Nusantara</td><td>Menu bebas kacang untuk 2 anak</td><td><div class="actions"><a class="btn btn-o btn-sm" href="#form-rundown">Ubah</a><button class="btn btn-o btn-sm" type="button" data-confirm="Hapus item rundown ini?" data-text="Item milik Anda dihapus dari rundown acara. Klien dan penyedia terkait tidak lagi melihat item ini." data-label="Hapus" data-tone="bad" data-done="Item rundown dihapus." data-remove="tr">Hapus</button></div></td></tr><tr><td><b>11.30–12.00</b></td><td>Tiup lilin dan foto</td><td>Klien</td><td>Area utama</td><td><span class="badge b-mute">Lihat</span></td></tr></tbody></table></div></section><section class="card mt-16" id="form-rundown"><div class="card-h"><h2>Tambah item rundown (vendor)</h2></div><div class="card-b"><form class="form-grid" onsubmit="return false"><div class="field"><label for="waktu-mulai">Waktu mulai</label><input class="input" id="waktu-mulai" type="time" value="10:30"></div><div class="field"><label for="waktu-selesai">Waktu selesai</label><input class="input" id="waktu-selesai" type="time" value="11:00"></div><div class="field full"><label for="nama-kegiatan">Nama kegiatan</label><input class="input" id="nama-kegiatan" placeholder="Nama kegiatan"></div><div class="field full"><label for="catatan-rundown">Catatan</label><textarea class="input" id="catatan-rundown" rows="3"></textarea></div><div class="full"><button class="btn">Simpan item</button></div></form><p class="hint">Bentrok waktu hanya menampilkan peringatan. Rundown dikunci setelah acara selesai.</p></div></section></main>
+<main class="content" id="konten" tabindex="-1">
+    <div class="page-head"><div><div class="crumbs"><a href="{{ route('vendor.beranda') }}">Beranda</a> / <a href="{{ route('vendor.rundown.index') }}">Rundown acara</a> / {{ $event->name }}</div><h1>{{ $event->name }}</h1><p class="sub">{{ $event->event_date?->translatedFormat('l, d F Y') }} · Rundown bersama hanya menampilkan segmen layanan milik Anda.</p></div><a class="btn btn-o" href="{{ route('vendor.rundown.index') }}">Kembali</a></div>
+    @if (session('status'))<div class="alert" role="status">{{ session('status') }}</div>@endif
+    @error('event')<div class="alert warn" role="alert">{{ $message }}</div>@enderror
+    @error('order_item_id')<div class="alert warn" role="alert">{{ $message }}</div>@enderror
+    @foreach ($orderItems as $orderItem)
+        <section class="card mt-16">
+            <div class="card-h"><div><h2>{{ $orderItem->subject?->name ?? 'Layanan' }}</h2><p class="meta">Pesanan #{{ $orderItem->id }}</p></div>@if (! $canEditRundown)<span class="badge b-mute">Hanya lihat</span>@endif</div>
+            @forelse ($orderItem->rundownItems as $segment)
+                <div class="card-b">
+                    <h3>{{ $segment->starts_at?->format('H:i') ?? 'Waktu belum ditentukan' }} · {{ $segment->title }}</h3>
+                    @if ($segment->duration_minutes)<p class="meta">Durasi {{ $segment->duration_minutes }} menit</p>@endif
+                    @if ($segment->notes)<p>{{ $segment->notes }}</p>@endif
+                    @if ($canEditRundown)
+                        <details class="mt-8">
+                            <summary>Ubah segmen</summary>
+                            <form class="stack mt-8" method="POST" action="{{ route('vendor.rundown.update', [$event, $segment]) }}">
+                                @csrf
+                                @method('PUT')
+                                <input type="hidden" name="order_item_id" value="{{ $orderItem->id }}">
+                                <div class="field"><label for="title-{{ $segment->id }}">Nama segmen</label><input class="input" id="title-{{ $segment->id }}" name="title" value="{{ old('title', $segment->title) }}" maxlength="255" required></div>
+                                <div class="field"><label for="starts-{{ $segment->id }}">Waktu mulai</label><input class="input" id="starts-{{ $segment->id }}" name="starts_at" type="time" value="{{ old('starts_at', $segment->starts_at?->format('H:i')) }}"></div>
+                                <div class="field"><label for="duration-{{ $segment->id }}">Durasi (menit)</label><input class="input" id="duration-{{ $segment->id }}" name="duration_minutes" type="number" min="5" max="720" value="{{ old('duration_minutes', $segment->duration_minutes) }}"></div>
+                                <div class="field"><label for="notes-{{ $segment->id }}">Catatan</label><textarea class="input" id="notes-{{ $segment->id }}" name="notes" rows="3" maxlength="2000">{{ old('notes', $segment->notes) }}</textarea></div>
+                                <button class="btn" type="submit">Simpan perubahan</button>
+                            </form>
+                            <form class="mt-8" method="POST" action="{{ route('vendor.rundown.destroy', [$event, $segment]) }}">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-o" type="submit">Hapus segmen</button>
+                            </form>
+                        </details>
+                    @endif
+                </div>
+            @empty
+                <p class="hint" style="padding:16px">Anda belum menambahkan segmen untuk layanan ini.</p>
+            @endforelse
+        </section>
+    @endforeach
+    @if ($canEditRundown)
+        <section class="card mt-16">
+            <div class="card-h"><h2>Tambah segmen layanan</h2></div>
+            <div class="card-b">
+                <form class="stack" method="POST" action="{{ route('vendor.rundown.store', $event) }}">
+                    @csrf
+                    <div class="field"><label for="order_item_id">Pesanan layanan</label><select class="input" id="order_item_id" name="order_item_id" required><option value="">Pilih pesanan</option>@foreach ($orderItems as $orderItem)<option value="{{ $orderItem->id }}" @selected(old('order_item_id') == $orderItem->id)>{{ $orderItem->subject?->name ?? 'Layanan' }} · #{{ $orderItem->id }}</option>@endforeach</select></div>
+                    <div class="field"><label for="title">Nama segmen</label><input class="input" id="title" name="title" value="{{ old('title') }}" maxlength="255" required>@error('title')<p class="hint">{{ $message }}</p>@enderror</div>
+                    <div class="field"><label for="starts_at">Waktu mulai</label><input class="input" id="starts_at" name="starts_at" type="time" value="{{ old('starts_at') }}">@error('starts_at')<p class="hint">{{ $message }}</p>@enderror</div>
+                    <div class="field"><label for="duration_minutes">Durasi (menit)</label><input class="input" id="duration_minutes" name="duration_minutes" type="number" min="5" max="720" value="{{ old('duration_minutes') }}">@error('duration_minutes')<p class="hint">{{ $message }}</p>@enderror</div>
+                    <div class="field"><label for="notes">Catatan</label><textarea class="input" id="notes" name="notes" rows="3" maxlength="2000">{{ old('notes') }}</textarea>@error('notes')<p class="hint">{{ $message }}</p>@enderror</div>
+                    <button class="btn" type="submit">Tambah segmen</button>
+                </form>
+            </div>
+        </section>
+    @else
+        <div class="alert mt-16" role="note">Rundown dikunci setelah acara selesai.</div>
+    @endif
+</main>
 @endsection

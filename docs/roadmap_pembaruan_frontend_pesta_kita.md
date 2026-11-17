@@ -612,8 +612,8 @@ Prioritas tampilan:
 > | 5.1 | Katalog Vendor | Selesai bersyarat |
 > | 5.2 | Katalog Venue | Selesai bersyarat |
 > | 5.3 | Profil dan Portofolio Penyedia | Selesai bersyarat |
-> | 5.4 | Request Quote / Custom Quotation | Selesai bersyarat (frontend selesai 2026-11-15; backend belum tersedia) |
-> | 5.5 | Kalender Ketersediaan | Selesai bersyarat (frontend selesai 2026-11-15; backend belum tersedia) |
+> | 5.4 | Request Quote / Custom Quotation | Frontend selesai bersyarat; backend BE-4 terhubung (2026-11-17) |
+> | 5.5 | Kalender Ketersediaan | Frontend selesai bersyarat; backend BE-3b terhubung (2026-11-16) |
 > | 5.6 | Kriteria Penerimaan dan Evaluasi Tahap 5 | Selesai (2026-11-15) — hasil: **Diterima Bersyarat** |
 >
 > Penomoran lama (katalog vendor 5.2, katalog venue 5.3, portofolio 5.4,
@@ -679,14 +679,11 @@ portofolio media yang tampil kepada Klien.
 
 ## 5.4 Request Quote / Custom Quotation
 
-> **Status: Selesai bersyarat (2026-11-15).** Frontend alur permintaan
-> penawaran telah dibuat untuk Klien, Vendor, Venue, dan Admin. Backend
-> (controller, model, database, endpoint) **belum tersedia**, sehingga
-> pengajuan dan perubahan penawaran belum tersimpan ke server; setiap
-> halaman memuat penanda prototipe. Harga katalog, harga yang diajukan
-> penyedia, dan harga yang disetujui Admin dibedakan secara tegas, dan
-> komisi 10% ditambahkan ke tagihan Klien (bukan dipotong dari penyedia).
-> Rincian: `docs/reports/tahap-5.4-request-quote.md`.
+> **Status frontend: selesai bersyarat (2026-11-15).** Saat laporan UI dibuat,
+> backend belum tersedia. Sejak itu BE-4 menghubungkan pengajuan, proposal,
+> dan keputusan quote ke server (2026-11-17). Rincian frontend:
+> `docs/reports/tahap-5.4-request-quote.md`; backend:
+> `docs/reports/BE-4_Implementation_Report_Pesta_Kita.md`.
 
 Alur frontend yang disarankan:
 
@@ -716,10 +713,11 @@ diajukan, dan harga yang sudah disetujui.
 > ruangan, bukan satu venue = satu jadwal). Vendor & Venue memiliki kontrol
 > prototype yang hanya mengubah state di memori dengan peringatan eksplisit.
 > Pemilihan tanggal Klien diteruskan ke alur Request Quote (5.4) lewat
-> parameter `?tanggal=`. Backend (controller, model, database, endpoint)
-> **belum tersedia**, sehingga tidak ada penyimpanan ke server dan tidak ada
-> notifikasi sukses palsu. Rincian:
-> `docs/reports/tahap-5.5-kalender-ketersediaan.md`.
+> parameter `?tanggal=`. Bagian ini mencatat kondisi frontend saat dibuat
+> (2026-11-15); BE-3b kemudian menghubungkan data ketersediaan dan pengajuan
+> harga ke backend. Rincian UI:
+> `docs/reports/tahap-5.5-kalender-ketersediaan.md`; implementasi:
+> `docs/reports/BE-3b_Wiring_Report_Pesta_Kita.md`.
 
 -   Tampilkan tampilan kalender bulanan.
 -   Gunakan legenda teks untuk tersedia, tidak tersedia, dan menunggu
@@ -771,21 +769,24 @@ Kriteria penerimaan yang dievaluasi:
 
 # TAHAP 6 --- Transaksi, Tagihan, Pembayaran, Refund, dan Pencairan
 
-> **Status: Selesai bersyarat (2026-11-15).** Pembaruan frontend Tahap 6
+> **Status frontend: selesai bersyarat (2026-11-15).** Pembaruan frontend Tahap 6
 > telah dilakukan pada empat portal (Klien, Vendor, Pemilik Venue, Admin)
 > untuk delapan fokus: informasi tagihan & rincian biaya, kode unik
 > transfer, unggah bukti pembayaran, status & riwayat pembayaran,
 > invoice/nota, pembatalan & refund, pencairan penyedia, dan dashboard
-> keuangan Admin. Seluruhnya adalah **UI prototipe frontend**; backend
-> transaksi/keuangan (controller, model, database, endpoint, payment
-> gateway, scheduler) **belum tersedia**, sehingga tidak ada penyimpanan ke
-> server dan tidak ada status final palsu. Perbaikan yang dilakukan:
+> keuangan Admin. Saat laporan ini ditulis, seluruhnya adalah **UI prototipe
+> frontend** dan backend transaksi belum tersedia. Perbaikan yang dilakukan:
 > penghapusan perhitungan refund final lokal, penegasan komisi 10%
 > ditambahkan ke tagihan Klien (bukan dipotong dari hak penyedia),
 > penyamaran nomor rekening, penghapusan pencampuran data Vendor pada portal
 > Venue, penambahan handler tombol salin kode unik, dan penambahan penanda
 > prototipe `.data-note` pada halaman keuangan. Rincian:
 > `docs/reports/tahap-6-transaksi-tagihan-pembayaran-refund-pencairan.md`.
+>
+> **Pembaruan backend (2026-11-17):** BE-6 kini menangani invoice,
+> pembayaran, rekening perusahaan, dan pencairan. Refund hanya menerima
+> permohonan; keputusan dan nominal final tetap ditunda sampai kebijakan B1
+> disetujui. Lihat addendum §8 laporan update backend.
 
 ## 6.1 Tujuan
 
@@ -932,6 +933,11 @@ serta ringkasan nilai.
 ------------------------------------------------------------------------
 
 # TAHAP 7 --- Koordinasi Acara dan Evaluasi
+
+> **Pembaruan backend (2026-11-17):** BE-7 menghubungkan rundown dan ulasan.
+> Klien/Vendor mengelola rundown; Venue/Admin read-only. Ulasan tersedia setelah
+> acara selesai dan invoice lunas; penyedia hanya melihat agregat anonim. Checklist
+> terpisah dan editor layout tetap di luar lingkup implementasi ini.
 
 ## 7.1 Tujuan
 

@@ -2,14 +2,61 @@
 
 @section('title', 'Detail keberatan · Admin Pesta Kita')
 
+@php
+    $item = $objection->orderItem;
+    $subject = $item->subject;
+    $subjectName = $subject?->name ?? 'Item tidak tersedia';
+    if ($subject instanceof \App\Models\VenueRoom) {
+        $subjectName = ($subject->venue?->name ? $subject->venue->name.' — ' : '').$subjectName;
+    }
+@endphp
+
 @section('content')
 <main class="content page-refined detail-page" id="konten" tabindex="-1">
-<div class="page-head"><div><div class="crumbs"><a href="{{ url('/admin') }}">Admin</a> / <a href="{{ url('/admin/keberatan') }}">Keberatan</a> / Detail</div><h1>Detail keberatan</h1><p class="meta">Periksa kronologi dan bukti dari kedua pihak sebelum menetapkan keputusan.</p></div><a class="btn btn-o" href="{{ url('/admin/keberatan') }}">Kembali ke daftar</a></div>
-<div class="detail-grid"><div class="detail-stack">
-<section class="card detail-card"><div class="card-h"><div class="split-head"><div><h2>KEB-2026-0014 · Pesanan PK/2026/10/0198</h2><p class="meta">Diajukan 08 November 2026, 10.24 WIB</p></div><span class="badge b-warn">Menunggu keputusan</span></div></div><div class="card-body"><div class="detail-kv"><div class="kv"><span class="k">Pengaju</span><span class="v">Nadia Putri · Klien</span></div><div class="kv"><span class="k">Pihak terkait</span><span class="v">Dapur Nusantara · Penyedia</span></div><div class="kv"><span class="k">Acara</span><span class="v">Pesta Kebun Raka</span></div><div class="kv"><span class="k">Tanggal acara</span><span class="v">12 November 2026</span></div><div class="kv"><span class="k">Kategori</span><span class="v">Layanan tidak sesuai pesanan</span></div><div class="kv"><span class="k">Nilai transaksi</span><span class="v">Rp 11.500.427</span></div></div></div></section>
-<section class="card detail-card"><div class="card-h"><h2>Ringkasan keberatan</h2><p class="meta">Pernyataan yang disampaikan oleh klien.</p></div><div class="card-body"><blockquote class="quote-panel">“Jumlah paket yang diterima tidak sesuai dengan jumlah yang tercantum pada rincian pesanan. Saya sudah mencoba menghubungi penyedia untuk meminta penyelesaian.”</blockquote><div class="detail-list"><div class="dl-row"><span>Permintaan klien</span><strong>Pengembalian sebagian pembayaran</strong></div><div class="dl-row"><span>Nominal yang diminta</span><strong>Rp 1.500.000</strong></div><div class="dl-row"><span>Status komunikasi</span><strong>Belum mencapai kesepakatan</strong></div></div></div></section>
-<section class="card detail-card"><div class="card-h"><h2>Bukti dari kedua pihak</h2><p class="meta">Berkas pendukung untuk pemeriksaan Admin.</p></div><div class="card-body"><div class="evidence-grid"><div class="evidence-card"><span class="evidence-icon">CP</span><div><b>Bukti klien</b><p class="meta">Foto_paket_diterima.jpg · 2,4 MB</p><span class="badge b-ok">Terlampir</span></div></div><div class="evidence-card"><span class="evidence-icon">MT</span><div><b>Tanggapan penyedia</b><p class="meta">Keterangan_mitra.pdf · 840 KB</p><span class="badge b-ok">Terlampir</span></div></div></div><div class="note-box detail-note"><span class="ic i-info"></span><p>Bandingkan bukti dengan rincian pesanan dan komunikasi kedua pihak. Jangan menetapkan keputusan hanya berdasarkan satu keterangan.</p></div></div></section>
-<section class="card detail-card"><div class="card-h"><h2>Kronologi</h2><p class="meta">Riwayat proses keberatan.</p></div><div class="card-body"><div class="timeline"><div class="timeline-item"><b>Keberatan dibuat oleh klien</b><small>08 Nov 2026 · 10.24 WIB</small></div><div class="timeline-item"><b>Notifikasi dikirim kepada penyedia</b><small>08 Nov 2026 · 10.26 WIB</small></div><div class="timeline-item"><b>Penyedia mengirim tanggapan</b><small>08 Nov 2026 · 14.10 WIB</small></div><div class="timeline-item"><b>Menunggu pemeriksaan Admin</b><small>Status saat ini</small></div></div></div></section>
-</div><aside class="detail-side"><section class="card detail-card"><div class="card-h"><h2>Keputusan Admin</h2><p class="meta">Tinjau keberatan dan tetapkan tindak lanjut.</p></div><div class="card-body"><label class="field-label" for="putusan">Keputusan</label><select aria-label="Keputusan" class="field-control" id="putusan"><option>Belum diputuskan</option><option>Keberatan diterima</option><option>Keberatan ditolak</option><option>Perlu bukti tambahan</option></select><label class="field-label" for="solusi">Solusi / tindak lanjut</label><textarea class="field-control" id="solusi" placeholder="Tuliskan alasan dan tindak lanjut keputusan…" rows="4"></textarea><label class="field-label" for="nominal">Nominal penyelesaian (Rp)</label><input class="field-control" id="nominal" placeholder="Masukkan nominal dalam rupiah" type="number"/><div class="detail-actions"><button class="btn" type="button" data-confirm="Simpan keputusan?" data-text="Keputusan wajib beralasan dan dicatat di log aktivitas." data-label="Simpan keputusan" data-need="main textarea" data-need-msg="Alasan keputusan wajib diisi.">Simpan keputusan</button><button class="btn btn-o">Minta bukti tambahan</button></div><div class="alert"><span class="ic i-info"></span><p>Keputusan harus disertai alasan dan akan dicatat pada log aktivitas Admin.</p></div></div></section><section class="card detail-card"><div class="card-h"><h2>Kontak terkait</h2></div><div class="card-body"><div class="detail-list"><div class="dl-row"><span>Klien</span><strong>Nadia Putri</strong></div><div class="dl-row"><span>Telepon</span><strong>0812-0000-1122</strong></div><div class="dl-row"><span>Penyedia</span><strong>Dapur Nusantara</strong></div><div class="dl-row"><span>Telepon</span><strong>0812-3456-7890</strong></div></div></div></section></aside></div>
-<div class="alert"><span class="ic i-info"></span><p>Pastikan kronologi, bukti, dan rincian pesanan sudah diperiksa. Setiap keputusan keberatan harus transparan dan terdokumentasi.</p></div></main>
+    <div class="page-head"><div><div class="crumbs"><a href="{{ route('admin.beranda') }}">Admin</a> / <a href="{{ route('admin.keberatan') }}">Keberatan</a> / Detail</div><h1>Detail keberatan</h1></div><a class="btn btn-o" href="{{ route('admin.keberatan') }}">Kembali</a></div>
+    @if (session('status'))<div class="alert" role="status">{{ session('status') }}</div>@endif
+    @error('objection')<div class="alert warn" role="alert">{{ $message }}</div>@enderror
+    <div class="grid two">
+        <div class="stack">
+            <section class="card">
+                <div class="card-h"><h2>Pesanan #{{ $item->id }}</h2><span class="badge {{ $objection->status === 'diajukan' ? 'b-warn' : 'b-mute' }}">{{ ucfirst($objection->admin_decision ?? $objection->status) }}</span></div>
+                <div class="card-b">
+                    <dl class="dl">
+                        <div><dt>Item</dt><dd>{{ $subjectName }}</dd></div>
+                        <div><dt>Acara</dt><dd>{{ $item->event->name }}</dd></div>
+                        <div><dt>Tanggal acara</dt><dd>{{ $item->event->event_date?->translatedFormat('d M Y') }}</dd></div>
+                        <div><dt>Penyedia</dt><dd>{{ $objection->providerUser->name }}</dd></div>
+                        <div><dt>Harga final</dt><dd>{{ $item->final_price === null ? 'Belum ditetapkan' : 'Rp '.number_format($item->final_price, 0, ',', '.') }}</dd></div>
+                        <div><dt>Batas keberatan</dt><dd>{{ $item->objection_deadline?->translatedFormat('d M Y H:i') }} WIB</dd></div>
+                    </dl>
+                </div>
+            </section>
+            <section class="card"><div class="card-h"><h2>Alasan penyedia</h2></div><div class="card-b"><p>{{ $objection->reason }}</p></div></section>
+            @if ($objection->admin_decision)
+                <section class="card"><div class="card-h"><h2>Keputusan Admin</h2></div><div class="card-b"><p>{{ ucfirst($objection->admin_decision) }}</p><p>{{ $item->rejection_reason }}</p><p class="meta">Diputuskan {{ $objection->decided_at?->translatedFormat('d M Y H:i') }}</p></div></section>
+            @endif
+        </div>
+        <aside class="stack">
+            @if ($objection->status === 'diajukan')
+                <section class="card">
+                    <div class="card-h"><h2>Putuskan keberatan</h2></div>
+                    <div class="card-b">
+                        <p>Menerima keberatan akan mengeluarkan item ini dari acara. Penolakan mempertahankan harga final yang sudah dikunci. Keputusan ini tidak menentukan refund.</p>
+                        <form method="POST" action="{{ route('admin.keberatan.decide', [$objection, 'approve']) }}">
+                            @csrf
+                            <div class="field"><label for="reason-approve">Alasan menerima keberatan</label><textarea class="input" id="reason-approve" name="reason" minlength="5" maxlength="2000" rows="3" required>{{ old('reason') }}</textarea>@error('reason')<p class="hint">{{ $message }}</p>@enderror</div>
+                            <button class="btn full" type="submit">Terima keberatan</button>
+                        </form>
+                        <form class="mt-16" method="POST" action="{{ route('admin.keberatan.decide', [$objection, 'reject']) }}">
+                            @csrf
+                            <div class="field"><label for="reason-reject">Alasan menolak keberatan</label><textarea class="input" id="reason-reject" name="reason" minlength="5" maxlength="2000" rows="3" required>{{ old('reason') }}</textarea>@error('reason')<p class="hint">{{ $message }}</p>@enderror</div>
+                            <button class="btn btn-o full" type="submit">Tolak keberatan</button>
+                        </form>
+                    </div>
+                </section>
+            @endif
+            <a class="btn btn-o" href="{{ route('admin.pesanan.detail', $item) }}">Lihat item pesanan</a>
+        </aside>
+    </div>
+</main>
 @endsection

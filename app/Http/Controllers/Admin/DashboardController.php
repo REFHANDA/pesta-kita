@@ -13,8 +13,9 @@ use Illuminate\View\View;
 
 /**
  * Beranda Admin: ringkasan operasional nyata (pengguna, penyedia, acara,
- * antrean verifikasi). Antrean transaksi, pendapatan, dan rating belum
- * punya backend (BE-3b/BE-4–BE-7); view memberi catatan jujur.
+ * antrean verifikasi). Antrean transaksi, rekap pendapatan, dan rating
+ * internal belum diagregasi pada dashboard; workflow terkait tersedia
+ * melalui halaman masing-masing.
  */
 class DashboardController extends Controller
 {

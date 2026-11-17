@@ -4,11 +4,34 @@
 
 @section('content')
 <main class="content" id="konten" tabindex="-1">
-<div class="page-head"><div><div class="crumbs"><a href="{{ url('/admin') }}">Admin</a> / Pemantauan / Pantau acara</div><h1>Pantau acara</h1></div></div>
-<section class="card"><div aria-label="Navigasi status" class="tabs" role="navigation"><a href="{{ url('/admin/acara') }}" aria-current="page">Semua acara</a><a href="{{ url('/admin/acara') }}?status=diajukan">Diajukan</a><a href="{{ url('/admin/acara') }}?status=menunggu-pembayaran">Menunggu pembayaran</a><a href="{{ url('/admin/acara') }}?status=terkonfirmasi">Terkonfirmasi</a><a href="{{ url('/admin/acara') }}?status=siap-selesai">Siap selesai</a><a href="{{ url('/admin/acara') }}?status=selesai">Selesai</a><a href="{{ url('/admin/acara') }}?status=dibatalkan">Dibatalkan</a></div><form class="toolbar" onsubmit="return false"><input class="input" aria-label="Cari berdasarkan ID atau nama acara" placeholder="Cari ID / nama acara"/><select aria-label="Filter status acara" class="input"><option>Semua status</option><option>Diajukan</option><option>Menunggu pembayaran</option><option>Terkonfirmasi</option><option>Selesai</option><option>Dibatalkan</option></select><input aria-label="Filter tanggal acara" class="input" type="date"/><button class="btn btn-o">Filter</button></form><div aria-label="Pantau acara. Gulir horizontal untuk melihat seluruh kolom" class="table-wrap" role="region" tabindex="0"><table class="t-wide"><caption class="sr-only">Tabel: Pantau acara</caption><thead><tr><th scope="col">Acara</th><th scope="col">Tanggal</th><th scope="col">Tamu</th><th scope="col">Pesanan</th><th scope="col">Tagihan</th><th scope="col">Status acara</th><th class="col-aksi" scope="col">Aksi</th></tr></thead><tbody>
-<tr><td><b>PK-028 · Pesta Kebun Raka</b><small>Klien: Raka P.</small></td><td>12 Nov 2026</td><td>120</td><td>4 / 4 diputuskan</td><td>Menunggu validasi</td><td><span class="badge b-warn">Menunggu pembayaran</span></td><td class="col-aksi"><a class="btn btn-o btn-sm" href="{{ url('/admin/acara-detail') }}">Pantau</a></td></tr>
-<tr><td><b>PK-026 · Garden Party Dimas</b><small>Klien: Dimas A.</small></td><td>20 Nov 2026</td><td>150</td><td>5 / 5 disetujui</td><td>Lunas</td><td><span class="badge b-ok">Terkonfirmasi</span></td><td class="col-aksi"><a class="btn btn-o btn-sm" href="{{ url('/admin/acara-detail') }}">Pantau</a></td></tr>
-<tr><td><b>PK-021 · Gathering Kantor</b><small>Klien: PT Maju</small></td><td>01 Nov 2026</td><td>90</td><td>3 / 3 selesai</td><td>Lunas</td><td><span class="badge b-ok">Siap ditandai selesai</span></td><td class="col-aksi"><a class="btn btn-o btn-sm" href="{{ url('/admin/acara-detail') }}">Pantau</a></td></tr>
-</tbody></table></div></section>
+    <div class="page-head"><div><div class="crumbs"><a href="{{ route('admin.beranda') }}">Admin</a> / Pemantauan / Pantau acara</div><h1>Pantau acara</h1></div></div>
+    <section class="card">
+        <div class="table-wrap" role="region" tabindex="0" aria-label="Daftar acara">
+            <table class="t-wide">
+                <caption class="sr-only">Acara yang sedang berjalan atau telah selesai</caption>
+                <thead><tr><th scope="col">Acara</th><th scope="col">Klien</th><th scope="col">Tanggal</th><th scope="col">Pesanan</th><th scope="col">Tagihan terbaru</th><th scope="col">Status</th><th scope="col"></th></tr></thead>
+                <tbody>
+                @forelse ($events as $event)
+                    @php
+                        $invoice = $event->latestInvoice;
+                        $label = str_replace('_', ' ', $event->status->value);
+                    @endphp
+                    <tr>
+                        <td>{{ $event->name }}</td>
+                        <td>{{ $event->client->name }}</td>
+                        <td>{{ $event->event_date?->translatedFormat('d M Y') }}</td>
+                        <td>{{ $event->order_items_count ?? $event->orderItems()->count() }}</td>
+                        <td>{{ $invoice ? ucfirst(str_replace('_', ' ', $invoice->status)).' · v'.$invoice->version : 'Belum diterbitkan' }}</td>
+                        <td>{{ ucfirst($label) }}</td>
+                        <td><a class="btn btn-o btn-sm" href="{{ route('admin.acara.detail', $event) }}">Pantau</a></td>
+                    </tr>
+                @empty
+                    <tr><td class="hint" colspan="7">Belum ada acara untuk dipantau.</td></tr>
+                @endforelse
+                </tbody>
+            </table>
+        </div>
+        <div class="card-b">{{ $events->links() }}</div>
+    </section>
 </main>
 @endsection

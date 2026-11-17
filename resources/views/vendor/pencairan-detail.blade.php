@@ -3,16 +3,21 @@
 @section('title', 'Detail pencairan · Panel Vendor Pesta Kita')
 
 @section('content')
-<main id="konten" class="content" tabindex="-1"><div class="page-head"><div><div class="crumbs"><a href="{{ url('/vendor') }}">Beranda</a> / <a href="{{ url('/vendor/pencairan') }}">Pencairan</a> / Detail</div><h1>Detail pencairan</h1><p class="sub">Informasi nilai transaksi, rekening tujuan, dan perkembangan transfer dana.</p></div><a class="btn btn-o" href="{{ url('/vendor/pencairan') }}">Kembali ke pencairan</a></div>
-<div class="data-note" role="note"><span class="ic i-info" aria-hidden="true"></span><p><b>Halaman ini masih berupa prototipe frontend.</b> Nilai hak penyedia, status, tanggal, dan referensi transfer di bawah adalah contoh statis. Nilai pencairan dan status final mengikuti sistem setelah backend tersedia.</p></div>
-<div class="payout-hero"><div><span class="eyebrow">Detail transaksi · PC-00842</span><h2>Pencairan hak pesanan</h2><p class="sub">Pesanan PK-0398 · Katering prasmanan</p></div><div class="payout-status"><span class="badge b-warn">Menunggu pencairan</span><strong>Rp 2.720.000</strong><small>Hak penyedia</small></div></div>
-<div class="grid payout-layout"><div class="stack">
-<section class="card"><div class="card-h"><div><h2>Ringkasan pencairan</h2><p class="sub">Rincian nilai transaksi dan dana yang menjadi hak penyedia.</p></div></div><div class="card-b"><dl class="dl"><div><dt>Nomor transaksi</dt><dd>PC-00842</dd></div><div><dt>Nomor pesanan</dt><dd><a href="{{ url('/vendor/pesanan-detail') }}">PK-0398</a></dd></div><div><dt>Jenis transaksi</dt><dd>Hak atas pesanan</dd></div><div><dt>Tanggal acara</dt><dd>18 Oktober 2026</dd></div><div><dt>Status acara</dt><dd><span class="badge b-ok">Selesai</span></dd></div><div><dt>Status pencairan</dt><dd><span class="badge b-warn">Menunggu pencairan</span></dd></div></dl></div></section>
-<section class="card"><div class="card-h"><h2>Rincian dana</h2></div><div class="table-wrap" role="region" tabindex="0" aria-label="Rincian dana. Gulir horizontal untuk melihat seluruh kolom"><table><caption class="sr-only">Tabel: Rincian dana</caption><thead><tr><th scope="col">Komponen</th><th scope="col" class="num">Jumlah</th></tr></thead><tbody><tr><td>Nilai hak penyedia (harga penuh)</td><td class="num">Rp 2.720.000</td></tr><tr><td>Komisi Pesta Kita</td><td class="num">Ditagihkan ke Klien</td></tr></tbody><tfoot><tr><th scope="row">Dana bersih diterima penyedia</th><th scope="row" class="num">Rp 2.720.000</th></tr></tfoot></table></div><div class="card-b"><p class="hint">Hak penyedia tidak dipotong komisi. Komisi 10% ditambahkan pada tagihan Klien, bukan dikurangi dari harga penyedia. Nominal final mengikuti data sistem.</p></div></section>
-<section class="card"><div class="card-h"><h2>Riwayat status</h2></div><div class="card-b"><ul class="timeline"><li class="done"><b>Pesanan diselesaikan</b><small>18 Oktober 2026 · Acara selesai dan divalidasi</small></li><li class="done"><b>Nilai pencairan dihitung</b><small>19 Oktober 2026 · Rincian dana tersedia</small></li><li class="pending"><b>Menunggu proses transfer</b><small>Menunggu antrean pencairan dari Pesta Kita</small></li><li><b>Dana berhasil ditransfer</b><small>Tanggal dan bukti transfer tersedia setelah proses selesai</small></li></ul></div></section>
-</div><aside class="stack">
-<section class="card"><div class="card-h"><h2>Rekening tujuan</h2></div><div class="card-b"><div class="bank"><span class="lbl">Bank</span><b>Bank BCA</b><span class="lbl">Nomor rekening</span><b class="tabular">•••• •••• 2841</b><span class="lbl">Nama pemilik</span><b>Dapur Nusantara</b></div><p class="hint">Perubahan rekening perlu melalui verifikasi Admin.</p><a href="{{ url('/vendor/profil') }}">Kelola rekening usaha</a></div></section>
-<section class="card"><div class="card-h"><h2>Informasi transfer</h2></div><div class="card-b"><dl class="side-dl"><div><dt>Jadwal transfer</dt><dd>Menunggu konfirmasi</dd></div><div><dt>Tanggal transfer</dt><dd>Belum tersedia</dd></div><div><dt>Nomor referensi bank</dt><dd>Belum tersedia</dd></div><div><dt>Bukti transfer</dt><dd>Belum tersedia</dd></div></dl><p class="hint">Informasi transfer diperbarui setelah dana dikirim.</p></div></section>
-<section class="card"><div class="card-h"><h2>Bantuan pencairan</h2></div><div class="card-b"><p class="sub">Jika ada ketidaksesuaian nominal atau rekening, hubungi Admin Pesta Kita dengan menyertakan nomor transaksi.</p><b>PC-00842</b></div></section>
-</aside></div></main>
+<main class="content" id="konten" tabindex="-1">
+    <div class="page-head"><div><div class="crumbs"><a href="{{ route('vendor.beranda') }}">Beranda</a> / <a href="{{ route('vendor.pencairan') }}">Riwayat pencairan</a> / Detail</div><h1>Detail pencairan</h1></div><a class="btn btn-o" href="{{ route('vendor.pencairan') }}">Kembali</a></div>
+    <section class="card">
+        <div class="card-h"><h2>Transfer tercatat</h2><span class="badge b-ok">Dicatat Admin</span></div>
+        <div class="card-b">
+            <dl class="dl">
+                <div><dt>Acara</dt><dd>{{ $payout->orderItem->event->name }} · {{ $payout->orderItem->event->event_date?->translatedFormat('d M Y') }}</dd></div>
+                <div><dt>Item layanan</dt><dd>{{ $payout->orderItem->subject?->name ?? 'Item tidak tersedia' }}</dd></div>
+                <div><dt>Hak penyedia</dt><dd>Rp {{ number_format($payout->amount, 0, ',', '.') }}</dd></div>
+                <div><dt>Tanggal transfer</dt><dd>{{ $payout->transferred_at->translatedFormat('d M Y') }}</dd></div>
+                <div><dt>Rekening tujuan</dt><dd>{{ $payout->bank_name_snapshot }} · •••• {{ substr($payout->account_number_snapshot, -4) }} · {{ $payout->account_name_snapshot }}</dd></div>
+            </dl>
+            @if ($payout->proof_path)<a class="btn btn-o mt-16" href="{{ route('vendor.pencairan.bukti', $payout) }}">Unduh bukti transfer</a>@endif
+            @if ($payout->notes)<p class="hint mt-16">{{ $payout->notes }}</p>@endif
+        </div>
+    </section>
+</main>
 @endsection

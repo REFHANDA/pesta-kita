@@ -1,7 +1,30 @@
 @extends('layouts.vendor')
 
-@section('title', 'Keberatan pesanan · Panel Vendor Pesta Kita')
+@section('title', 'Keberatan saya · Panel Vendor Pesta Kita')
 
 @section('content')
-<main id="konten" class="content" tabindex="-1"><div class="page-head"><div><div class="crumbs"><a href="{{ url('/vendor') }}">Beranda</a> / Keberatan pesanan</div><h1>Keberatan pesanan</h1><p class="sub">Keberatan menjadi catatan untuk Admin dan tidak mengubah status pesanan secara otomatis. Hanya pesanan milik usaha Anda yang dapat diajukan. Setelah masa keberatan 24 jam berakhir, pengajuan hanya tersedia sebagai keberatan darurat (setelah tagihan lunas) dengan bukti wajib.</p></div></div><section class="card"><div class="tabs"><a href="{{ url('/vendor/keberatan') }}" aria-current="page">Semua</a><a href="{{ url('/vendor/keberatan') }}?status=menunggu-ditinjau">Menunggu ditinjau</a><a href="{{ url('/vendor/keberatan') }}?status=diputuskan">Diputuskan</a></div><div class="table-wrap" role="region" tabindex="0" aria-label="Daftar keberatan. Gulir horizontal untuk melihat seluruh kolom"><table class="t-wide"><caption class="sr-only">Tabel: Daftar keberatan</caption><thead><tr><th scope="col">Acara</th><th scope="col">Item pesanan</th><th scope="col">Alasan</th><th scope="col">Diajukan</th><th scope="col">Status</th><th scope="col"></th></tr></thead><tbody><tr><td><b>PK-0412</b><small class="hint">14 Nov 2026</small></td><td>Katering prasmanan</td><td>Jadwal bentrok</td><td>03 Nov 2026</td><td><span class="badge b-warn">Diajukan</span></td><td><a class="btn btn-o btn-sm" href="{{ url('/vendor/pesanan-detail') }}">Detail</a></td></tr><tr><td><b>PK-0381</b><small class="hint">01 Nov 2026</small></td><td>Paket kue ulang tahun</td><td>Kapasitas</td><td>20 Okt 2026</td><td><span class="badge b-bad">Ditolak Admin</span></td><td><a class="btn btn-o btn-sm" href="{{ url('/vendor/pesanan-detail') }}">Detail</a></td></tr></tbody></table></div></section><div class="alert warn mt-16">Untuk keberatan darurat setelah pembayaran lunas, bukti pendukung wajib dilampirkan. Keputusan akhir tetap berada pada Admin Pesta Kita.</div></main>
+<main class="content" id="konten" tabindex="-1">
+    <div class="page-head"><div><div class="crumbs"><a href="{{ route('vendor.beranda') }}">Beranda</a> / <a href="{{ route('vendor.pesanan') }}">Pesanan</a> / Keberatan</div><h1>Keberatan saya</h1></div></div>
+    <section class="card">
+        <div class="table-wrap" role="region" tabindex="0" aria-label="Daftar keberatan">
+            <table class="t-wide">
+                <caption class="sr-only">Keberatan yang Anda ajukan</caption>
+                <thead><tr><th scope="col">Pesanan</th><th scope="col">Tanggal acara</th><th scope="col">Alasan</th><th scope="col">Status</th></tr></thead>
+                <tbody>
+                @forelse ($objections as $objection)
+                    <tr>
+                        <td><a href="{{ route('vendor.pesanan.detail', $objection->orderItem) }}">Pesanan #{{ $objection->order_item_id }}</a></td>
+                        <td>{{ $objection->orderItem->event?->event_date?->translatedFormat('d M Y') }}</td>
+                        <td>{{ $objection->reason }}</td>
+                        <td>{{ ucfirst($objection->admin_decision ?? $objection->status) }}</td>
+                    </tr>
+                @empty
+                    <tr><td class="hint" colspan="4">Anda belum mengajukan keberatan.</td></tr>
+                @endforelse
+                </tbody>
+            </table>
+        </div>
+        @if (method_exists($objections, 'links'))<div class="card-b">{{ $objections->links() }}</div>@endif
+    </section>
+</main>
 @endsection

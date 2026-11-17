@@ -2,14 +2,108 @@
 
 @section('title', 'Detail pesanan · Admin Pesta Kita')
 
+@php
+    $item = $orderItem;
+    $provider = $item->provider;
+    $subject = $item->subject;
+    $subjectName = $subject?->name ?? 'Item tidak tersedia';
+    if ($subject instanceof \App\Models\VenueRoom) {
+        $subjectName = ($subject->venue?->name ? $subject->venue->name.' — ' : '').$subjectName;
+    }
+    $status = match ($item->status) {
+        \App\Enums\OrderItemStatus::MenungguAdmin => ['b-warn', 'Menunggu review Admin'],
+        \App\Enums\OrderItemStatus::MasaKeberatan => ['b-warn', 'Masa keberatan'],
+        \App\Enums\OrderItemStatus::Mengikat => ['b-ok', 'Mengikat'],
+        \App\Enums\OrderItemStatus::Disetujui => ['b-ok', 'Disetujui'],
+        \App\Enums\OrderItemStatus::Ditolak => ['b-bad', 'Ditolak'],
+        default => ['b-mute', $item->status->value],
+    };
+    [$badgeClass, $badgeLabel] = $status;
+    $amount = $item->final_price ?? $item->proposed_price_snapshot ?? $item->catalog_price_snapshot;
+    $rupiah = fn ($value) => 'Rp '.number_format((int) $value, 0, ',', '.');
+@endphp
+
 @section('content')
-<main class="content page-refined" id="konten" tabindex="-1">
-<div class="page-head"><div><div class="crumbs"><a href="{{ url('/admin') }}">Admin</a> / Review pesanan / Detail</div><h1>Detail pesanan</h1></div><a class="btn btn-o" href="{{ url('/admin/pengguna') }}">Kembali</a></div>
-<div class="detail-grid"><div class="detail-stack">
-<section class="card detail-card"><div class="card-h"><div class="row"><div><h2>PK/2026/11/0028</h2><p class="meta">Dibuat 01 November 2026 · Versi pesanan 1</p></div><span class="badge b-warn">Menunggu review</span></div></div><div class="card-body"><div class="detail-kv"><div class="kv"><span class="k">Nama acara</span><span class="v">Pesta Kebun Raka</span></div><div class="kv"><span class="k">Tanggal acara</span><span class="v">12 November 2026</span></div><div class="kv"><span class="k">Klien</span><span class="v">Raka Pratama</span></div><div class="kv"><span class="k">Lokasi</span><span class="v">Kediri, Jawa Timur</span></div><div class="kv"><span class="k">Waktu acara</span><span class="v">10.00–15.00 WIB</span></div><div class="kv"><span class="k">Jumlah tamu</span><span class="v">100 orang</span></div></div></div></section>
-<section class="card detail-card"><div class="card-h"><h2>Item pesanan</h2><p class="meta">Rincian layanan dan penyedia yang terlibat.</p></div><div aria-label="Item pesanan. Gulir horizontal untuk melihat seluruh kolom" class="table-wrap" role="region" tabindex="0"><table class="detail-table t-wide"><caption class="sr-only">Tabel: Item pesanan</caption><thead><tr><th scope="col">Item &amp; penyedia</th><th scope="col">Jumlah</th><th class="num" scope="col">Harga penyedia</th><th scope="col">Status</th></tr></thead><tbody><tr><td><b>Katering prasmanan</b><span class="sub-t"><a href="{{ url('/admin/mitra-detail') }}">Dapur Nusantara</a></span></td><td>100 pax</td><td class="num">Rp 3.200.000</td><td><span class="badge b-warn">Menunggu review</span></td></tr><tr><td><b>Dekorasi taman</b><span class="sub-t">Kreasi Pesta</span></td><td>1 paket</td><td class="num">Rp 2.100.000</td><td><span class="badge b-ok">Disetujui</span></td></tr><tr><td><b>Sound system</b><span class="sub-t">Sewa Audio Jaya</span></td><td>2 unit</td><td class="num">Rp 1.800.000</td><td><span class="badge b-ok">Terkonfirmasi</span></td></tr></tbody></table></div></section>
-<section class="card detail-card"><div class="card-h"><h2>Catatan klien &amp; kebutuhan acara</h2></div><div class="card-body"><p class="m-0">Acara luar ruangan dengan konsep taman. Mohon penyedia datang paling lambat dua jam sebelum acara dimulai untuk persiapan.</p><div class="note-box detail-note"><span class="ic i-info"></span><p>Perubahan pesanan setelah disetujui perlu mengikuti alur pengajuan perubahan. Jangan mengubah harga pesanan yang sudah disetujui secara langsung.</p></div></div></section>
-</div><aside class="detail-side"><section class="card detail-card"><div class="card-h"><h2>Ringkasan tagihan</h2></div><div class="card-body"><div class="detail-list"><div class="dl-row"><span>Subtotal penyedia</span><strong>Rp 7.100.000</strong></div><div class="dl-row"><span>Komisi platform (10%)</span><strong>Rp 710.000</strong></div><div class="dl-row"><span>Biaya kebersihan</span><strong>Rp 500.000</strong></div><div class="dl-row"><span>Kode unik</span><strong>Rp 427</strong></div><div class="dl-row"><span><b>Total tagihan</b></span><strong>Rp 8.310.427</strong></div></div><a class="btn btn-o w-full mt-16" href="{{ url('/admin/pembayaran-detail') }}">Lihat pembayaran</a></div></section><section class="card detail-card"><div class="card-h"><h2>Informasi klien</h2></div><div class="card-body"><div class="profile-head"><span class="avatar">R</span><div><h3>Raka Pratama</h3><p>raka.pratama@test</p></div></div><div class="detail-list mt-16"><div class="dl-row"><span>Telepon</span><strong>0813-2222-4567</strong></div><div class="dl-row"><span>Total pesanan</span><strong>4</strong></div></div><a class="btn btn-o w-full mt-16" href="{{ url('/admin/pengguna-detail') }}">Lihat detail pengguna</a></div></section><section class="card detail-card"><div class="card-h"><h2>Riwayat pesanan</h2></div><div class="card-body"><div class="timeline"><div class="timeline-item"><b>Pesanan diajukan klien</b><small>01 Nov 2026 · 09.15</small></div><div class="timeline-item"><b>Menunggu review Admin</b><small>01 Nov 2026 · 09.16</small></div><div class="timeline-item"><b>Validasi pembayaran</b><small>Belum dimulai</small></div></div></div></section></aside></div>
-<section class="card detail-card"><div class="card-h"><h2>Tindakan Admin</h2><p class="meta">Tentukan keputusan untuk pesanan yang menunggu review.</p></div><div class="card-body"><div class="field"><label for="catatan-review">Catatan keputusan</label><textarea class="input" id="catatan-review" placeholder="Tuliskan alasan persetujuan, penolakan, atau pengalihan…" rows="3"></textarea></div><div class="detail-actions"><button class="btn" type="button" data-confirm="Setujui pesanan ini?" data-text="Harga penyedia dikunci dan masa keberatan 24 jam dimulai." data-label="Setujui pesanan" data-done="Pesanan disetujui dan dicatat di log aktivitas.">Setujui pesanan</button><button class="btn btn-o" type="button" data-confirm="Alihkan ke penyedia lain?" data-text="Pesanan baru berstatus dialihkan dibuat untuk penyedia pengganti." data-label="Alihkan" data-ask="Alasan pengalihan" data-done="Pesanan dialihkan dan dicatat di log aktivitas.">Alihkan ke penyedia lain</button><button class="btn btn-danger" type="button" data-confirm="Tolak pesanan ini?" data-text="Klien diberi tahu dan dapat memilih layanan lain atau melanjutkan tanpa item ini." data-label="Tolak pesanan" data-tone="bad" data-ask="Alasan penolakan" data-done="Pesanan ditolak dan dicatat di log aktivitas.">Tolak pesanan</button></div></div></section>
+<main class="content page-refined detail-page" id="konten" tabindex="-1">
+    <div class="page-head">
+        <div>
+            <div class="crumbs"><a href="{{ route('admin.beranda') }}">Admin</a> / <a href="{{ route('admin.pesanan') }}">Review pesanan</a> / Detail</div>
+            <h1>Detail item pesanan</h1>
+            <p class="sub">{{ $subjectName }}</p>
+        </div>
+        <a class="btn btn-o" href="{{ route('admin.pesanan') }}">Kembali ke daftar</a>
+    </div>
+    @if (session('status'))<div class="alert" role="status">{{ session('status') }}</div>@endif
+    @error('order_item')<div class="alert warn" role="alert">{{ $message }}</div>@enderror
+    <div class="detail-grid">
+        <div class="detail-stack">
+            <section class="card detail-card">
+                <div class="card-h">
+                    <div class="split-head"><div><h2>{{ $subjectName }}</h2><p class="meta">Item #{{ $item->id }}</p></div><span class="badge {{ $badgeClass }}">{{ $badgeLabel }}</span></div>
+                </div>
+                <div class="card-body">
+                    <div class="detail-kv">
+                        <div class="kv"><span class="k">Acara</span><span class="v">{{ $item->event->name }}</span></div>
+                        <div class="kv"><span class="k">Tanggal acara</span><span class="v">{{ $item->event->event_date?->translatedFormat('d F Y') }}</span></div>
+                        <div class="kv"><span class="k">Jumlah tamu</span><span class="v">{{ number_format($item->event->guest_count) }}</span></div>
+                        <div class="kv"><span class="k">Klien</span><span class="v">{{ $item->event->client->name }}</span></div>
+                        <div class="kv"><span class="k">Penyedia</span><span class="v">{{ $provider?->business_name ?? 'Penyedia tidak tersedia' }}</span></div>
+                    </div>
+                </div>
+            </section>
+            <section class="card detail-card">
+                <div class="card-h"><h2>Rincian harga</h2><p class="meta">Harga final ditentukan Admin saat review dan tidak dapat diubah dari browser.</p></div>
+                <div class="card-body">
+                    <div class="detail-list">
+                        <div class="dl-row"><span>Harga katalog snapshot</span><strong>{{ $rupiah($item->catalog_price_snapshot) }}</strong></div>
+                        @if ($item->proposed_price_snapshot !== null)<div class="dl-row"><span>Harga usulan yang disetujui</span><strong>{{ $rupiah($item->proposed_price_snapshot) }}</strong></div>@endif
+                        <div class="dl-row"><span>Harga final</span><strong>{{ $item->final_price === null ? 'Belum ditetapkan' : $rupiah($item->final_price) }}</strong></div>
+                        @if ($item->rejection_reason)<div class="dl-row"><span>Alasan penolakan</span><strong>{{ $item->rejection_reason }}</strong></div>@endif
+                        @if ($item->objection_deadline)<div class="dl-row"><span>Batas keberatan</span><strong>{{ $item->objection_deadline->translatedFormat('d M Y H:i') }} WIB</strong></div>@endif
+                    </div>
+                </div>
+            </section>
+            @if ($item->objections->isNotEmpty())
+                <section class="card detail-card">
+                    <div class="card-h"><h2>Keberatan penyedia</h2></div>
+                    @foreach ($item->objections as $objection)
+                        <div class="card-body">
+                            <p><b>{{ $objection->providerUser->name }}</b> · {{ $objection->created_at?->translatedFormat('d M Y H:i') }}</p>
+                            <p>{{ $objection->reason }}</p>
+                            <p class="meta">Status: {{ $objection->status }}</p>
+                            @if ($objection->status === 'diajukan')
+                                <a class="btn btn-o" href="{{ route('admin.keberatan.detail', $objection) }}">Periksa keberatan</a>
+                            @endif
+                        </div>
+                    @endforeach
+                </section>
+            @endif
+        </div>
+        <aside class="detail-side">
+            @if ($item->status === \App\Enums\OrderItemStatus::MenungguAdmin && $item->event->status === \App\Enums\EventStatus::Diajukan)
+                <section class="card detail-card">
+                    <div class="card-h"><h2>Tindakan Admin</h2><p class="meta">Keputusan berlaku untuk item ini saja.</p></div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ route('admin.pesanan.decide', [$item, 'approve']) }}">
+                            @csrf
+                            <button class="btn full" type="submit">Setujui · {{ $rupiah($amount) }}</button>
+                        </form>
+                        <form class="mt-16" method="POST" action="{{ route('admin.pesanan.decide', [$item, 'reject']) }}">
+                            @csrf
+                            <div class="field">
+                                <label for="reason">Alasan penolakan</label>
+                                <textarea class="input" id="reason" name="reason" rows="3" minlength="5" maxlength="2000" required>{{ old('reason') }}</textarea>
+                                @error('reason')<p class="hint">{{ $message }}</p>@enderror
+                            </div>
+                            <button class="btn btn-danger full" type="submit">Tolak item</button>
+                        </form>
+                    </div>
+                </section>
+            @elseif ($item->status === \App\Enums\OrderItemStatus::MasaKeberatan)
+                <div class="data-note" role="note">Masa keberatan penyedia berakhir pada {{ $item->objection_deadline?->translatedFormat('d M Y H:i') }} WIB.</div>
+            @endif
+            <a class="btn btn-o full" href="{{ route('admin.pesanan') }}">Kembali ke review pesanan</a>
+        </aside>
+    </div>
 </main>
 @endsection

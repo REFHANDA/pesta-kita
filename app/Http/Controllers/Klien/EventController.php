@@ -3,23 +3,24 @@
 namespace App\Http\Controllers\Klien;
 
 use App\Enums\EventStatus;
+use App\Enums\PricingMode;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Client\StoreEventRequest;
+use App\Http\Requests\Client\UpdateEventRequest;
+use App\Models\CatalogItem;
 use App\Models\Event;
+use App\Models\VenueRoom;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Wiring read-only daftar acara Klien: halaman `acara` menampilkan agenda
- * yang masih berjalan, `riwayat` menampilkan acara yang sudah berakhir
- * (selesai/dinilai/dibatalkan). Keduanya membaca tabel `events` milik akun
- * login — sama seperti sumber data beranda. Halaman status (draft/diajukan/
- * terkonfirmasi/dibatalkan) adalah daftar milik sendiri yang difilter per
- * status, dan `acara-detail` menampilkan satu acara nyata miliknya sendiri.
+ * Alur acara Klien: daftar agenda/riwayat, pembuatan dan penyuntingan draft,
+ * pengajuan, serta detail acara yang dimiliki akun login.
  *
- * Pesanan, tagihan, rundown, dan penilaian belum punya backend (BE-4–BE-7),
- * karena itu halaman detail hanya merender kolom nyata `events` plus
- * permintaan penawaran terkait — tanpa tombol aksi yang mati.
+ * Alur pesanan, tagihan, rundown, refund-intake, dan ulasan ditangani
+ * controller tahap BE-5–BE-7; halaman detail juga menampilkan quote terkait.
  */
 class EventController extends Controller
 {
@@ -41,6 +42,50 @@ class EventController extends Controller
         EventStatus::Dinilai,
         EventStatus::Dibatalkan,
     ];
+
+    /**
+     * Show the event draft form.
+     */
+    public function create(): View
+    {
+        return view('klien.acara-baru');
+    }
+
+    /**
+     * Save a new event as a draft.
+     */
+    public function store(StoreEventRequest $request): RedirectResponse
+    {
+        $event = $request->user()->events()->create($request->validated());
+
+        return redirect()->route('klien.acara.detail', $event)
+            ->with('status', 'Konsep acara tersimpan sebagai draft.');
+    }
+
+    /**
+     * Show the edit form for an owned draft.
+     */
+    public function edit(Request $request, Event $event): View
+    {
+        abort_unless($event->client_id === $request->user()->id, 404);
+        abort_unless($event->status === EventStatus::Draft, 404);
+
+        return view('klien.acara-form', ['event' => $event]);
+    }
+
+    /**
+     * Update an owned draft without accepting client-controlled state.
+     */
+    public function update(UpdateEventRequest $request, Event $event): RedirectResponse
+    {
+        abort_unless($event->client_id === $request->user()->id, 404);
+        abort_unless($event->status === EventStatus::Draft, 404);
+
+        $event->update($request->validated());
+
+        return redirect()->route('klien.acara.detail', $event)
+            ->with('status', 'Draft acara diperbarui.');
+    }
 
     /**
      * Daftar acara mendatang milik Klien login.
@@ -73,7 +118,26 @@ class EventController extends Controller
         abort_unless($event->client_id === $request->user()->id, 404);
 
         return view('klien.acara-detail', [
-            'event' => $event->load(['quoteRequests.subject', 'quoteRequests.proposals']),
+            'event' => $event->load([
+                'orderItems.subject',
+                'orderItems.objections',
+                'orderItems.review',
+                'quoteRequests.subject',
+                'quoteRequests.proposals',
+                'quoteRequests.decision',
+                'latestInvoice.latestPayment',
+                'refundRequest',
+            ]),
+            'catalogItems' => CatalogItem::publikUntukKlien()
+                ->where('pricing_mode', PricingMode::Tetap)
+                ->with('vendorProfile')
+                ->orderBy('name')
+                ->get(),
+            'venueRooms' => VenueRoom::query()
+                ->whereHas('venue', fn ($query) => $query->publikUntukKlien())
+                ->with('venue')
+                ->orderBy('name')
+                ->get(),
         ]);
     }
 

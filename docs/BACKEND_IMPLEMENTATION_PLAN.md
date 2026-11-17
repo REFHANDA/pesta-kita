@@ -1,6 +1,6 @@
 # Rencana Implementasi Backend — Pesta Kita
 
-Status diperbarui pada 2026-11-17: BE-0 sampai BE-4 telah dilaksanakan dan didokumentasikan. Tahap berikutnya adalah BE-5, tetapi jangan mulai sebelum pengguna memberi instruksi dan keputusan B7 yang dibutuhkan dikonfirmasi.
+Status diperbarui pada 2026-11-17: BE-0 sampai BE-7 sudah diimplementasikan dan diuji di working tree. BE-5, BE-6, dan BE-7 mengikuti keputusan produk yang disetujui; keputusan final kebijakan/nominal refund tetap ditunda. BE-8 berisi stabilisasi, pemeriksaan deployment migration, dan sisa integrasi di luar tahap.
 
 ## 1. Arsitektur yang disarankan
 
@@ -62,13 +62,15 @@ Dependensi: BE-2/BE-3 untuk katalog dan tabel quote; BE-3b tersedia untuk kalend
 
 Dependensi: BE-4 untuk item yang perlu penawaran. Item harga tetap dapat menjadi pesanan tanpa quote.
 
-Mengisi review Admin, penolakan per item, dan keberatan penyedia. Butuh jawaban B7 sebelum masa keberatan dikunci di kode.
+**Selesai — terhubung.** Klien membuat/mengubah draft, menambah atau menghapus item katalog/ruangan, lalu mengajukan acara. Admin menyetujui atau menolak item; penyedia dapat mengajukan keberatan dalam 24 jam sejak persetujuan Admin. Satu acara dapat berisi beberapa venue. Invoice menunggu seluruh keputusan item dan masa keberatan selesai.
 
 ### BE-6 — Tagihan, bayar, refund, cair
 
-Dependensi: BE-5. Blocker produk: B1, B2, B3, B8, B9, B10, B13.
+Dependensi: BE-5.
 
-Jangan mengodekan persentase 70%. Jika B1 belum dijawab, tahap ini berhenti di penerbitan tagihan dan verifikasi bayar, tanpa aksi refund final.
+**Selesai — terhubung dengan batas refund.** Admin menerbitkan versi invoice dengan snapshot baris, kode unik 3 digit yang masuk total, dan komisi 10% dari harga penyedia. Versi baru menonaktifkan versi sebelumnya; invoice kedaluwarsa tidak membatalkan pesanan. Jatuh tempo H-7 pukul 23.59 WIB, atau 24 jam setelah penerbitan jika sudah melewati H-7 (dibatasi akhir tanggal acara karena skema belum menyimpan jam acara). Klien mengunggah bukti privat; Admin memverifikasi nominal. Bukti disimpan privat dan dihapus setelah lima tahun sejak acara ditutup. Pencairan Admin dicatat satu kali per item dan bukti hanya dapat diunduh pemilik/admin sesuai peran.
+
+Refund hanya menerima dan mencatat permohonan Klien. Keputusan, persentase, nominal final, dan transfer refund tetap nonaktif sampai kebijakan B1 disetujui.
 
 Transaksi database, unique constraint, audit log, dan disk privat wajib. Tabel `jobs` bawaan tidak dipakai sampai ada kebutuhan kirim notifikasi.
 
@@ -76,11 +78,11 @@ Transaksi database, unique constraint, audit log, dan disk privat wajib. Tabel `
 
 Dependensi: acara terkonfirmasi dan, untuk ulasan, tagihan lunas.
 
-Venue dan Admin tidak mendapat route tulis rundown. Checklist menunggu view checklist. Saat audit belum ada view checklist terpisah.
+**Selesai — terhubung.** Klien dan Vendor terkait dapat mengelola rundown; Venue dan Admin hanya membaca. Klien dapat mengirim ulasan setelah acara ditutup dan tagihan lunas; Vendor/Venue melihat agregat anonim. Checklist belum memiliki view terpisah.
 
 ### BE-8 — Integrasi dan stabilisasi
 
-Ganti sisa data contoh pada halaman yang tahapnya sudah hidup. Jalankan tes feature per alur, `view:cache`, dan Pint untuk PHP yang berubah. Periksa response Klien agar tidak memuat kontak penyedia atau nomor rekening utuh.
+Tindak lanjuti halaman prototipe di luar BE-5–BE-7, periksa sisa data contoh, jalankan verifikasi deployment migration pada lingkungan yang disetujui, dan periksa response Klien agar tidak memuat kontak penyedia atau nomor rekening utuh. Tes workflow BE-5–BE-7, `view:cache`, route, dan Pint sudah dijalankan pada sesi implementasi ini.
 
 ## 4. Strategi tes
 
@@ -93,7 +95,7 @@ Ganti sisa data contoh pada halaman yang tahapnya sudah hidup. Jalankan tes feat
 
 ## 5. Integrasi tampilan
 
-Controller mengisi view yang sama. Penanda prototipe dilepas per halaman yang sudah hidup. Rekomendasi historis setelah auth adalah menyambungkan katalog lebih dahulu; BE-3 dan BE-4 kini selesai. Tahap implementasi berikutnya adalah BE-5 setelah ada instruksi pengguna dan keputusan B7.
+Controller mengisi view yang sama. Penanda prototipe dilepas per halaman yang sudah hidup. BE-3 sampai BE-7 kini terhubung; halaman lain yang belum masuk tahap ini dapat tetap berupa prototipe sampai tahap wiring disepakati.
 
 ## 6. Risiko
 
@@ -103,5 +105,6 @@ Controller mengisi view yang sama. Penanda prototipe dilepas per halaman yang su
 | Catch-all menelan route baru                          | Daftarkan route eksplisit sebelum `/{page}`.                                                                             |
 | Tes lama menuntut portal publik                       | Ubah tes pada BE-1. Jangan melepas middleware agar tes lama lulus.                                                       |
 | Database `pesta_kita` telah digunakan                 | Sebelum tahap berikutnya, cek konfigurasi dan status migrasi saat ini; jangan reset atau membuat ulang database.         |
+| Migration BE-5–BE-7 belum diverifikasi pada lingkungan deployment | Terapkan hanya melalui proses deployment yang disetujui; tes lokal memakai SQLite in-memory.                     |
 | `laravel/boost` ada di working tree `composer.json`   | Dipertahankan sesuai keputusan 2026-11-16. Jangan menambah, melepas, atau memperbarui dependency tanpa persetujuan baru. |
 | Sebagian salinan UI venue masih mengikuti pola vendor | Policy backend memisahkan hak akses. Perbaikan teks UI dicatat terpisah dari migration.                                  |

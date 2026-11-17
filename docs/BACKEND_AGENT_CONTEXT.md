@@ -4,7 +4,7 @@
 >
 > Frontend tetap acuan kebutuhan. Jangan menganggap rancangan di dokumen saudara sebagai kode yang sudah jalan.
 >
-> **Pembaruan 2026-11-16:** bagian 1–8 adalah snapshot historis sebelum BE-1. Kondisi backend terverifikasi terkini ada di **bagian 11** (BE-1 + BE-2 + BE-3 sudah diimplementasikan). Jangan membaca bagian 1–8 sebagai kondisi sekarang.
+> **Pembaruan 2026-11-17:** bagian 1–8 adalah snapshot historis sebelum BE-1. Bagian 11 mencatat BE-1–BE-3; **bagian 12** memperbarui status hingga BE-7. Jangan membaca snapshot lama sebagai kondisi saat ini.
 
 ## 1. Status sesi
 
@@ -130,3 +130,15 @@ Bagian ini memperbarui bagian 10 untuk lingkup BE-3 (media, katalog vendor, venu
 - **Pengujian:** `php artisan test` → **220 lulus (1139 assertions)**; 96 baseline BE-1/BE-2 + 124 BE-3 (schema additions, policy, media, catalog CRUD, venue CRUD, verification workflow, catalog visibility, portal pages/accessibility diperbarui). Trait `Tests\Concerns\MakesUploadedFiles` untuk unggahan tanpa ekstensi GD. Pint lulus 142 file; `view:cache` seluruh Blade sukses; `route:list` 62 route; `git diff --check` bersih.
 - **Batasan yang tetap berlaku:** kalender ketersediaan dan pengajuan harga (BE-3b), tambah item ke acara draft (BE-4/BE-5), stok peralatan, rekening bank UI, dan seluruh fitur keuangan belum ada backend-nya. Halaman di luar 20 view wiring tetap prototipe. Laravel Boost dipertahankan; tanpa dependency baru, tanpa perubahan `.env`, tanpa commit/push/merge/PR.
 - **Rujukan:** `docs/reports/BE-3_Implementation_Report_Pesta_Kita.md`, `docs/reports/BE-3_Preparation_Report_Pesta_Kita.md`, `docs/AI_AGENT_CONTEXT.md` bagian 6.15, `docs/BACKEND_BUSINESS_RULES.md` bagian B/E/F.
+
+## 12. Addendum 2026-11-17 — BE-5–BE-7 terimplementasi
+
+Bagian ini memperbarui status backend terkini. Detail baseline dan hasil BE-1–BE-4 di atas tetap menjadi catatan historis tahap masing-masing.
+
+- **BE-5 — acara/pesanan:** Klien membuat/mengubah draft, mengelola item katalog/ruangan, lalu mengajukan acara. Admin memutuskan item; Vendor/Venue mengajukan keberatan dalam 24 jam sejak persetujuan. Satu acara dapat mempunyai beberapa venue. Invoice hanya dapat terbit setelah semua item dan masa keberatan selesai.
+- **BE-6 — finansial:** invoice berisi snapshot dan versi, kode 3 digit masuk total, komisi 10% dihitung dari harga penyedia, unggah bukti privat dan verifikasi nominal Admin, rekening perusahaan, pencairan satu kali per item, serta penghapusan bukti setelah lima tahun sejak acara ditutup. Invoice kedaluwarsa tidak membatalkan pesanan otomatis.
+- **Refund:** hanya intake permohonan dan tampilan antrean/tinjauan. Tidak ada endpoint keputusan, nominal final, atau transfer refund sampai kebijakan B1 disetujui.
+- **BE-7 — rundown/ulasan:** Klien dan Vendor terkait mengelola rundown; Venue/Admin read-only. Klien dapat mengulas setelah acara selesai dan invoice lunas; penyedia hanya melihat agregat anonim.
+- **Batas teknis:** jika invoice diterbitkan setelah H-7, jatuh tempo 24 jam kemudian, dengan batas akhir tanggal acara karena waktu acara belum tersedia dalam skema. Bukti tetap tersimpan privat.
+- **Validasi:** suite penuh PHPUnit **315 tests / 1.609 assertions lulus**; Pint, `view:cache`, `route:list --except-vendor`, dan `git diff --check` berhasil. Tes memakai SQLite in-memory. Migration tidak dijalankan pada database MySQL lokal selama sesi ini; verifikasi deployment masih terpisah.
+- **Rujukan:** `docs/BACKEND_API_CONTRACT.md`, `docs/BACKEND_BUSINESS_RULES.md` bagian B/C/H, dan addendum §8 `docs/reports/Laporan_Update_Terbaru_Frontend_Backend_Pesta_Kita.md`.

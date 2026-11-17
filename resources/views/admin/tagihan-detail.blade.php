@@ -3,13 +3,72 @@
 @section('title', 'Detail tagihan · Admin Pesta Kita')
 
 @section('content')
-<main class="content page-refined detail-page" id="konten" tabindex="-1">
-<div class="page-head"><div><div class="crumbs"><a href="{{ url('/admin') }}">Admin</a> / <a href="{{ url('/admin/pembayaran') }}">Tagihan &amp; pembayaran</a> / Detail tagihan</div><h1>Detail tagihan</h1><p class="meta">Rincian invoice, komponen biaya, dan status pembayaran klien. Tagihan yang belum dibayar dapat dibuat ulang sebagai versi baru.</p></div><div class="actions"><a class="btn btn-o" href="{{ url('/admin/pembayaran') }}">Kembali ke tagihan</a><button class="btn btn-o" type="button" data-confirm="Buat ulang tagihan?" data-text="Versi lama dibatalkan dan versi baru diterbitkan dengan batas bayar baru. Setelah lunas, isi tagihan terkunci dan tidak dapat dibuat ulang." data-label="Buat versi baru" data-done="Tagihan versi baru diterbitkan dan dicatat di log aktivitas.">Buat ulang tagihan</button></div></div>
-<div class="data-note" role="note"><span class="ic i-info" aria-hidden="true"></span><p><b>Halaman ini masih berupa prototipe frontend.</b> Nomor invoice, rincian komponen biaya, dan status di bawah adalah contoh statis. Nomor tagihan, komponen biaya final, dan status pembayaran mengikuti sistem setelah backend transaksi tersedia.</p></div>
-<div class="detail-grid"><div class="detail-stack">
-<section class="card detail-card"><div class="card-h"><div class="split-head"><div><h2>Invoice INV/2026/11/0028</h2><p class="meta">Pesanan PK/2026/11/0028 · Versi 1</p></div><span class="badge b-warn">Menunggu pembayaran</span></div></div><div class="card-body"><div class="detail-kv"><div class="kv"><span class="k">Klien</span><span class="v">Raka Pratama</span></div><div class="kv"><span class="k">Acara</span><span class="v">Pesta Kebun Raka</span></div><div class="kv"><span class="k">Tanggal acara</span><span class="v">12 November 2026</span></div><div class="kv"><span class="k">Batas pembayaran</span><span class="v">10 November 2026 · 23.59 WIB</span></div></div><div class="invoice-total"><small>Total tagihan</small><strong>Rp 11.500.427</strong><span>Termasuk kode unik transfer Rp 427</span></div></div></section>
-<section class="card detail-card"><div class="card-h"><h2>Rincian tagihan</h2><p class="meta">Komponen pembentuk total pembayaran.</p></div><div aria-label="Rincian tagihan. Gulir horizontal untuk melihat seluruh kolom" class="table-wrap" role="region" tabindex="0"><table class="detail-table"><caption class="sr-only">Tabel: Rincian tagihan</caption><thead><tr><th scope="col">Komponen</th><th class="num" scope="col">Nominal</th></tr></thead><tbody><tr><td>Subtotal harga penyedia</td><td class="num">Rp 10.000.000</td></tr><tr><td>Komisi platform (10%)</td><td class="num">Rp 1.000.000</td></tr><tr><td>Biaya kebersihan</td><td class="num">Rp 500.000</td></tr><tr><td>Kode unik transfer</td><td class="num">Rp 427</td></tr><tr class="total-row"><td><b>Total tagihan</b></td><td class="num"><b>Rp 11.500.427</b></td></tr></tbody></table></div></section>
-<section class="card detail-card"><div class="card-h"><h2>Rincian penyedia</h2><p class="meta">Pihak yang menyediakan layanan pada pesanan.</p></div><div aria-label="Rincian penyedia. Gulir horizontal untuk melihat seluruh kolom" class="table-wrap" role="region" tabindex="0"><table class="detail-table t-wide"><caption class="sr-only">Tabel: Rincian penyedia</caption><thead><tr><th scope="col">Penyedia</th><th scope="col">Layanan</th><th class="num" scope="col">Subtotal</th><th scope="col">Status</th></tr></thead><tbody><tr><td><b>Dapur Nusantara</b><span class="sub-t">Katering</span></td><td>Paket prasmanan</td><td class="num">Rp 6.000.000</td><td><span class="badge b-ok">Terkonfirmasi</span></td></tr><tr><td><b>Venue Sejahtera</b><span class="sub-t">Venue</span></td><td>Garden Hall</td><td class="num">Rp 4.000.000</td><td><span class="badge b-ok">Terkonfirmasi</span></td></tr></tbody></table></div></section>
-<section class="card detail-card"><div class="card-h"><h2>Riwayat tagihan</h2></div><div class="card-body"><div class="timeline"><div class="timeline-item"><b>Tagihan diterbitkan</b><small>03 Nov 2026 · 09.00 WIB</small></div><div class="timeline-item"><b>Notifikasi pembayaran dikirim</b><small>03 Nov 2026 · 09.01 WIB</small></div><div class="timeline-item"><b>Menunggu pembayaran klien</b><small>Status saat ini</small></div></div></div></section>
-</div><aside class="detail-side"><section class="card detail-card"><div class="card-h"><h2>Status pembayaran</h2></div><div class="card-body"><div class="detail-list"><div class="dl-row"><span>Status</span><strong class="warn-t">Belum dibayar</strong></div><div class="dl-row"><span>Metode</span><strong>Transfer bank</strong></div><div class="dl-row"><span>Rekening tujuan</span><strong>BCA ···· 1208</strong></div><div class="dl-row"><span>Diterbitkan</span><strong>03 Nov 2026</strong></div><div class="dl-row"><span>Jatuh tempo</span><strong>10 Nov 2026</strong></div></div><a class="btn btn-block" href="{{ url('/admin/pembayaran-detail') }}">Buka validasi pembayaran</a></div></section><section class="card detail-card"><div class="card-h"><h2>Informasi kebijakan</h2></div><div class="card-body"><div class="detail-list"><div class="dl-row"><span>Batas pembayaran</span><strong>48 jam</strong></div><div class="dl-row"><span>Komisi platform</span><strong>10%</strong></div><div class="dl-row"><span>Kode unik transfer</span><strong>Rp 427</strong></div></div><div class="note-box detail-note"><span class="ic i-info"></span><p>Validasi pembayaran dilakukan setelah bukti transfer diterima. Pastikan nominal dan rekening tujuan sesuai tagihan.</p></div></div></section></aside></div></main>
+<main class="content" id="konten" tabindex="-1">
+    <div class="page-head"><div><div class="crumbs"><a href="{{ route('admin.beranda') }}">Admin</a> / <a href="{{ route('admin.pembayaran') }}">Tagihan &amp; pembayaran</a> / Detail</div><h1>Tagihan #{{ $invoice->id }} · Versi {{ $invoice->version }}</h1><p class="sub">{{ $invoice->event->name }} · {{ $invoice->event->client->name }}</p></div><a class="btn btn-o" href="{{ route('admin.pembayaran') }}">Kembali</a></div>
+    @if (session('status'))<div class="alert" role="status">{{ session('status') }}</div>@endif
+    @error('payment')<div class="alert warn" role="alert">{{ $message }}</div>@enderror
+    @error('event')<div class="alert warn" role="alert">{{ $message }}</div>@enderror
+    <div class="grid two">
+        <section class="card">
+            <div class="card-h"><h2>Rincian tagihan</h2><span class="badge {{ $invoice->status === 'lunas' ? 'b-ok' : 'b-warn' }}">{{ ucfirst(str_replace('_', ' ', $invoice->status)) }}</span></div>
+            <div class="table-wrap" role="region" tabindex="0" aria-label="Rincian invoice">
+                <table class="t-wide">
+                    <caption class="sr-only">Baris invoice snapshot</caption>
+                    <thead><tr><th scope="col">Item</th><th scope="col" class="num">Harga penyedia</th><th scope="col" class="num">Komisi</th><th scope="col" class="num">Kebersihan</th><th scope="col" class="num">Total baris</th></tr></thead>
+                    <tbody>
+                    @foreach ($invoice->lines as $line)
+                        <tr><td>{{ $line->description_snapshot }}</td><td class="num">Rp {{ number_format($line->provider_amount, 0, ',', '.') }}</td><td class="num">Rp {{ number_format($line->commission_amount, 0, ',', '.') }}</td><td class="num">Rp {{ number_format($line->cleaning_fee_amount, 0, ',', '.') }}</td><td class="num">Rp {{ number_format($line->total_amount, 0, ',', '.') }}</td></tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-b">
+                <dl class="dl">
+                    <div><dt>Subtotal penyedia</dt><dd>Rp {{ number_format($invoice->provider_subtotal, 0, ',', '.') }}</dd></div>
+                    <div><dt>Komisi 10%</dt><dd>Rp {{ number_format($invoice->commission_total, 0, ',', '.') }}</dd></div>
+                    <div><dt>Biaya kebersihan</dt><dd>Rp {{ number_format($invoice->cleaning_total, 0, ',', '.') }}</dd></div>
+                    <div><dt>Kode unik (3 digit)</dt><dd>{{ $invoice->unique_code }}</dd></div>
+                    <div><dt>Total transfer</dt><dd><b>Rp {{ number_format($invoice->total_amount, 0, ',', '.') }}</b></dd></div>
+                    <div><dt>Jatuh tempo</dt><dd>{{ $invoice->due_at->translatedFormat('d M Y H:i') }} WIB</dd></div>
+                </dl>
+            </div>
+        </section>
+        <section class="card">
+            <div class="card-h"><h2>Bukti pembayaran</h2></div>
+            @forelse ($invoice->payments->sortByDesc('id') as $payment)
+                <div class="card-b">
+                    <h3>{{ ucfirst(str_replace('_', ' ', $payment->status)) }}</h3>
+                    <dl class="dl">
+                        <div><dt>Pengirim</dt><dd>{{ $payment->sender_name }}</dd></div>
+                        <div><dt>Tanggal transfer</dt><dd>{{ $payment->transferred_at?->translatedFormat('d M Y') }}</dd></div>
+                        <div><dt>Nominal bukti</dt><dd>Rp {{ number_format($payment->amount, 0, ',', '.') }}</dd></div>
+                        <div><dt>Rekening tujuan</dt><dd>{{ $payment->bank_name_snapshot }} · {{ $payment->account_number_snapshot }} · {{ $payment->account_name_snapshot }}</dd></div>
+                    </dl>
+                    @if ($payment->proof_path)<a class="btn btn-o mt-8" href="{{ route('admin.pembayaran.bukti', $payment) }}">Unduh bukti privat</a>@endif
+                    @if ($payment->rejection_reason)<p class="hint">{{ $payment->rejection_reason }}</p>@endif
+                    @if ($payment->status === 'menunggu_verifikasi')
+                        <form class="mt-16" method="POST" action="{{ route('admin.pembayaran.decide', [$payment, 'approve']) }}">
+                            @csrf
+                            <div class="field"><label for="received-{{ $payment->id }}">Nominal yang diterima</label><input class="input" id="received-{{ $payment->id }}" name="received_amount" type="number" min="0" step="1" value="{{ old('received_amount', $payment->amount) }}" required>@error('received_amount')<p class="hint">{{ $message }}</p>@enderror</div>
+                            <button class="btn full" type="submit">Sahkan pembayaran</button>
+                        </form>
+                        <form class="mt-16" method="POST" action="{{ route('admin.pembayaran.decide', [$payment, 'reject']) }}">
+                            @csrf
+                            <div class="field"><label for="reason-{{ $payment->id }}">Alasan penolakan</label><textarea class="input" id="reason-{{ $payment->id }}" name="reason" minlength="5" maxlength="2000" rows="3" required>{{ old('reason') }}</textarea>@error('reason')<p class="hint">{{ $message }}</p>@enderror</div>
+                            <button class="btn btn-danger full" type="submit">Tolak bukti</button>
+                        </form>
+                    @endif
+                </div>
+            @empty
+                <p class="hint" style="padding:16px">Belum ada bukti pembayaran.</p>
+            @endforelse
+        </section>
+    </div>
+    @if ($invoice->status === 'kedaluwarsa' || ($invoice->status === 'terbit' && ! $invoice->due_at->isFuture()))
+        <form class="mt-16" method="POST" action="{{ route('admin.tagihan.issue', $invoice->event) }}">
+            @csrf
+            <button class="btn" type="submit">Terbitkan versi tagihan baru</button>
+        </form>
+    @endif
+</main>
 @endsection

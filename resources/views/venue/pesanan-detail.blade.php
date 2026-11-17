@@ -1,26 +1,60 @@
 @extends('layouts.venue')
 
-@section('title', 'Detail pesanan venue · Panel Pemilik Venue Pesta Kita')
+@section('title', 'Detail pesanan · Panel Pemilik Venue Pesta Kita')
+
+@php
+    $item = $orderItem;
+    $badge = match ($item->status) {
+        \App\Enums\OrderItemStatus::MenungguAdmin => ['b-warn', 'Menunggu review Admin'],
+        \App\Enums\OrderItemStatus::MasaKeberatan => ['b-warn', 'Masa keberatan'],
+        \App\Enums\OrderItemStatus::Mengikat => ['b-ok', 'Mengikat'],
+        \App\Enums\OrderItemStatus::Disetujui => ['b-ok', 'Disetujui'],
+        \App\Enums\OrderItemStatus::Ditolak => ['b-bad', 'Ditolak'],
+        default => ['b-mute', $item->status->value],
+    };
+    [$badgeClass, $badgeLabel] = $badge;
+    $mayObject = $item->status === \App\Enums\OrderItemStatus::MasaKeberatan
+        && $item->objection_deadline?->isFuture()
+        && $item->objections->isEmpty();
+@endphp
 
 @section('content')
-<main id="konten" class="content" tabindex="-1">
-<div class="page-head"><div><div class="crumbs"><a href="{{ url('/venue') }}">Beranda</a> / <a href="{{ url('/venue/pesanan') }}">Pesanan</a> / PK-0418</div><h1>Detail pesanan venue</h1><p class="sub">Rincian reservasi, kebutuhan ruangan, nilai hak penyedia, dan status operasional.</p></div></div>
-
-<div class="order-banner"><div><span class="eyebrow">Pesanan venue · PK-0418</span><h2>Resepsi pernikahan · Acara #E-0418</h2><p>Sabtu, 21 November 2026 · Graha Melati Ballroom</p></div><div class="order-banner-side"><span class="badge b-ok">Disetujui</span><b class="amount">Rp 7.850.000</b><small class="sub">Hak penyedia (harga penuh)</small></div></div>
-<div class="grid order-layout">
- <div class="stack">
-  <section class="card"><div class="card-h"><h2>Informasi pemesanan</h2><span class="badge b-ok">Jadwal terkonfirmasi</span></div><div class="card-b"><dl class="dl"><div><dt>Nomor pesanan</dt><dd>PK-0418</dd></div><div><dt>Tanggal acara</dt><dd>Sabtu, 21 November 2026</dd></div><div><dt>Waktu acara</dt><dd>10.00–16.00 WIB</dd></div><div><dt>Waktu akses persiapan</dt><dd>07.00 WIB</dd></div><div><dt>Jumlah tamu</dt><dd>180 orang</dd></div><div><dt>Tata letak</dt><dd>Round table · 18 meja</dd></div><div><dt>Area digunakan</dt><dd>Ballroom utama + foyer</dd></div><div><dt>Durasi sewa</dt><dd>8 jam</dd></div></dl><div class="note"><b>Catatan dari Pesta Kita:</b> Klien meminta area khusus untuk keluarga inti dan jalur akses kursi roda tetap terbuka.</div></div></section>
-  <section class="card"><div class="card-h"><h2>Rincian biaya venue</h2><span class="sub">Rincian transaksi</span></div><div class="table-wrap" role="region" tabindex="0" aria-label="Rincian biaya venue. Gulir horizontal untuk melihat seluruh kolom"><table><caption class="sr-only">Tabel: Rincian biaya venue</caption><thead><tr><th scope="col">Komponen</th><th scope="col" class="num">Jumlah</th></tr></thead><tbody><tr><td>Sewa Graha Melati Ballroom</td><td class="num">Rp 7.500.000</td></tr><tr><td>Biaya kebersihan</td><td class="num">Rp 350.000</td></tr></tbody><tfoot><tr><th scope="row">Total hak penyedia</th><th scope="row" class="num">Rp 7.850.000</th></tr></tfoot></table></div><div class="card-b"><p class="hint">Pencairan dilakukan setelah acara ditandai selesai oleh Pesta Kita sesuai ketentuan kemitraan.</p></div></section>
-  <section class="card"><div class="card-h"><h2>Rundown dan kebutuhan ruangan</h2><a class="btn btn-o btn-sm" href="{{ url('/venue/rundown') }}">Lihat rundown</a></div><div class="card-b"><ul class="timeline"><li class="done"><b>07.00 · Akses venue dibuka</b><small>Persiapan dekorasi dan vendor</small></li><li class="done"><b>10.00 · Penerimaan tamu</b><small>Area foyer dan ballroom siap</small></li><li><b>12.00 · Acara utama</b><small>Layout round table, 18 meja</small></li><li><b>16.00 · Acara selesai</b><small>Persiapan pembersihan venue</small></li></ul></div></section>
-  <section class="card"><div class="card-h"><h2>Ajukan keberatan</h2></div><div class="card-b"><p class="sub">Masa keberatan sampai 11 November 2026 pukul 14.20 WIB. Keberatan menjadi catatan untuk Admin dan tidak mengubah status pesanan sampai diputuskan.</p><form class="form-grid" onsubmit="return false"><div class="field"><label for="kategori">Kategori keberatan</label><select class="input" id="kategori"><option>Jadwal bentrok</option><option>Kapasitas / tata letak</option><option>Kondisi fasilitas</option><option>Ketentuan penggunaan venue</option><option>Lainnya</option></select></div><div class="field"><label for="bukti-order">Bukti pendukung (opsional)</label><input class="input" id="bukti-order" type="file"></div><div class="field full"><label for="alasan">Alasan keberatan</label><textarea class="input" id="alasan" rows="3" placeholder="Jelaskan kendala yang perlu ditinjau Admin"></textarea></div><div class="field full"><button class="btn btn-bad" type="submit" data-confirm="Kirim keberatan ke Admin?" data-text="Keberatan wajib beralasan, tidak mengubah status pesanan, dan baru berlaku setelah Admin memutuskan." data-label="Kirim keberatan" data-done="Keberatan terkirim ke Admin dan dicatat di log aktivitas." data-need="main form textarea" data-need-msg="Keterangan keberatan wajib diisi.">Kirim keberatan ke Admin</button></div></form></div></section>
- </div>
- <aside class="stack">
-  <section class="card"><div class="card-h"><h2>Status pesanan</h2></div><div class="card-b"><ul class="timeline"><li class="done"><b>Pesanan diterima</b><small>08 November 2026 · 10.12</small></li><li class="done"><b>Disetujui Pesta Kita</b><small>09 November 2026 · 15.30</small></li><li class="pending"><b>Masa keberatan</b><small>Berakhir 11 November 2026 · 14.20</small></li><li><b>Acara berlangsung</b><small>21 November 2026</small></li><li><b>Pencairan</b><small>Setelah acara dinyatakan selesai</small></li></ul></div></section>
-  <section class="card"><div class="card-h"><h2>Informasi acara</h2></div><div class="card-b"><div class="profile-mini"><span class="avatar">#</span><div><b>Acara #E-0418</b><small>Identitas klien tidak ditampilkan</small></div></div><dl class="side-dl"><div><dt>Kontak</dt><dd>Melalui Pesta Kita</dd></div><div><dt>Permintaan khusus</dt><dd>Area keluarga inti dan akses kursi roda</dd></div></dl><p class="hint">Komunikasi dan perubahan permintaan dilakukan melalui Admin Pesta Kita.</p></div></section>
-  <section class="card"><div class="card-h"><h2>Pencairan</h2></div><div class="card-b"><span class="lbl">Estimasi hak penyedia</span><div class="big-num">Rp 7.850.000</div><span class="badge b-warn">Belum dapat dicairkan</span><p class="hint">Menunggu acara selesai dan validasi Pesta Kita.</p><a class="btn btn-o block-btn" href="{{ url('/venue/pencairan') }}">Lihat pencairan</a></div></section>
-  <section class="card"><div class="card-h"><h2>Butuh bantuan?</h2></div><div class="card-b"><p class="sub">Hubungi Admin untuk perubahan jadwal atau kebutuhan teknis.</p><b>0341-555-0123</b></div></section>
- </aside>
-</div>
-
+<main class="content" id="konten" tabindex="-1">
+    <div class="page-head"><div><div class="crumbs"><a href="{{ route('venue.beranda') }}">Beranda</a> / <a href="{{ route('venue.pesanan') }}">Pesanan</a> / Detail</div><h1>Pesanan #{{ $item->id }}</h1></div><a class="btn btn-o" href="{{ route('venue.pesanan') }}">Kembali</a></div>
+    @if (session('status'))<div class="alert" role="status">{{ session('status') }}</div>@endif
+    @error('order_item')<div class="alert warn" role="alert">{{ $message }}</div>@enderror
+    <div class="grid two">
+        <section class="card">
+            <div class="card-h"><h2>{{ $item->subject?->name ?? 'Ruangan tidak tersedia' }}</h2><span class="badge {{ $badgeClass }}">{{ $badgeLabel }}</span></div>
+            <div class="card-b">
+                <dl class="dl">
+                    <div><dt>Tanggal acara</dt><dd>{{ $item->event->event_date?->translatedFormat('l, d F Y') }}</dd></div>
+                    <div><dt>Jumlah tamu</dt><dd>{{ number_format($item->event->guest_count) }}</dd></div>
+                    <div><dt>Harga final</dt><dd>{{ $item->final_price === null ? 'Belum ditetapkan' : 'Rp '.number_format($item->final_price, 0, ',', '.') }}</dd></div>
+                    @if ($item->objection_deadline)<div><dt>Batas keberatan</dt><dd>{{ $item->objection_deadline->translatedFormat('d M Y H:i') }} WIB</dd></div>@endif
+                    @if ($item->rejection_reason)<div><dt>Catatan Admin</dt><dd>{{ $item->rejection_reason }}</dd></div>@endif
+                </dl>
+                <p class="hint mt-16">Nama dan kontak Klien tidak tersedia di tampilan penyedia.</p>
+            </div>
+        </section>
+        <section class="card">
+            <div class="card-h"><h2>Keberatan</h2></div>
+            <div class="card-b">
+                @if ($item->objections->isNotEmpty())
+                    <p>Keberatan Anda sudah dikirim dan sedang diproses Admin.</p>
+                    <p>{{ $item->objections->first()->reason }}</p>
+                @elseif ($mayObject)
+                    <p>Anda dapat mengajukan satu keberatan sebelum batas waktu.</p>
+                    <form method="POST" action="{{ route('venue.keberatan.store', $item) }}">
+                        @csrf
+                        <div class="field"><label for="reason">Alasan keberatan</label><textarea class="input" id="reason" name="reason" rows="4" minlength="5" maxlength="2000" required>{{ old('reason') }}</textarea>@error('reason')<p class="hint">{{ $message }}</p>@enderror</div>
+                        <button class="btn mt-8" type="submit">Kirim keberatan</button>
+                    </form>
+                @else
+                    <p class="sub">Tidak ada keberatan yang dapat diajukan saat ini.</p>
+                @endif
+            </div>
+        </section>
+    </div>
 </main>
 @endsection

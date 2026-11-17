@@ -1,10 +1,10 @@
 # Rancangan Database Backend — Pesta Kita
 
-Status: **sebagian dimigrasi (per 2026-11-16)**. Skema domain non-finansial **BE-2** (16 tabel) sudah dimigrasi ke MySQL `pesta_kita` bersama **BE-1** (auth/role/profil). Tabel keuangan (`invoices`, `invoice_lines`, `payments`, `refund_requests`, `refund_transfers`, `payouts`) serta koordinasi/ulasan (`rundown_items`, `reviews`, `notifications`) **masih rancangan**, belum dimigrasi (BE-3+). Penanda status per kelompok tabel ada di bagian 4. Bukti: `php artisan migrate:status` → 23 Ran dan `docs/reports/BE-2_Implementation_Report_Pesta_Kita.md`.
+Status diperbarui 2026-11-17: migration BE-5–BE-7 tersedia di repository. Sesi ini tidak menjalankannya terhadap MySQL lokal; status deployment belum diverifikasi. Rincian tabel di bagian rancangan lama adalah proposal, bukan skema aktual terkini. Sumber skema yang berlaku ialah file migration, terutama `2026_11_17_041227_create_financial_workflow_tables.php` dan `2026_11_17_041228_create_rundown_and_review_tables.php`.
 
 > Snapshot historis 2026-11-15: belum ada migration domain, skema aktual hanya tabel bawaan Laravel, dan database MySQL `pesta_kita` belum ada. Kondisi itu sudah berubah setelah BE-1 dan BE-2 dilaksanakan; jangan membaca bagian 1 sebagai kondisi sekarang.
 
-Jangan membuat tabel yang bergantung pada keputusan terbuka B1–B18 sebelum jawaban pengguna. Kolom yang bergantung keputusan ditandai `pending`.
+Jangan menambah tabel/alur final yang bergantung pada keputusan yang masih terbuka. Refund transfer dan kebijakan final B1 tetap ditunda.
 
 ## 1. Skema yang benar-benar ada
 
@@ -54,7 +54,7 @@ erDiagram
     invoices ||--o{ payments : paid_by
     events ||--o{ refund_requests : cancels
     events ||--o{ rundown_items : schedules
-    events ||--o{ reviews : rated_after
+    events ||--o{ event_reviews : rated_after
     users ||--o{ audit_logs : acts
 ```
 
@@ -116,7 +116,9 @@ erDiagram
 
 ### Tagihan, bayar, refund, cair
 
-> Status: **rancangan, belum dimigrasi** (BE-3+): `invoices`, `invoice_lines`, `payments`, `refund_requests`, `refund_transfers`, `payouts`.
+> Status: migration BE-6 tersedia untuk `invoices`, `invoice_lines`, `payments`, `refund_requests`, dan `payouts`. `refund_transfers` belum dibuat karena keputusan refund final B1 ditunda. Migration belum dijalankan pada MySQL dalam sesi 2026-11-17.
+>
+> Field di bawah adalah proposal awal yang belum diselaraskan dengan migration aktual; gunakan file migration sebagai sumber skema.
 
 `invoices`: `event_id`, `version`, `number` unique, `status`, `provider_subtotal`, `commission_amount`, `cleaning_fee`, `other_amount`, `unique_code` (B2), `total`, `due_at` (B9), `supersedes_invoice_id` nullable. Satu tagihan aktif per acara dijaga di aplikasi dan dengan index.
 
@@ -132,7 +134,9 @@ erDiagram
 
 ### Koordinasi dan ulasan
 
-> Status: **sebagian** — `audit_logs` dimigrasi (BE-2); `rundown_items`, `reviews`, `notifications` masih rancangan (BE-3+).
+> Status: `rundown_items` dan `event_reviews` memiliki migration BE-7. `notifications` tetap ditunda. Migration belum dijalankan pada MySQL dalam sesi 2026-11-17.
+>
+> Field di bawah adalah proposal awal; nama tabel ulasan aktual ialah `event_reviews`. Gunakan file migration sebagai sumber skema.
 
 `rundown_items`: `event_id`, `owner_user_id` nullable, `title`, `starts_at`, `ends_at`, `notes`, `status`. Vendor mengubah item miliknya pada acara terkonfirmasi. Venue dan Admin hanya membaca. Tombol tambah di halaman venue tidak diberi route tulis.
 

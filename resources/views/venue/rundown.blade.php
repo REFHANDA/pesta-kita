@@ -1,7 +1,35 @@
 @extends('layouts.venue')
 
-@section('title', 'Rundown acara · Panel Pemilik Venue Pesta Kita')
+@section('title', 'Monitoring rundown · Panel Pemilik Venue Pesta Kita')
 
 @section('content')
-<main id="konten" class="content" tabindex="-1"><div class="page-head"><div><div class="crumbs"><a href="{{ url('/venue') }}">Beranda</a> / Rundown acara</div><h1>Rundown acara</h1><p class="sub">Vendor dapat menambah dan mengubah item rundown miliknya untuk pesanan yang sudah terkonfirmasi. Pemilik venue hanya dapat melihat rundown dan layout acara.</p></div></div><section class="card"><div class="toolbar"><div class="field min-220"><label for="pilih-acara">Pilih acara</label><select class="input" id="pilih-acara"><option>PK-0398 · 08 Nov 2026</option><option>PK-0405 · 21 Nov 2026</option><option>PK-0412 · 14 Nov 2026</option></select></div><span class="badge b-ok">Terkonfirmasi</span><span class="spacer"></span><button class="btn" type="button">＋ Tambah item rundown</button></div><div class="table-wrap" role="region" tabindex="0" aria-label="Susunan run down. Gulir horizontal untuk melihat seluruh kolom"><table class="t-wide"><caption class="sr-only">Tabel: Susunan run down</caption><thead><tr><th scope="col">Waktu</th><th scope="col">Agenda</th><th scope="col">Penanggung jawab</th><th scope="col">Catatan</th><th scope="col"></th></tr></thead><tbody><tr><td><b>10.00–10.30</b></td><td>Kedatangan tamu</td><td>Klien</td><td>Area penerima tamu dibuka</td><td><span class="badge b-mute">Lihat</span></td></tr><tr><td><b>10.30–11.00</b></td><td>Persiapan prasmanan</td><td>Dapur Nusantara</td><td>Pastikan menu siap sebelum tamu makan</td><td><div class="actions"><a class="btn btn-o btn-sm" href="#form-rundown">Ubah</a><button class="btn btn-o btn-sm" type="button" data-confirm="Hapus item rundown ini?" data-text="Item milik Anda dihapus dari rundown acara. Klien dan penyedia terkait tidak lagi melihat item ini." data-label="Hapus" data-tone="bad" data-done="Item rundown dihapus." data-remove="tr">Hapus</button></div></td></tr><tr><td><b>11.00–11.30</b></td><td>Makan bersama</td><td>Dapur Nusantara</td><td>Menu bebas kacang untuk 2 anak</td><td><div class="actions"><a class="btn btn-o btn-sm" href="#form-rundown">Ubah</a><button class="btn btn-o btn-sm" type="button" data-confirm="Hapus item rundown ini?" data-text="Item milik Anda dihapus dari rundown acara. Klien dan penyedia terkait tidak lagi melihat item ini." data-label="Hapus" data-tone="bad" data-done="Item rundown dihapus." data-remove="tr">Hapus</button></div></td></tr><tr><td><b>11.30–12.00</b></td><td>Tiup lilin dan foto</td><td>Klien</td><td>Area utama</td><td><span class="badge b-mute">Lihat</span></td></tr></tbody></table></div></section><section class="card mt-16" id="form-rundown"><div class="card-h"><h2>Tambah item rundown (vendor)</h2></div><div class="card-b"><form class="form-grid" onsubmit="return false"><div class="field"><label for="waktu-mulai">Waktu mulai</label><input class="input" id="waktu-mulai" type="time" value="10:30"></div><div class="field"><label for="waktu-selesai">Waktu selesai</label><input class="input" id="waktu-selesai" type="time" value="11:00"></div><div class="field full"><label for="nama-kegiatan">Nama kegiatan</label><input class="input" id="nama-kegiatan" placeholder="Nama kegiatan"></div><div class="field full"><label for="catatan-rundown">Catatan</label><textarea class="input" id="catatan-rundown" rows="3"></textarea></div><div class="full"><button class="btn">Simpan item</button></div></form><p class="hint">Bentrok waktu hanya menampilkan peringatan. Rundown dikunci setelah acara selesai.</p></div></section></main>
+<main class="content" id="konten" tabindex="-1">
+    <div class="page-head"><div><div class="crumbs"><a href="{{ route('venue.beranda') }}">Beranda</a> / Rundown</div><h1>Monitoring rundown</h1><p class="sub">Anda dapat melihat rundown acara yang menggunakan venue milik Anda. Perubahan dilakukan Klien atau Vendor terkait.</p></div></div>
+    @forelse ($events as $event)
+        <section class="card mt-16">
+            <div class="card-h"><div><h2>{{ $event->name }}</h2><p class="meta">{{ $event->event_date?->translatedFormat('l, d F Y') }}</p></div><span class="badge b-ok">{{ ucfirst(str_replace('_', ' ', $event->status->value)) }}</span></div>
+            <div class="table-wrap" role="region" tabindex="0" aria-label="Rundown {{ $event->name }}">
+                <table class="t-wide">
+                    <caption class="sr-only">Segmen rundown {{ $event->name }}</caption>
+                    <thead><tr><th scope="col">Waktu</th><th scope="col">Agenda</th><th scope="col">Durasi</th><th scope="col">Catatan</th></tr></thead>
+                    <tbody>
+                    @forelse ($event->rundownItems->sortBy('starts_at') as $segment)
+                        <tr>
+                            <td>{{ $segment->starts_at?->format('H:i') ?? '—' }}</td>
+                            <td>{{ $segment->title }}</td>
+                            <td>{{ $segment->duration_minutes ? $segment->duration_minutes.' menit' : '—' }}</td>
+                            <td>{{ $segment->notes ?: '—' }}</td>
+                        </tr>
+                    @empty
+                        <tr><td class="hint" colspan="4">Belum ada segmen rundown.</td></tr>
+                    @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    @empty
+        <section class="card"><p class="hint" style="padding:16px">Belum ada acara terkonfirmasi yang menggunakan venue Anda.</p></section>
+    @endforelse
+    <div class="card-b">{{ $events->links() }}</div>
+</main>
 @endsection
