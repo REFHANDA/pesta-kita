@@ -1,6 +1,6 @@
 # Rencana Implementasi Backend — Pesta Kita
 
-Status: rekomendasi setelah audit BE-0 pada 2026-11-15. Jangan mulai BE-1 sebelum pengguna menyetujui rancangan dan menjawab keputusan yang mengunci tahap terkait.
+Status diperbarui pada 2026-11-17: BE-0 sampai BE-4 telah dilaksanakan dan didokumentasikan. Tahap berikutnya adalah BE-5, tetapi jangan mulai sebelum pengguna memberi instruksi dan keputusan B7 yang dibutuhkan dikonfirmasi.
 
 ## 1. Arsitektur yang disarankan
 
@@ -54,9 +54,9 @@ Mengisi controller untuk halaman Tahap 5.1–5.3 dan 5.5. Harga di halaman Klien
 
 ### BE-4 — Request quote
 
-Dependensi: BE-3 dan acara draft.
+Dependensi: BE-2/BE-3 untuk katalog dan tabel quote; BE-3b tersedia untuk kalender. Tautan ke acara draft bersifat opsional.
 
-Mengisi delapan halaman penawaran. Tiga nominal tetap kolom terpisah. Admin satu-satunya yang menulis harga disetujui.
+**Selesai — terverifikasi (2026-11-17).** Delapan halaman penawaran terhubung ke database: Klien mengajukan quote dengan snapshot harga katalog; Vendor/Venue mengusulkan harga; Admin menyetujui atau menolak proposal terbaru. Harga katalog, harga usulan, dan harga disetujui tetap terpisah. Pengajuan quote tidak membuat acara; hanya dapat menautkan acara draft milik Klien. Keputusan bersifat final pada skema saat ini.
 
 ### BE-5 — Acara dan persetujuan pesanan
 
@@ -93,7 +93,7 @@ Ganti sisa data contoh pada halaman yang tahapnya sudah hidup. Jalankan tes feat
 
 ## 5. Integrasi tampilan
 
-Controller mengisi view yang sama. Penanda prototipe dilepas per halaman yang sudah hidup. Urutan sambung yang paling aman setelah auth adalah katalog, karena katalog tidak membutuhkan keputusan refund.
+Controller mengisi view yang sama. Penanda prototipe dilepas per halaman yang sudah hidup. Rekomendasi historis setelah auth adalah menyambungkan katalog lebih dahulu; BE-3 dan BE-4 kini selesai. Tahap implementasi berikutnya adalah BE-5 setelah ada instruksi pengguna dan keputusan B7.
 
 ## 6. Risiko
 
@@ -102,6 +102,6 @@ Controller mengisi view yang sama. Penanda prototipe dilepas per halaman yang su
 | Working tree frontend belum di-commit                 | Jangan reset, clean, atau checkout paksa.                                                                                |
 | Catch-all menelan route baru                          | Daftarkan route eksplisit sebelum `/{page}`.                                                                             |
 | Tes lama menuntut portal publik                       | Ubah tes pada BE-1. Jangan melepas middleware agar tes lama lulus.                                                       |
-| Database `pesta_kita` belum ada                       | Buat database hanya setelah persetujuan implementasi.                                                                    |
+| Database `pesta_kita` telah digunakan                 | Sebelum tahap berikutnya, cek konfigurasi dan status migrasi saat ini; jangan reset atau membuat ulang database.         |
 | `laravel/boost` ada di working tree `composer.json`   | Dipertahankan sesuai keputusan 2026-11-16. Jangan menambah, melepas, atau memperbarui dependency tanpa persetujuan baru. |
 | Sebagian salinan UI venue masih mengikuti pola vendor | Policy backend memisahkan hak akses. Perbaikan teks UI dicatat terpisah dari migration.                                  |

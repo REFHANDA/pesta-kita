@@ -4,17 +4,20 @@ namespace App\Http\Controllers\Venue;
 
 use App\Enums\QuoteRequestStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Venue\StoreQuoteProposalRequest;
+use App\Models\QuoteProposal;
 use App\Models\QuoteRequest;
 use App\Models\VenueRoom;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 /**
- * Wiring read-only permintaan penawaran yang masuk ke ruangan venue milik
- * Pemilik Venue login (`quote_requests` dengan subject venue_room milik
- * profil akun). Alur tulis pengusulan harga menyusul pada BE-4; halaman
- * ini hanya menampilkan data yang sudah tersimpan, tanpa form aksi.
+ * BE-4: daftar, detail, dan usulan harga untuk ruangan milik Pemilik Venue.
  */
 class QuoteRequestController extends Controller
 {
@@ -38,6 +41,11 @@ class QuoteRequestController extends Controller
         return view('venue.permintaan-penawaran', [
             'requests' => $this->ownedRequests($request)
                 ->when($statuses, fn (Builder $q) => $q->whereIn('status', array_column($statuses, 'value')))
+                ->with([
+                    'subject' => fn (MorphTo $morphTo) => $morphTo->morphWith([
+                        VenueRoom::class => ['venue.venueProfile'],
+                    ]),
+                ])
                 ->latest()
                 ->get(),
         ]);
@@ -54,8 +62,46 @@ class QuoteRequestController extends Controller
         );
 
         return view('venue.permintaan-penawaran-detail', [
-            'quoteRequest' => $quoteRequest->load(['subject', 'event', 'proposals']),
+            'quoteRequest' => $quoteRequest->load([
+                'subject.venue',
+                'proposals' => fn ($query) => $query->orderByDesc('submitted_at')->orderByDesc('id'),
+                'decision',
+            ]),
         ]);
+    }
+
+    /**
+     * Catat usulan harga Pemilik Venue untuk permintaan yang masih menunggu.
+     */
+    public function store(StoreQuoteProposalRequest $request, QuoteRequest $quoteRequest): RedirectResponse
+    {
+        $data = $request->validated();
+
+        DB::transaction(function () use ($request, $quoteRequest, $data): void {
+            $ownedRequest = $this->ownedRequests($request)
+                ->whereKey($quoteRequest->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($ownedRequest->status !== QuoteRequestStatus::Diajukan) {
+                throw ValidationException::withMessages([
+                    'quote_request' => 'Permintaan ini tidak lagi menunggu usulan Pemilik Venue.',
+                ]);
+            }
+
+            QuoteProposal::create([
+                'quote_request_id' => $ownedRequest->id,
+                'proposed_amount' => $data['proposed_amount'],
+                'breakdown' => null,
+                'notes' => $data['notes'] ?? null,
+                'submitted_at' => now(),
+            ]);
+
+            $ownedRequest->update(['status' => QuoteRequestStatus::DiusulkanPenyedia]);
+        });
+
+        return redirect()->route('venue.penawaran.detail', $quoteRequest)
+            ->with('status', 'Usulan harga tersimpan dan diteruskan kepada Admin untuk ditinjau.');
     }
 
     /**
@@ -70,6 +116,10 @@ class QuoteRequestController extends Controller
         return QuoteRequest::query()
             ->where('subject_type', 'venue_room')
             ->whereIn('subject_id', $roomIds)
-            ->with(['subject', 'event', 'proposals']);
+            ->with([
+                'subject.venue',
+                'proposals' => fn ($query) => $query->orderByDesc('submitted_at')->orderByDesc('id'),
+                'decision',
+            ]);
     }
 }

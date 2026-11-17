@@ -4,16 +4,20 @@ namespace App\Http\Controllers\Vendor;
 
 use App\Enums\QuoteRequestStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Vendor\StoreQuoteProposalRequest;
+use App\Models\CatalogItem;
+use App\Models\QuoteProposal;
 use App\Models\QuoteRequest;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 /**
- * Wiring read-only permintaan penawaran yang masuk ke katalog Vendor login
- * (`quote_requests` dengan subject item milik profil akun). Pengusulan
- * harga oleh penyedia adalah alur tulis BE-4; halaman ini hanya menampilkan
- * permintaan dan usulan yang sudah tersimpan, tanpa form aksi.
+ * BE-4: daftar, detail, dan usulan harga untuk permintaan katalog milik Vendor.
  */
 class QuoteRequestController extends Controller
 {
@@ -37,6 +41,11 @@ class QuoteRequestController extends Controller
         return view('vendor.permintaan-penawaran', [
             'requests' => $this->ownedRequests($request)
                 ->when($statuses, fn (Builder $q) => $q->whereIn('status', array_column($statuses, 'value')))
+                ->with([
+                    'subject' => fn (MorphTo $morphTo) => $morphTo->morphWith([
+                        CatalogItem::class => ['vendorProfile'],
+                    ]),
+                ])
                 ->latest()
                 ->get(),
         ]);
@@ -53,8 +62,46 @@ class QuoteRequestController extends Controller
         );
 
         return view('vendor.permintaan-penawaran-detail', [
-            'quoteRequest' => $quoteRequest->load(['subject', 'event', 'proposals']),
+            'quoteRequest' => $quoteRequest->load([
+                'subject',
+                'proposals' => fn ($query) => $query->orderByDesc('submitted_at')->orderByDesc('id'),
+                'decision',
+            ]),
         ]);
+    }
+
+    /**
+     * Catat usulan Vendor untuk permintaan yang masih menunggu usulan.
+     */
+    public function store(StoreQuoteProposalRequest $request, QuoteRequest $quoteRequest): RedirectResponse
+    {
+        $data = $request->validated();
+
+        DB::transaction(function () use ($request, $quoteRequest, $data): void {
+            $ownedRequest = $this->ownedRequests($request)
+                ->whereKey($quoteRequest->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($ownedRequest->status !== QuoteRequestStatus::Diajukan) {
+                throw ValidationException::withMessages([
+                    'quote_request' => 'Permintaan ini tidak lagi menunggu usulan Vendor.',
+                ]);
+            }
+
+            QuoteProposal::create([
+                'quote_request_id' => $ownedRequest->id,
+                'proposed_amount' => $data['proposed_amount'],
+                'breakdown' => null,
+                'notes' => $data['notes'] ?? null,
+                'submitted_at' => now(),
+            ]);
+
+            $ownedRequest->update(['status' => QuoteRequestStatus::DiusulkanPenyedia]);
+        });
+
+        return redirect()->route('vendor.penawaran.detail', $quoteRequest)
+            ->with('status', 'Usulan harga tersimpan dan diteruskan kepada Admin untuk ditinjau.');
     }
 
     /**
@@ -68,6 +115,10 @@ class QuoteRequestController extends Controller
         return QuoteRequest::query()
             ->where('subject_type', 'catalog_item')
             ->whereIn('subject_id', $itemIds)
-            ->with(['subject', 'event', 'proposals']);
+            ->with([
+                'subject',
+                'proposals' => fn ($query) => $query->orderByDesc('submitted_at')->orderByDesc('id'),
+                'decision',
+            ]);
     }
 }

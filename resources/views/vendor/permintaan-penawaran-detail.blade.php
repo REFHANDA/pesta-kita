@@ -29,12 +29,18 @@ $statusBadge = fn ($status) => match ($status) {
         <div>
             <div class="crumbs"><a href="{{ url('/vendor') }}">Beranda</a> / <a href="{{ url('/vendor/permintaan-penawaran') }}">Permintaan penawaran</a> / #{{ $quoteRequest->id }}</div>
             <h1>Permintaan: {{ $subject?->name ?? 'Item katalog (sudah dihapus)' }}</h1>
-            <p class="meta">Permintaan #{{ $quoteRequest->id }} · {{ $quoteRequest->event?->name ?? 'Tanpa tertaut acara' }} · {{ $quoteRequest->event_date?->translatedFormat('d F Y') ?? 'tanggal belum diisi' }} · masuk {{ $quoteRequest->created_at?->translatedFormat('d F Y') }}</p>
+            <p class="meta">Permintaan #{{ $quoteRequest->id }} · {{ $quoteRequest->event_date?->translatedFormat('d F Y') ?? 'tanggal belum diisi' }} · masuk {{ $quoteRequest->created_at?->translatedFormat('d F Y') }}</p>
         </div>
         <a class="btn btn-o" href="{{ url('/vendor/permintaan-penawaran') }}">Kembali ke daftar</a>
     </div>
 
-    <div class="data-note" role="note"><span class="ic i-info" aria-hidden="true"></span><p><b>Alur usulan harga belum terhubung.</b> Halaman ini membaca permintaan dan usulan yang tersimpan di basis data. Form pengusulan harga serta keputusan Admin menyusul pada backend BE-4/BE-5, sehingga tidak ada form kirim di halaman ini. Identitas dan kontak Klien tidak ditampilkan — seluruh komunikasi berjalan melalui Pesta Kita.</p></div>
+    <div class="data-note" role="note"><span class="ic i-info" aria-hidden="true"></span><p>Identitas dan kontak Klien tidak ditampilkan. Sampaikan usulan harga melalui Pesta Kita; Admin akan meninjau proposal tersebut.</p></div>
+    @if(session('status'))
+    <div class="alert mt-16" role="status"><span class="ic i-check" aria-hidden="true"></span><p>{{ session('status') }}</p></div>
+    @endif
+    @if($errors->has('quote_request'))
+    <div class="alert mt-16" role="alert"><span class="ic i-info" aria-hidden="true"></span><p>{{ $errors->first('quote_request') }}</p></div>
+    @endif
 
     <div class="detail-grid">
         <div class="detail-stack">
@@ -43,7 +49,6 @@ $statusBadge = fn ($status) => match ($status) {
                 <div class="card-body">
                     <div class="detail-kv">
                         <div class="kv"><span class="k">Layanan</span><span class="v">{{ $subject?->name ?? 'Item katalog (sudah dihapus)' }}</span></div>
-                        <div class="kv"><span class="k">Acara</span><span class="v">{{ $quoteRequest->event?->name ?? 'Tanpa tertaut acara' }}</span></div>
                         <div class="kv"><span class="k">Tanggal acara</span><span class="v">{{ $quoteRequest->event_date?->translatedFormat('d F Y') ?? '—' }}</span></div>
                         <div class="kv"><span class="k">Perkiraan tamu</span><span class="v">{{ $quoteRequest->guest_count ? $quoteRequest->guest_count.' orang' : '—' }}</span></div>
                         <div class="kv"><span class="k">Anggaran acuan Klien</span><span class="v">{{ $quoteRequest->budget ? $rupiah($quoteRequest->budget) : '—' }}</span></div>
@@ -68,7 +73,23 @@ $statusBadge = fn ($status) => match ($status) {
                         @endif
                     </div>
                     @else
-                    <p class="m-0">Belum ada usulan harga yang tercatat untuk permintaan ini. Pengusulan harga akan tersedia setelah backend BE-4 terhubung.</p>
+                    <p class="m-0">Belum ada usulan harga yang tercatat untuk permintaan ini.</p>
+                    @endif
+                    @if($quoteRequest->status === \App\Enums\QuoteRequestStatus::Diajukan)
+                    <form method="post" action="{{ route('vendor.penawaran.store', $quoteRequest) }}" class="mt-16">
+                        @csrf
+                        <div class="field">
+                            <label for="vendor-proposed-amount">Harga usulan (Rp)</label>
+                            <input class="input" type="number" id="vendor-proposed-amount" name="proposed_amount" min="1" step="1" value="{{ old('proposed_amount') }}" required>
+                            @error('proposed_amount')<p class="field-error" role="alert">{{ $message }}</p>@enderror
+                        </div>
+                        <div class="field">
+                            <label for="vendor-proposal-notes">Catatan untuk Admin dan Klien</label>
+                            <textarea class="input" id="vendor-proposal-notes" name="notes" rows="3" maxlength="2000">{{ old('notes') }}</textarea>
+                            @error('notes')<p class="field-error" role="alert">{{ $message }}</p>@enderror
+                        </div>
+                        <button class="btn mt-12" type="submit">Kirim usulan harga</button>
+                    </form>
                     @endif
                     <div class="alert mt-16"><span class="ic i-info" aria-hidden="true"></span><p>Harga yang Anda usulkan belum menjadi harga final. Harga final ditetapkan setelah Admin menyetujui usulan; komisi 10% ditambahkan ke tagihan Klien oleh sistem, bukan dipotong dari harga Anda.</p></div>
                 </div>
@@ -82,7 +103,7 @@ $statusBadge = fn ($status) => match ($status) {
                         @foreach ($proposals->sortBy('submitted_at') as $proposal)
                         <div class="timeline-item"><b>Usulan harga tercatat {{ $rupiah($proposal->proposed_amount) }}</b><small>{{ $proposal->submitted_at?->translatedFormat('d M Y H.i') ?? 'waktu usulan tidak tercatat' }}</small></div>
                         @endforeach
-                        <div class="timeline-item"><b>{{ $qLabel }}</b><small>Status saat ini · keputusan Admin terhubung pada BE-4/BE-5</small></div>
+                        <div class="timeline-item"><b>{{ $qLabel }}</b><small>Status saat ini</small></div>
                     </div>
                 </div>
             </section>
