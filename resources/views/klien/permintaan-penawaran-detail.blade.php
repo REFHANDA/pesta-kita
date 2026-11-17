@@ -51,8 +51,11 @@ if ($subject instanceof \App\Models\CatalogItem) {
 
     <div class="data-note" role="note">
         <span class="ic i-info" aria-hidden="true"></span>
-        <p><b>Sebagian alur belum terhubung.</b> Halaman ini membaca permintaan dan usulan yang tersimpan di basis data. Keputusan Admin atas usulan penyedia serta lanjutan ke pesanan menyusul pada backend BE-4/BE-5, sehingga tidak ada tombol aksi di halaman ini.</p>
+        <p>Harga katalog, usulan penyedia, dan harga yang disetujui Admin dicatat terpisah. Pemesanan dan tagihan hanya diproses pada tahap backend berikutnya.</p>
     </div>
+    @if(session('status'))
+    <div class="alert mt-16" role="status"><span class="ic i-check" aria-hidden="true"></span><p>{{ session('status') }}</p></div>
+    @endif
 
     <div class="detail-grid">
         <div class="detail-stack">
@@ -80,8 +83,22 @@ if ($subject instanceof \App\Models\CatalogItem) {
                     <div class="detail-list">
                         <div class="dl-row"><span>Harga katalog (referensi)</span><strong>{{ $rupiah($quoteRequest->catalog_price_snapshot) }} <span class="badge b-mute">Referensi</span></strong></div>
                         <div class="dl-row"><span>Harga diajukan penyedia</span><strong>@if($usulan){{ $rupiah($usulan->proposed_amount) }} <span class="badge b-warn">Usulan</span>@else Belum ada usulan @endif</strong></div>
-                        <div class="dl-row"><span>Harga disetujui Admin</span><strong>Belum diputuskan — alur keputusan Admin terhubung pada BE-4/BE-5</strong></div>
+                        <div class="dl-row">
+                            <span>Harga disetujui Admin</span>
+                            <strong>
+                                @if($quoteRequest->decision?->decision === \App\Enums\QuoteDecisionResult::Disetujui)
+                                {{ $rupiah($quoteRequest->decision->approved_amount) }}
+                                @elseif($quoteRequest->decision?->decision === \App\Enums\QuoteDecisionResult::Ditolak)
+                                Ditolak Admin
+                                @else
+                                Belum diputuskan
+                                @endif
+                            </strong>
+                        </div>
                     </div>
+                    @if($quoteRequest->decision?->reason)
+                    <p class="hint mt-12">Catatan keputusan Admin: {{ $quoteRequest->decision->reason }}</p>
+                    @endif
                     @if ($usulan?->notes)
                     <p class="hint mt-12">Catatan penyedia atas usulan: {{ $usulan->notes }}</p>
                     @endif
@@ -98,7 +115,10 @@ if ($subject instanceof \App\Models\CatalogItem) {
                         <div class="timeline-item"><b>Penyedia mengusulkan harga {{ $rupiah($proposal->proposed_amount) }}</b><small>{{ $proposal->submitted_at?->translatedFormat('d M Y H.i') ?? 'waktu usulan tidak tercatat' }}</small></div>
                         @endforeach
                         @if ($proposals->isEmpty())
-                        <div class="timeline-item"><b>Belum ada usulan penyedia</b><small>Usulan akan tampil di sini setelah tercatat pada backend BE-4.</small></div>
+                        <div class="timeline-item"><b>Belum ada usulan penyedia</b><small>Usulan akan tampil di sini setelah penyedia merespons.</small></div>
+                        @endif
+                        @if($quoteRequest->decision)
+                        <div class="timeline-item"><b>Keputusan Admin: {{ $quoteRequest->decision->decision->value }}</b><small>{{ $quoteRequest->decision->decided_at?->translatedFormat('d M Y H.i') ?? '—' }}@if($quoteRequest->decision->reason) · {{ $quoteRequest->decision->reason }}@endif</small></div>
                         @endif
                     </div>
                 </div>
@@ -109,7 +129,7 @@ if ($subject instanceof \App\Models\CatalogItem) {
             <section class="card detail-card">
                 <div class="card-h"><h2>Status alur</h2><p class="meta">Kelanjutan permintaan ini.</p></div>
                 <div class="card-body">
-                    <p class="body-copy">Status saat ini: <span class="badge {{ $qClass }}">{{ $qLabel }}</span>. Pemesanan lanjutan, tagihan, dan keputusan harga final mengikuti backend BE-4–BE-6 dan belum dapat diproses dari halaman ini.</p>
+                    <p class="body-copy">Status saat ini: <span class="badge {{ $qClass }}">{{ $qLabel }}</span>. Pemesanan lanjutan dan tagihan mengikuti tahap backend berikutnya.</p>
                     <div class="alert mt-16"><span class="ic i-info" aria-hidden="true"></span><p>Kontak pribadi penyedia tidak ditampilkan. Seluruh komunikasi dan pembayaran dilakukan melalui Pesta Kita.</p></div>
                 </div>
             </section>

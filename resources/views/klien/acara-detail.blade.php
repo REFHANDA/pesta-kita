@@ -21,20 +21,15 @@ $badgeFor = fn ($status) => match ($status) {
 
 // Tahap alur normal; acara dibatalkan tidak menampilkan langkah aktif.
 $flow = [
-    \App\Enums\EventStatus::Draft => 'Draft',
-    \App\Enums\EventStatus::Diajukan => 'Diajukan',
-    \App\Enums\EventStatus::MenungguPembayaran => 'Menunggu pembayaran',
-    \App\Enums\EventStatus::Terkonfirmasi => 'Terkonfirmasi',
-    \App\Enums\EventStatus::Selesai => 'Selesai',
-    \App\Enums\EventStatus::Dinilai => 'Dinilai',
+    \App\Enums\EventStatus::Draft->value => 'Draft',
+    \App\Enums\EventStatus::Diajukan->value => 'Diajukan',
+    \App\Enums\EventStatus::MenungguPembayaran->value => 'Menunggu pembayaran',
+    \App\Enums\EventStatus::Terkonfirmasi->value => 'Terkonfirmasi',
+    \App\Enums\EventStatus::Selesai->value => 'Selesai',
+    \App\Enums\EventStatus::Dinilai->value => 'Dinilai',
 ];
-$flowKeys = array_keys($flow);
-$currentStep = null;
-foreach ($flowKeys as $i => $stepStatus) {
-    if ($stepStatus === $event->status) {
-        $currentStep = $i;
-    }
-}
+$currentStep = array_search($event->status?->value, array_keys($flow), true);
+$currentStep = $currentStep === false ? null : $currentStep;
 $rupiah = fn ($n) => 'Rp '.number_format((int) $n, 0, ',', '.');
 
 $statusBadgeForQuote = fn ($status) => match ($status) {
@@ -50,7 +45,7 @@ $statusBadgeForQuote = fn ($status) => match ($status) {
 <main id="konten" class="content" tabindex="-1">
 <div class="page-head"><div><div class="crumbs"><a href="{{ url('/klien') }}">Beranda</a> / <a href="{{ url('/klien/acara') }}">Rancang acara</a> / Detail</div><h1>{{ $event->name ?: 'Detail acara' }}</h1><p class="sub">{{ $event->event_date?->translatedFormat('l, d F Y') ?? 'Tanggal belum diisi' }} · {{ $event->guest_count ? $event->guest_count.' tamu' : 'Jumlah tamu belum diisi' }}</p></div><span class="badge {{ $badgeClass }}">{{ $badgeLabel }}</span></div>
 
-<div class="data-note" role="note"><span class="ic i-info" aria-hidden="true"></span><p><b>Sebagian alur belum terhubung.</b> Halaman ini membaca data acara Anda yang tersimpan di basis data. Pesanan final, tagihan, refund, rundown, dan penilaian menyusul pada backend BE-4–BE-7, sehingga tidak ada tombol aksi di halaman ini yang memproses data.</p></div>
+<div class="data-note" role="note"><span class="ic i-info" aria-hidden="true"></span><p>Halaman ini membaca acara dan permintaan penawaran tertaut dari basis data. Pesanan final, tagihan, refund, rundown, dan penilaian menyusul pada backend BE-5–BE-7.</p></div>
 
 @if ($currentStep !== null)
 <section class="card"><ol class="steps" aria-label="Tahap acara">

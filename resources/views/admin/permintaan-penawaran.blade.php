@@ -2,63 +2,79 @@
 
 @section('title', 'Peninjauan penawaran · Admin Pesta Kita')
 
+@php
+$rupiah = fn ($amount) => 'Rp '.number_format((int) $amount, 0, ',', '.');
+$statusBadge = fn ($status) => match ($status) {
+    \App\Enums\QuoteRequestStatus::Diajukan => ['b-warn', 'Menunggu usulan'],
+    \App\Enums\QuoteRequestStatus::DiusulkanPenyedia => ['b-info', 'Menunggu keputusan'],
+    \App\Enums\QuoteRequestStatus::DisetujuiAdmin => ['b-ok', 'Disetujui'],
+    \App\Enums\QuoteRequestStatus::DitolakAdmin => ['b-bad', 'Ditolak'],
+};
+$providerName = fn ($subject) => match (true) {
+    $subject instanceof \App\Models\CatalogItem => $subject->vendorProfile?->business_name,
+    $subject instanceof \App\Models\VenueRoom => $subject->venue?->venueProfile?->business_name,
+    default => null,
+};
+@endphp
+
 @section('content')
 <main class="content page-refined" id="konten" tabindex="-1">
     <div class="page-head">
         <div>
             <div class="crumbs"><a href="{{ url('/admin') }}">Admin</a> / Permintaan &amp; penawaran</div>
             <h1>Peninjauan penawaran</h1>
-            <p class="meta">Bandingkan harga katalog dan harga yang diajukan penyedia sebelum menetapkan harga final untuk Klien.</p>
+            <p class="meta">Tinjau proposal harga penyedia dan catat keputusan final untuk setiap permintaan.</p>
         </div>
     </div>
 
-    <div class="alert"><span class="ic i-info" aria-hidden="true"></span><p><b>Fitur ini masih berupa prototipe frontend.</b> Pengajuan dan perubahan penawaran belum tersimpan ke server. Semua nominal, nama, dan status di halaman ini adalah contoh statis.</p></div>
-
     <section class="card workflow-card">
         <div aria-label="Navigasi status" class="tabs" role="navigation">
-            <a href="{{ url('/admin/permintaan-penawaran') }}" aria-current="page">Menunggu keputusan <span class="n">2</span></a>
-            <a href="{{ url('/admin/permintaan-penawaran') }}?status=disetujui">Disetujui</a>
-            <a href="{{ url('/admin/permintaan-penawaran') }}?status=ditolak">Ditolak</a>
-            <a href="{{ url('/admin/permintaan-penawaran') }}?status=semua">Semua</a>
+            @foreach(['menunggu' => 'Menunggu keputusan', 'disetujui' => 'Disetujui', 'ditolak' => 'Ditolak', 'semua' => 'Semua'] as $filter => $label)
+            <a href="{{ route('admin.penawaran', ['status' => $filter]) }}" @if($statusFilter === $filter) aria-current="page" @endif>
+                {{ $label }}@if($filter === 'menunggu') <span class="n">{{ $waitingCount }}</span>@endif
+            </a>
+            @endforeach
         </div>
 
-        <div class="item workflow-item">
+        @forelse($requests as $quoteRequest)
+        @php
+        $proposal = $quoteRequest->proposals->first();
+        [$badgeClass, $badgeLabel] = $statusBadge($quoteRequest->status);
+        @endphp
+        <article class="item workflow-item">
             <div class="item-h">
-                <div><h2>Graha Melati Ballroom</h2><p class="meta">Graha Melati · Venue · permintaan PWV-0017 · diusulkan 02 Nov 2026</p></div>
-                <span class="badge b-warn">Menunggu keputusan</span>
+                <div>
+                    <h2>{{ $quoteRequest->subject?->name ?? 'Subjek sudah tidak tersedia' }}</h2>
+                    <p class="meta">
+                        {{ $providerName($quoteRequest->subject) ?? 'Penyedia tidak tersedia' }}
+                        · Permintaan #{{ $quoteRequest->id }}
+                        · {{ $quoteRequest->event_date?->translatedFormat('d M Y') ?? 'Tanggal tidak tersedia' }}
+                        · {{ $quoteRequest->created_at?->translatedFormat('d M Y') ?? '—' }}
+                    </p>
+                </div>
+                <span class="badge {{ $badgeClass }}">{{ $badgeLabel }}</span>
             </div>
             <div class="price-compare">
-                <div><small>Harga katalog (referensi)</small><b>Rp 8.600.000</b></div>
+                <div><small>Harga katalog (referensi)</small><b>{{ $rupiah($quoteRequest->catalog_price_snapshot) }}</b></div>
                 <span>→</span>
-                <div><small>Harga diajukan penyedia</small><b>Rp 8.250.000</b></div>
+                <div><small>Harga diajukan penyedia</small><b>{{ $proposal ? $rupiah($proposal->proposed_amount) : 'Belum ada usulan' }}</b></div>
             </div>
-            <p>Alasan: penyesuaian jam tambahan dan fasilitas untuk 60 tamu.</p>
+            @if($proposal?->notes)
+            <p>{{ $proposal->notes }}</p>
+            @elseif($quoteRequest->notes)
+            <p>Kebutuhan Klien: {{ $quoteRequest->notes }}</p>
+            @endif
             <div class="toolbar">
-                <button class="btn" type="button" data-confirm="Setujui penawaran ini?" data-text="Harga final ditetapkan dari harga yang disetujui, lalu komisi 10% ditambahkan ke tagihan Klien. Pada prototipe ini keputusan belum tersimpan ke server." data-label="Setujui penawaran">Setujui penawaran</button>
-                <button class="btn btn-danger" type="button" data-confirm="Tolak penawaran ini?" data-text="Penyedia dan Klien diberi tahu, lalu penawaran perlu diusulkan ulang. Pada prototipe ini keputusan belum tersimpan ke server." data-label="Tolak penawaran" data-tone="bad" data-ask="Alasan penolakan">Tolak penawaran</button>
-                <a class="btn btn-o" href="{{ url('/admin/permintaan-penawaran-detail') }}">Lihat detail</a>
+                <a class="btn btn-o" href="{{ route('admin.penawaran.detail', $quoteRequest) }}">Lihat detail</a>
             </div>
-        </div>
+        </article>
+        @empty
+        <div class="item workflow-item"><p class="m-0">Belum ada permintaan pada status ini.</p></div>
+        @endforelse
 
-        <div class="item workflow-item">
-            <div class="item-h">
-                <div><h2>Katering prasmanan</h2><p class="meta">Dapur Nusantara · Vendor · permintaan PW-0044 · diusulkan 02 Nov 2026</p></div>
-                <span class="badge b-warn">Menunggu keputusan</span>
-            </div>
-            <div class="price-compare">
-                <div><small>Harga katalog (referensi)</small><b>Rp 2.992.000</b></div>
-                <span>→</span>
-                <div><small>Harga diajukan penyedia</small><b>Rp 3.100.000</b></div>
-            </div>
-            <p>Alasan: penyesuaian menu bebas kacang dan tambahan dua menu sayur.</p>
-            <div class="toolbar">
-                <button class="btn" type="button" data-confirm="Setujui penawaran ini?" data-text="Harga final ditetapkan dari harga yang disetujui, lalu komisi 10% ditambahkan ke tagihan Klien. Pada prototipe ini keputusan belum tersimpan ke server." data-label="Setujui penawaran">Setujui penawaran</button>
-                <button class="btn btn-danger" type="button" data-confirm="Tolak penawaran ini?" data-text="Penyedia dan Klien diberi tahu, lalu penawaran perlu diusulkan ulang. Pada prototipe ini keputusan belum tersimpan ke server." data-label="Tolak penawaran" data-tone="bad" data-ask="Alasan penolakan">Tolak penawaran</button>
-                <a class="btn btn-o" href="{{ url('/admin/permintaan-penawaran-detail') }}">Lihat detail</a>
-            </div>
-        </div>
+        {{ $requests->links() }}
 
-        <div class="alert"><span class="ic i-info" aria-hidden="true"></span><p>Harga katalog, harga usulan penyedia, dan harga final adalah tiga hal berbeda. Harga final hanya ditetapkan setelah Admin menyetujui penawaran.</p></div>
+        <div class="alert"><span class="ic i-info" aria-hidden="true"></span><p>Harga katalog, harga usulan penyedia, dan harga final adalah nilai yang berbeda. Persetujuan mengambil nominal proposal terakhir yang tersimpan di server.</p></div>
     </section>
 </main>
 @endsection

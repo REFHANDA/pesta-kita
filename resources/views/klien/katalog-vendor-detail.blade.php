@@ -42,7 +42,11 @@ $fee = $item ? intdiv($item->catalog_price * 10, 100) : 0;
 @endif
 <p class="hint">Estimasi; harga akhir ditetapkan sistem setelah pesanan disetujui Admin.</p>
 </div></section>
-<section class="card"><div class="card-h"><h2>Tambahkan ke acara</h2></div><div class="card-b"><p class="hint">Penambahan item ke acara draft tersedia pada tahap berikutnya (BE-4/BE-5). Pesanan kelak ditinjau dan dibayar lewat Pesta Kita dalam satu tagihan gabungan, bukan langsung ke penyedia.</p></div></section>
+@if($item->pricing_mode === \App\Enums\PricingMode::PerluPenawaran)
+<section class="card"><div class="card-h"><h2>Ajukan permintaan penawaran</h2></div><div class="card-b"><p class="hint">Pilih kebutuhan acara dan kirim permintaan kepada penyedia melalui Pesta Kita.</p><a class="btn" href="{{ route('klien.penawaran', ['subject' => 'catalog_item:'.$item->id]) }}">Ajukan penawaran untuk layanan ini</a></div></section>
+@else
+<section class="card"><div class="card-h"><h2>Pemesanan layanan</h2></div><div class="card-b"><p class="hint">Layanan ini memakai harga katalog tetap. Alur pemesanan tersedia pada tahap backend berikutnya.</p></div></section>
+@endif
 <section class="card"><div class="card-h"><h2>Status penyedia</h2></div><div class="card-b"><p class="mb-8"><span class="badge b-ok">Terverifikasi</span></p><p class="hint">Status verifikasi mengikuti keputusan Admin Pesta Kita. Kontak pribadi penyedia tidak ditampilkan.</p></div></section>
 </aside></div>
 @endif

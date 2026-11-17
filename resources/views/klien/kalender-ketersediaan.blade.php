@@ -136,7 +136,7 @@ $kalConfig = json_encode([
                     <div class="card-h"><h2>Ajukan permintaan penawaran</h2></div>
                     <div class="card-b">
                         <p class="hint">Status ketersediaan di atas adalah gambaran dari penyedia dan tetap perlu dikonfirmasi. Proses permintaan penawaran sedang dikembangkan (BE-4); untuk saat ini halaman tersebut masih prototipe.</p>
-                        <a class="btn mt-12" id="kal-quote-link" data-base="{{ url('/klien/permintaan-penawaran') }}" href="{{ url('/klien/permintaan-penawaran') }}">Lihat prototipe permintaan penawaran</a>
+                        <a class="btn mt-12" id="kal-quote-link" data-base="{{ route('klien.penawaran') }}" href="{{ route('klien.penawaran') }}">Ajukan permintaan penawaran</a>
                     </div>
                 </section>
             </aside>

@@ -41,7 +41,7 @@ $photos = $photos ?? collect();
 <section class="card"><div class="card-h"><h2>Status verifikasi</h2></div><div class="card-b"><p class="mb-8"><span class="badge b-ok">Terverifikasi</span></p><p class="hint">Status verifikasi mengikuti keputusan Admin Pesta Kita; venue mengikuti status verifikasi profil penyedia.</p></div></section>
 <section class="card"><div class="card-h"><h2>Kontak penyedia</h2></div><div class="card-b"><p class="hint">Kontak pribadi pemilik venue tidak ditampilkan. Seluruh komunikasi, pesanan, dan pembayaran diproses melalui Pesta Kita dalam satu tagihan gabungan.</p></div></section>
 <section class="card"><div class="card-h"><h2>Ketersediaan</h2></div><div class="card-b"><p class="mb-8"><span class="badge b-warn">Perlu konfirmasi</span></p><div class="warn-box">Ketersediaan venue perlu dikonfirmasi sebelum pesanan dapat diproses. Kalender ketersediaan akan tersedia pada tahap berikutnya (BE-3b).</div></div></section>
-<section class="card"><div class="card-h"><h2>Ajukan kebutuhan acara</h2></div><div class="card-b"><p class="hint">Pilih venue penyedia ini dari katalog; penambahan ke acara draft tersedia pada tahap berikutnya (BE-4/BE-5).</p><a class="btn" href="{{ route('klien.katalog.venue') }}">Lihat venue di katalog</a></div></section>
+<section class="card"><div class="card-h"><h2>Ajukan kebutuhan acara</h2></div><div class="card-b"><p class="hint">Pilih venue dari katalog untuk memilih ruangan dan mengajukan permintaan penawaran.</p><a class="btn" href="{{ route('klien.katalog.venue') }}">Lihat venue di katalog</a></div></section>
 </aside></div>
 @endif
 </main>

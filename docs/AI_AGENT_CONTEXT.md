@@ -544,6 +544,8 @@ Rincian: `docs/reports/BE-2_Implementation_Report_Pesta_Kita.md`.
 
 ### 6.15 Hasil BE-3 — Media, Katalog, Venue, Verifikasi Mitra, Visibilitas Klien (Gate 4B) (2026-11-16)
 
+Catatan batasan di bagian ini mencerminkan status saat BE-3 ditutup pada 2026-11-16; hasil tahap berikutnya ada di 6.16.
+
 Lingkup yang disetujui pengguna: **BE-3 Gate 4B** (Gate 4A + rekomendasi §18 butir 1–10 disetujui). Lingkup inti A–G: media privat + unggah/hapus/stream berotorisasi, CRUD katalog vendor (layanan/peralatan), CRUD venue + ruangan/fasilitas, workflow verifikasi penyedia–Admin, endpoint visibilitas Klien, dan wiring Blade terbatas (20 view, tanpa redesign). Ditunda: kalender ketersediaan & pengajuan harga (BE-3b), tambah item ke acara draft (BE-4/BE-5). Keputusan diterapkan: B12/B14 (lihat `BACKEND_BUSINESS_RULES.md` bagian E/F), tanpa persetujuan Admin per item, venue mengikuti verifikasi profil + penonaktifan individual oleh Admin, `cleaning_fee` hanya Admin, bukti rekening bukan syarat verifikasi, satu dokumen aktif per jenis (ganti setelah unggah baru sukses), disk `private` `serve=false`.
 
 Yang dikerjakan:
@@ -570,6 +572,12 @@ Pengujian aktual pada 2026-11-16:
 - Perbaikan selama wiring: bug Blade `@endif@if(...)` bersebelahan tidak terkompilasi (dipisah spasi) pada katalog-vendor-detail/penyedia-venue; `Str::limit(null)` dicegah dengan `?? ''`.
 
 Rincian: `docs/reports/BE-3_Implementation_Report_Pesta_Kita.md`.
+
+### 6.16 Hasil BE-4 — Wiring Request Quote (2026-11-17)
+
+**Status: selesai — terverifikasi.** Alur quote Klien → Vendor/Venue → Admin dihubungkan ke backend dan delapan view quote menggunakan data server. Pengajuan quote menyimpan snapshot harga katalog; `event_id` hanya opsional untuk acara draft milik Klien dan tidak membuat acara. Proposal penyedia dibatasi pada subjek miliknya; nama Klien dan acara tidak ditampilkan di portal penyedia. Admin memutuskan proposal terakhir yang tersimpan, keputusan dicatat pada quote dan audit log dalam transaksi. Penolakan membutuhkan alasan; tiap quote hanya dapat diputuskan sekali dan tidak mendukung usulan ulang. Notifikasi dan alur acara/pesanan/keuangan belum termasuk.
+
+Tes BE-4 dan regresi portal terarah: **40 tests / 454 assertions lulus**; suite penuh **289 tests / 1536 assertions lulus** pada 2026-11-17. `view:cache` berhasil lalu cache dibersihkan; `route:list` menampilkan 13 route quote. Pint dan `git diff --check` lulus. Rincian perubahan dan batasan ada di `docs/reports/BE-4_Implementation_Report_Pesta_Kita.md`.
 
 ## 7. Panduan Tahap 4 — Penyempurnaan Portal per Role
 
@@ -684,6 +692,7 @@ Tambahkan baris terbaru di bawah ini setiap kali konteks utama diperbarui secara
 | 2026-11-16 | BE-1 — Autentikasi, otorisasi, role, wiring frontend terbatas + Gate 2      | Selesai — terverifikasi                                | Implementasi penuh BE-1: enum + skema users/profil, login/register/logout (rate limit, pesan generik, T1/T2), middleware `EnsureRole` seluruh portal, profil/sandi, demo bar local-only (B18), wiring 10 file, seeder demo lokal idempoten. Gate 2 dilaksanakan: `pesta_kita` dibuat (utf8mb4_unicode_ci), 7 migration Ran, seed terverifikasi. Tes 58 lulus (616 assertions); route:list, migrate:status, view:cache, Pint, git diff --check lulus; tanpa perubahan dependensi/.env/commit. Rincian pada 6.13 dan `docs/reports/BE-1_Implementation_Report_Pesta_Kita.md`.                                                                                                                                                                            |
 | 2026-11-16 | BE-2 — Skema domain non-finansial (Gate 3)                                  | Selesai — terverifikasi                                | 16 migration additive FK-safe reversible + 16 model/relasi + 10 enum + 19 factory + perluasan LocalDemoSeeder (idempoten, local-only) + 38 integrity tests (14 kategori §8). Keputusan B4/B15/B5/B6/B7/B11/T2 diterapkan; tanpa events.venue_id; morph enforceMorphMap. Tes 96 lulus (704 assertions); migrate MySQL 23 Ran (BE-1 batch [1] utuh, BE-2 batch [2]); db:seed ×2 idempoten; rollback SQLite sementara membuktikan down() FK-safe; Pint 64 isu; git diff --check lulus; tanpa dependensi/.env/commit/Blade. Rincian pada 6.14 dan `docs/reports/BE-2_Implementation_Report_Pesta_Kita.md`.                                                                                                                                                 |
 | 2026-11-16 | BE-3 — Media, katalog, venue, verifikasi mitra, visibilitas Klien (Gate 4B) | Selesai — terverifikasi                                | 2 migration additive batch [3] (media kind/metadata; kolom reviewer/alasan/waktu pengajuan profil) + 3 enum + 8 controller + 12 Form Request + 5 Policy + disk private serve=false + scope publikUntukKlien + wiring 20 view Blade tanpa redesign (vendor 6, venue 4, admin 3, klien 7). Keputusan Gate 4B butir 1–10 diterapkan; B12/B14 diperbarui di BACKEND_BUSINESS_RULES (B/E/F). Tes 220 lulus (1139 assertions); migrate MySQL 25 Ran (BE-1/BE-2 utuh); reversibility SQLite sementara; view:cache, route:list 62, Pint 142 file, git diff --check lulus; tanpa dependensi/.env/commit. Sisa: BE-3b kalender & pengajuan harga, BE-4/BE-5 tambah item ke acara. Rincian pada 6.15 dan `docs/reports/BE-3_Implementation_Report_Pesta_Kita.md`. |
+| 2026-11-17 | BE-4 — Wiring Request Quote | Selesai — terverifikasi | Alur Klien→Vendor/Venue→Admin dihubungkan; quote menyimpan snapshot harga katalog, proposal, keputusan final, dan audit. Event draft opsional; tidak membuat acara. Tes terarah 40/454 dan suite penuh 289/1536 lulus; `view:cache`, `route:list` (13 route quote), Pint, dan pemeriksaan diff tercatat di laporan. Rincian di 6.16 dan `docs/reports/BE-4_Implementation_Report_Pesta_Kita.md`. |
 
 ## 10. Efisiensi Token dan Pencegahan Halusinasi
 
@@ -783,7 +792,7 @@ Jika roadmap tidak tersedia atau lingkupnya ambigu, jangan menebak—laporkan ba
 
 ## 14. Dokumentasi backend
 
-Audit BE-0 (2026-11-15) memeriksa repository dan tidak mengubah kode aplikasi. Frontend Tahap 4, 5.1–5.6, dan 6 tetap acuan kebutuhan tampilan. **Per 2026-11-16, BE-1 (auth, role, profil, database `pesta_kita`), BE-2 (skema domain non-finansial: 16 tabel, model, relasi, factory, seeder, integrity tests), dan BE-3 (media privat, katalog vendor, venue, verifikasi mitra, visibilitas Klien, wiring 20 view) telah diimplementasikan dan terverifikasi.** Kalender/pengajuan harga (BE-3b), alur quote/order, dan keuangan (invoice/payment/refund/payout) belum ada backend-nya. Lihat 6.13, 6.14, dan 6.15.
+Audit BE-0 (2026-11-15) memeriksa repository dan tidak mengubah kode aplikasi. Frontend Tahap 4, 5.1–5.6, dan 6 tetap acuan kebutuhan tampilan. **Per 2026-11-17, BE-1 (auth/role), BE-2 (skema domain), BE-3 (media/katalog/verifikasi), BE-3b (kalender/pengajuan harga), dan BE-4 (alur quote) telah diimplementasikan dan terverifikasi sesuai laporan masing-masing.** BE-5 (acara/pesanan) dan BE-6–BE-7 (keuangan, rundown, ulasan) belum dilaksanakan. Lihat 6.13–6.16.
 
 | Kebutuhan                                           | Dokumen                                                 |
 | --------------------------------------------------- | ------------------------------------------------------- |
@@ -796,5 +805,7 @@ Audit BE-0 (2026-11-15) memeriksa repository dan tidak mengubah kode aplikasi. F
 | Hasil implementasi BE-2 + Gate 3 (2026-11-16)       | `docs/reports/BE-2_Implementation_Report_Pesta_Kita.md` |
 | Persiapan BE-3 + Gate 4A (2026-11-16)               | `docs/reports/BE-3_Preparation_Report_Pesta_Kita.md`    |
 | Hasil implementasi BE-3 + Gate 4B (2026-11-16)      | `docs/reports/BE-3_Implementation_Report_Pesta_Kita.md` |
+| Hasil implementasi BE-3b (2026-11-16)               | `docs/reports/BE-3b_Wiring_Report_Pesta_Kita.md`        |
+| Hasil implementasi BE-4 (2026-11-17)                | `docs/reports/BE-4_Implementation_Report_Pesta_Kita.md` |
 
-BE-1, BE-2, dan BE-3 sudah disetujui dan dilaksanakan; jangan mengulang implementasinya. Tahap backend berikutnya (BE-3b, BE-4, dan seterusnya) tetap menunggu instruksi eksplisit pengguna. Jangan memperlakukan ERD atau route usulan di luar skema yang sudah dimigrasi sebagai endpoint yang sudah terpasang.
+BE-1, BE-2, BE-3, BE-3b, dan BE-4 sudah dilaksanakan; jangan mengulang implementasinya. Tahap berikutnya adalah BE-5, yang tetap menunggu instruksi eksplisit pengguna dan konfirmasi keputusan B7. Jangan memperlakukan route usulan BE-5+ sebagai endpoint yang sudah terpasang.

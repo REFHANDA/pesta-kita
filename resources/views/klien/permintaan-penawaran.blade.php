@@ -39,19 +39,94 @@ $tabAktif = (string) request('status', '');
 
     <div class="data-note" role="note">
         <span class="ic i-info" aria-hidden="true"></span>
-        <p><b>Sebagian alur belum terhubung.</b> Daftar di bawah dibaca dari basis data permintaan milik akun Anda. Pengajuan permintaan baru dari katalog serta keputusan Admin atas usulan penyedia menyusul pada backend BE-4/BE-5, karena itu tidak ada form pengajuan di halaman ini.</p>
+        <p>Pengajuan, usulan penyedia, dan keputusan Admin tersimpan di Pesta Kita. Keputusan Admin menetapkan harga final untuk permintaan ini; proses pemesanan dan tagihan mengikuti tahap backend berikutnya.</p>
     </div>
 
     @if(request()->filled('tanggal'))
     <div class="alert mt-16" role="status">
         <span class="ic i-cal" aria-hidden="true"></span>
-        <p>Tanggal pilihan dari kalender ketersediaan: <b>{{ request('tanggal') }}</b>. Tanggal ini hanya usulan tampilan dan belum tersimpan; ini bukan tanggal yang sudah dipesan dan status ketersediaannya tetap perlu dikonfirmasi.</p>
+        <p>Tanggal pilihan dari kalender ketersediaan: <b>{{ request('tanggal') }}</b>. Tanggal ini baru tersimpan sebagai permintaan penawaran setelah formulir di bawah dikirim; bukan tanggal yang sudah dipesan.</p>
     </div>
     @endif
 
     <section class="card mt-16">
+        <div class="card-h"><h2>Ajukan permintaan penawaran</h2><p class="meta">Pilih layanan atau ruangan venue yang tersedia, lalu jelaskan kebutuhan acara Anda.</p></div>
+        <div class="card-body">
+            @if(session('status'))
+            <div class="alert" role="status"><span class="ic i-check" aria-hidden="true"></span><p>{{ session('status') }}</p></div>
+            @endif
+            @if($errors->has('quote_request'))
+            <div class="alert" role="alert"><span class="ic i-info" aria-hidden="true"></span><p>{{ $errors->first('quote_request') }}</p></div>
+            @endif
+            <form method="post" action="{{ route('klien.penawaran.store') }}">
+                @csrf
+                <div class="field">
+                    <label for="quote-subject">Layanan / ruangan venue</label>
+                    <select class="input" id="quote-subject" name="subject" required>
+                        <option value="">Pilih layanan atau venue</option>
+                        @foreach($catalogItems as $item)
+                        <option value="catalog_item:{{ $item->id }}" @selected(old('subject', request('subject')) === 'catalog_item:'.$item->id)>
+                            {{ $item->name }} · {{ $item->vendorProfile?->business_name }} · harga referensi {{ $rupiah($item->catalog_price) }}
+                        </option>
+                        @endforeach
+                        @foreach($venueRooms as $room)
+                        <option value="venue_room:{{ $room->id }}" @selected(old('subject', request('subject')) === 'venue_room:'.$room->id)>
+                            {{ $room->name }} · {{ $room->venue?->name }} · harga referensi {{ $rupiah($room->venue?->rental_price) }}
+                        </option>
+                        @endforeach
+                    </select>
+                    @error('subject')<p class="field-error" role="alert">{{ $message }}</p>@enderror
+                </div>
+
+                <div class="field">
+                    <label for="quote-event">Tautkan acara draft (opsional)</label>
+                    <select class="input" id="quote-event" name="event_id">
+                        <option value="">Tanpa acara tertaut</option>
+                        @foreach($draftEvents as $event)
+                        <option value="{{ $event->id }}" @selected((string) old('event_id') === (string) $event->id)>{{ $event->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('event_id')<p class="field-error" role="alert">{{ $message }}</p>@enderror
+                </div>
+
+                <div class="form-grid mt-12">
+                    <div class="field">
+                        <label for="quote-event-date">Tanggal acara</label>
+                        <input class="input" type="date" id="quote-event-date" name="event_date" min="{{ now()->toDateString() }}" value="{{ old('event_date', request('tanggal')) }}" required>
+                        @error('event_date')<p class="field-error" role="alert">{{ $message }}</p>@enderror
+                    </div>
+                    <div class="field">
+                        <label for="quote-guest-count">Perkiraan tamu</label>
+                        <input class="input" type="number" min="1" step="1" id="quote-guest-count" name="guest_count" value="{{ old('guest_count') }}">
+                        @error('guest_count')<p class="field-error" role="alert">{{ $message }}</p>@enderror
+                    </div>
+                    <div class="field">
+                        <label for="quote-budget">Anggaran acuan (Rp)</label>
+                        <input class="input" type="number" min="0" step="1" id="quote-budget" name="budget" value="{{ old('budget') }}">
+                        @error('budget')<p class="field-error" role="alert">{{ $message }}</p>@enderror
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="quote-notes">Kebutuhan khusus</label>
+                    <textarea class="input" id="quote-notes" name="notes" rows="4" maxlength="2000">{{ old('notes') }}</textarea>
+                    @error('notes')<p class="field-error" role="alert">{{ $message }}</p>@enderror
+                </div>
+                <div class="toolbar mt-16">
+                    <button class="btn" type="submit" @disabled($catalogItems->isEmpty() && $venueRooms->isEmpty())>Kirim permintaan penawaran</button>
+                </div>
+                @if($catalogItems->isEmpty() && $venueRooms->isEmpty())
+                <p class="hint mt-12">Belum ada layanan yang memerlukan penawaran atau ruangan venue terverifikasi yang tersedia.</p>
+                @endif
+            </form>
+        </div>
+    </section>
+
+    <section class="card mt-16">
         <div class="tabs">
-            @php($tabs = ['' => 'Semua', 'menunggu' => 'Menunggu penawaran', 'ditinjau' => 'Ditinjau Admin', 'disetujui' => 'Penawaran disetujui', 'ditolak' => 'Ditolak Admin'])
+            @php
+            $tabs = ['' => 'Semua', 'menunggu' => 'Menunggu penawaran', 'ditinjau' => 'Ditinjau Admin', 'disetujui' => 'Penawaran disetujui', 'ditolak' => 'Ditolak Admin'];
+            @endphp
             @foreach($tabs as $key => $label)
             <a href="{{ url('/klien/permintaan-penawaran').($key !== '' ? '?status='.$key : '') }}"@if($tabAktif === $key) aria-current="page"@endif>{{ $label }}</a>
             @endforeach
@@ -74,7 +149,7 @@ $tabAktif = (string) request('status', '');
                 <tbody>
                 @forelse($requests as $row)
                     @php
-                    $usulan = $row->proposals->sortByDesc('submitted_at')->first();
+                    $usulan = $row->proposals->first();
                     [$qClass, $qLabel] = $statusBadge($row->status);
                     @endphp
                     <tr>
@@ -88,7 +163,7 @@ $tabAktif = (string) request('status', '');
                         <td><a class="btn btn-o btn-sm" href="{{ url('/klien/permintaan-penawaran-detail/'.$row->id) }}">Lihat detail</a></td>
                     </tr>
                 @empty
-                    <tr><td colspan="8"><p class="hint" style="padding:16px;margin:0">Belum ada permintaan penawaran tersimpan untuk akun Anda. Alur pengajuan penawaran dari katalog akan terhubung pada backend BE-4; sementara itu Anda dapat menjelajahi katalog penyedia dan peralatan.</p></td></tr>
+                    <tr><td colspan="8"><p class="hint" style="padding:16px;margin:0">Belum ada permintaan penawaran tersimpan untuk akun Anda. Ajukan melalui formulir di atas.</p></td></tr>
                 @endforelse
                 </tbody>
             </table>

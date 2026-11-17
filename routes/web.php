@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CatalogController as AdminCatalogController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\PriceChangeController as AdminPriceChangeController;
 use App\Http\Controllers\Admin\ProviderVerificationController;
+use App\Http\Controllers\Admin\QuoteRequestController as AdminQuoteRequestController;
 use App\Http\Controllers\Admin\VenueController as AdminVenueController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
@@ -124,6 +125,7 @@ Route::prefix('klien')->name('klien.')->middleware(['auth', 'role:klien'])->grou
     Route::get('/acara-terkonfirmasi', [KlienEventController::class, 'terkonfirmasi'])->name('acara.terkonfirmasi');
     Route::get('/acara-dibatalkan', [KlienEventController::class, 'dibatalkan'])->name('acara.dibatalkan');
     Route::get('/permintaan-penawaran', [KlienQuoteRequestController::class, 'index'])->name('penawaran');
+    Route::post('/permintaan-penawaran', [KlienQuoteRequestController::class, 'store'])->name('penawaran.store');
     Route::get('/permintaan-penawaran-detail/{quoteRequest}', [KlienQuoteRequestController::class, 'show'])->name('penawaran.detail');
 
     Route::get('/{page}', function ($page) {
@@ -163,10 +165,10 @@ Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'role:vendor'])->g
     Route::get('/pengajuan-harga', [VendorPriceChangeController::class, 'index'])->name('pengajuan-harga');
     Route::post('/pengajuan-harga', [VendorPriceChangeController::class, 'store'])->name('pengajuan-harga.store');
 
-    // Wiring read-only: permintaan penawaran masuk atas item katalog milik
-    // vendor login (sebelum catch-all). Alur tulis usulan harga BE-4.
+    // BE-4: permintaan penawaran dan usulan harga (sebelum catch-all).
     Route::get('/permintaan-penawaran', [VendorQuoteRequestController::class, 'index'])->name('penawaran');
     Route::get('/permintaan-penawaran-detail/{quoteRequest}', [VendorQuoteRequestController::class, 'show'])->name('penawaran.detail');
+    Route::post('/permintaan-penawaran-detail/{quoteRequest}', [VendorQuoteRequestController::class, 'store'])->name('penawaran.store');
 
     Route::get('/{page}', function ($page) {
         $view = 'vendor.'.$page;
@@ -204,10 +206,10 @@ Route::prefix('venue')->name('venue.')->middleware(['auth', 'role:venue'])->grou
     Route::get('/pengajuan-harga', [VenuePriceChangeController::class, 'index'])->name('pengajuan-harga');
     Route::post('/pengajuan-harga', [VenuePriceChangeController::class, 'store'])->name('pengajuan-harga.store');
 
-    // Wiring read-only: permintaan penawaran masuk atas ruangan venue milik
-    // login (sebelum catch-all). Alur tulis usulan harga BE-4.
+    // BE-4: permintaan penawaran dan usulan harga (sebelum catch-all).
     Route::get('/permintaan-penawaran', [VenueQuoteRequestController::class, 'index'])->name('penawaran');
     Route::get('/permintaan-penawaran-detail/{quoteRequest}', [VenueQuoteRequestController::class, 'show'])->name('penawaran.detail');
+    Route::post('/permintaan-penawaran-detail/{quoteRequest}', [VenueQuoteRequestController::class, 'store'])->name('penawaran.store');
 
     Route::get('/{page}', function ($page) {
         $view = 'venue.'.$page;
@@ -251,6 +253,13 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // penyedia, harga lewat pengajuan harga, venue lewat formulir venue.
     Route::get('/katalog', [AdminCatalogController::class, 'index'])->name('katalog');
     Route::get('/katalog-detail/{item}', [AdminCatalogController::class, 'show'])->name('katalog.detail');
+
+    // BE-4: antrean, detail, dan keputusan penawaran sebelum catch-all.
+    Route::get('/permintaan-penawaran', [AdminQuoteRequestController::class, 'index'])->name('penawaran');
+    Route::get('/permintaan-penawaran-detail', [AdminQuoteRequestController::class, 'empty'])->name('penawaran.empty');
+    Route::get('/permintaan-penawaran-detail/{quoteRequest}', [AdminQuoteRequestController::class, 'show'])->name('penawaran.detail');
+    Route::post('/permintaan-penawaran/{quoteRequest}/{action}', [AdminQuoteRequestController::class, 'decide'])
+        ->whereIn('action', ['approve', 'reject'])->name('penawaran.decide');
 
     Route::get('/{page}', function ($page) {
         $view = 'admin.'.$page;

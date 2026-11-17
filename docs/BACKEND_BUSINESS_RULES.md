@@ -64,6 +64,8 @@ Penolakan satu item tidak otomatis membatalkan acara. UI `acara-diajukan` menamp
 
 Harga katalog tetap tersimpan sebagai snapshot. Harga usulan tidak menjadi harga final sebelum keputusan Admin.
 
+Implementasi BE-4 memakai alur di atas. Proposal penyedia terbaru di database menjadi sumber harga saat Admin menyetujui; harga final tidak berasal dari input browser. Satu quote hanya dapat diputuskan sekali. Status disetujui maupun ditolak bersifat final pada skema sekarang; pengusulan ulang setelah keputusan belum tersedia dan memerlukan perubahan alur/skema yang disetujui.
+
 ### Tagihan dan pembayaran
 
 `menunggu_pembayaran` → `bukti_diunggah` → `menunggu_verifikasi` → `lunas` atau `bukti_ditolak`.
@@ -133,3 +135,12 @@ Pengguna menyetujui Gate 4A dan seluruh rekomendasi §18 butir 1–10 laporan pe
 10. Satu dokumen aktif per jenis dokumen verifikasi; unggah ulang menggantikan dokumen lama setelah unggahan baru berhasil.
 
 Hasil implementasi, daftar perubahan, dan sisa pekerjaan dicatat dalam `docs/reports/BE-3_Implementation_Report_Pesta_Kita.md`. Keputusan bagian B yang belum disebut di atas tetap terbuka.
+
+## G. Catatan implementasi BE-4 (2026-11-17)
+
+- Quote dapat merujuk ke item katalog Vendor dengan mode perlu penawaran atau ruangan venue publik/terverifikasi. Harga katalog diambil server saat pengajuan sebagai snapshot.
+- `event_id` opsional dan hanya menerima acara draft milik Klien. BE-4 tidak membuat acara atau menambahkan item ke pesanan.
+- Proposal Vendor/Venue hanya dapat dibuat untuk subjek milik akun login dan saat quote berstatus `diajukan`. Detail penyedia tidak menampilkan nama Klien atau nama acara.
+- Admin hanya dapat memutuskan quote berstatus `diusulkan_penyedia`; persetujuan memakai proposal terakhir tersimpan. Penolakan mewajibkan alasan. Keputusan dan perubahan status dicatat di audit log dalam transaksi.
+- Keputusan disimpan satu kali per quote. Penolakan final dan tidak ada siklus usulan ulang pada implementasi saat ini; jangan menganggap ini sebagai kebijakan daur ulang yang dapat diubah tanpa penyesuaian skema dan persetujuan produk.
+- Tidak ada notifikasi yang dikirim pada tahap ini.

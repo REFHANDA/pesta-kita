@@ -63,7 +63,16 @@ $total = $venue ? $venue->rental_price + ($cleaning ?? 0) + $fee : 0;
 <p class="mb-8"><span class="badge b-warn">Perlu konfirmasi</span></p>
 <div class="warn-box mt-12">Ketersediaan venue perlu dikonfirmasi sebelum pesanan dapat diproses. Kalender ketersediaan akan tersedia pada tahap berikutnya (BE-3b).</div>
 </div></section>
-<section class="card"><div class="card-h"><h2>Tambahkan ke acara</h2></div><div class="card-b"><p class="hint">Penambahan venue ke acara draft tersedia pada tahap berikutnya (BE-4/BE-5). Pesanan kelak ditinjau dan dibayar lewat Pesta Kita dalam satu tagihan gabungan, bukan langsung ke penyedia.</p></div></section>
+<section class="card"><div class="card-h"><h2>Ajukan permintaan penawaran</h2></div><div class="card-b">
+@if($venue->rooms->isNotEmpty())
+<p class="hint">Pilih ruangan yang ingin Anda tanyakan. Permintaan belum menjadi pemesanan dan ketersediaan tetap perlu dikonfirmasi.</p>
+@foreach($venue->rooms as $room)
+<a class="btn btn-o btn-block mt-12" href="{{ route('klien.penawaran', ['subject' => 'venue_room:'.$room->id]) }}">Ajukan untuk {{ $room->name }}</a>
+@endforeach
+@else
+<p class="hint">Venue ini belum memiliki ruangan yang dapat dipilih untuk permintaan penawaran.</p>
+@endif
+</div></section>
 <section class="card"><div class="card-h"><h2>Status penyedia</h2></div><div class="card-b"><p class="mb-8"><span class="badge b-ok">Terverifikasi</span></p><p class="hint">Status verifikasi mengikuti keputusan Admin Pesta Kita. Kontak pribadi penyedia tidak ditampilkan.</p></div></section>
 </aside></div>
 @endif
