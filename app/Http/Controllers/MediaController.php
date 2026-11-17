@@ -6,6 +6,7 @@ use App\Enums\MediaKind;
 use App\Enums\MediaVisibility;
 use App\Enums\VerificationStatus;
 use App\Http\Requests\Media\StorePhotoRequest;
+use App\Http\Requests\Media\StoreFloorPlanRequest;
 use App\Http\Requests\Media\StoreVerificationDocumentRequest;
 use App\Models\CatalogItem;
 use App\Models\Media;
@@ -86,6 +87,59 @@ class MediaController extends Controller
         $this->storePhoto($request, $venue);
 
         return redirect()->back()->with('status', 'Foto berhasil diunggah.');
+    }
+
+    /**
+     * Replace the private venue floor plan with a newly uploaded file.
+     */
+    public function storeVenueFloorPlan(StoreFloorPlanRequest $request, Venue $venue): RedirectResponse
+    {
+        Gate::authorize('managePhotos', $venue);
+
+        $file = $request->file('file');
+        $path = $file->store('media/venue/'.$venue->id.'/denah', 'private');
+        if ($path === false) {
+            throw ValidationException::withMessages([
+                'file' => 'Denah gagal disimpan. Coba unggah ulang.',
+            ]);
+        }
+
+        $saved = false;
+        $oldPaths = [];
+        try {
+            $oldPaths = DB::transaction(function () use ($venue, $file, $path): array {
+                $venue->newQuery()->whereKey($venue->id)->lockForUpdate()->firstOrFail();
+                $verified = $venue->venueProfile?->verification_status === VerificationStatus::Terverifikasi;
+                $new = $venue->media()->create([
+                    'kind' => MediaKind::Denah,
+                    'path' => $path,
+                    'disk' => 'private',
+                    'mime_type' => $file->getMimeType(),
+                    'size' => $file->getSize(),
+                    'original_name' => $file->getClientOriginalName(),
+                    'visibility' => $verified ? MediaVisibility::Publik : MediaVisibility::Privat,
+                    'sort_order' => 0,
+                ]);
+
+                $oldPlans = $venue->media()->denah()->whereKeyNot($new->id)->get();
+                foreach ($oldPlans as $oldPlan) {
+                    $oldPlan->delete();
+                }
+
+                return $oldPlans->map(fn (Media $oldPlan) => [$oldPlan->disk, $oldPlan->path])->all();
+            });
+            $saved = true;
+        } finally {
+            if (! $saved) {
+                Storage::disk('private')->delete($path);
+            }
+        }
+
+        foreach ($oldPaths as [$disk, $oldPath]) {
+            Storage::disk($disk)->delete($oldPath);
+        }
+
+        return redirect()->back()->with('status', 'Denah venue berhasil diperbarui.');
     }
 
     /**

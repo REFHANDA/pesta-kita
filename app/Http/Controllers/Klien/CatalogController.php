@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Klien;
 
 use App\Enums\CatalogKind;
 use App\Enums\MediaVisibility;
+use App\Enums\MediaKind;
 use App\Enums\VerificationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\CatalogItem;
@@ -88,6 +89,9 @@ class CatalogController extends Controller
         return view('klien.katalog-venue-detail', [
             'venue' => $venue,
             'photos' => $this->publicPhotos($venue),
+            'floorPlan' => $venue->media()->where('kind', MediaKind::Denah)
+                ->where('visibility', MediaVisibility::Publik)
+                ->first(),
         ]);
     }
 

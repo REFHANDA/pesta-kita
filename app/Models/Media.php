@@ -75,6 +75,17 @@ class Media extends Model
     }
 
     /**
+     * Venue floor plans are served privately after authorization.
+     *
+     * @param  Builder<Media>  $query
+     * @return Builder<Media>
+     */
+    public function scopeDenah(Builder $query): Builder
+    {
+        return $query->where('kind', MediaKind::Denah);
+    }
+
+    /**
      * Profil penyedia yang menaungi media ini, untuk cek verifikasi/ownership.
      * catalog_item -> vendorProfile; venue -> venueProfile; profil -> dirinya.
      * Owner soft-deleted/tidak ada menghasilkan null (akses publik ditolak).

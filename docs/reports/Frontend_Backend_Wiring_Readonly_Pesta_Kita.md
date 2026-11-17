@@ -86,3 +86,7 @@ Middleware `auth` + `role:klien` / `role:admin` tidak diubah; tidak ada rute tul
 | Belum terjadwal | `admin/pengguna*`, `admin/katalog*`, `admin/pengaturan`, notifikasi semua portal, rekomendasi klien | Perlu keputusan lingkup produk                      |
 
 Seluruh halaman itu masih dapat dibuka lewat catch-all dan tetap memakai data contoh + `aksi.js` (toast pratinjau) — disengaja sampai backend tahap terkait hidup.
+
+## 8. Catatan status setelah implementasi berikutnya (2026-11-17)
+
+Bagian 1–7 merupakan snapshot sebelum alur BE-4–BE-7 tersedia. Status yang menyatakan acara, quote, pesanan, tagihan, pembayaran, pencairan, rundown, dan ulasan masih menunggu tahap backend sudah kedaluwarsa. Fitur-fitur tersebut kini terhubung, dengan refund tetap terbatas pada penerimaan permohonan dan peninjauan Admin. Status backlog terbaru ada pada §10 `Laporan_Update_Terbaru_Frontend_Backend_Pesta_Kita.md`; gunakan bagian tersebut sebagai acuan, bukan tabel sisa pekerjaan §7 di sini. Catatan historis tentang scope read-only dan hasil wiring aktivitas/katalog Admin serta daftar acara/riwayat Klien tetap berlaku.

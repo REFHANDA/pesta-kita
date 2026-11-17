@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Rekening bank penyedia (Vendor/Venue) via morph owner ke profil.
@@ -21,6 +22,9 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
     'account_number',
     'account_name',
     'verification_status',
+    'reviewed_by',
+    'reviewed_at',
+    'verification_note',
 ])]
 class ProviderBankAccount extends Model
 {
@@ -36,6 +40,7 @@ class ProviderBankAccount extends Model
     {
         return [
             'verification_status' => VerificationStatus::class,
+            'reviewed_at' => 'datetime',
         ];
     }
 
@@ -47,5 +52,15 @@ class ProviderBankAccount extends Model
     public function owner(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    /**
+     * Admin who reviewed this payout account.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function reviewer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
     }
 }

@@ -65,6 +65,9 @@
                 <a @if(request()->is('admin/rekening*')) aria-current="page" @endif href="{{ url('/admin/rekening') }}">
                     <span aria-hidden="true" class="ic i-bank"></span>Rekening perusahaan
                 </a>
+                <a @if(request()->is('admin/rekening-penyedia*')) aria-current="page" @endif href="{{ route('admin.provider-bank-accounts') }}">
+                    <span aria-hidden="true" class="ic i-bank"></span>Review rekening payout
+                </a>
             </nav>
 
             <p class="nav-label">Pemantauan</p>
@@ -115,8 +118,9 @@
                     <input id="cari" placeholder="Cari pesanan, acara, atau penyedia…" type="search"/>
                 </div>
                 <div class="top-right">
-                    <a aria-label="Notifikasi" class="icon-btn" href="{{ url('/admin/notifikasi') }}">
+                    <a aria-label="Notifikasi, {{ $unreadNotificationCount }} belum dibaca" class="icon-btn" href="{{ url('/admin/notifikasi') }}">
                         <span aria-hidden="true" class="ic i-bell"></span>
+                        @if ($unreadNotificationCount > 0)<span class="badge b-bad">{{ $unreadNotificationCount }}</span>@endif
                     </a>
                     <a aria-label="Profil Admin" class="user" href="{{ url('/admin/profil') }}">
                         <span aria-hidden="true" class="avatar">{{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</span>

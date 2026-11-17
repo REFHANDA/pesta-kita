@@ -92,8 +92,9 @@
                     <input id="cari" type="search" placeholder="Cari vendor, venue, atau peralatan…">
                 </div>
                 <div class="top-right">
-                    <a class="icon-btn" href="{{ url('/klien/notifikasi') }}" aria-label="Notifikasi">
+                    <a class="icon-btn" href="{{ url('/klien/notifikasi') }}" aria-label="Notifikasi, {{ $unreadNotificationCount }} belum dibaca">
                         <span class="ic i-bell" aria-hidden="true"></span>
+                        @if ($unreadNotificationCount > 0)<span class="badge b-bad">{{ $unreadNotificationCount }}</span>@endif
                     </a>
                     <a class="user" href="{{ url('/klien/profil') }}">
                         <span class="avatar" aria-hidden="true">{{ mb_strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}</span>

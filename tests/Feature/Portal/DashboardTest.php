@@ -6,6 +6,8 @@ use App\Enums\EventStatus;
 use App\Enums\VerificationStatus;
 use App\Models\CatalogItem;
 use App\Models\Event;
+use App\Models\EventReview;
+use App\Models\Invoice;
 use App\Models\User;
 use App\Models\VendorProfile;
 use App\Models\Venue;
@@ -102,7 +104,17 @@ class DashboardTest extends TestCase
         VendorProfile::factory()->menunggu()->create();
         VenueProfile::factory()->menunggu()->create();
         VendorProfile::factory()->terverifikasi()->create();
-        Event::factory()->create();
+        $event = Event::factory()->create();
+        Invoice::factory()->create([
+            'event_id' => $event->id,
+            'commission_total' => 12_345,
+            'status' => 'lunas',
+        ]);
+        Invoice::factory()->create([
+            'commission_total' => 99_999,
+            'status' => 'terbit',
+        ]);
+        EventReview::factory()->create(['rating' => 4]);
 
         $admin = User::factory()->admin()->create();
 
@@ -111,6 +123,9 @@ class DashboardTest extends TestCase
             ->assertSee('Penyedia menunggu verifikasi')
             ->assertSeeText('2 menunggu')
             ->assertSee(route('admin.penyedia.index'))
+            ->assertSee('Rp 12.345')
+            ->assertSee('4,0 / 5')
+            ->assertSee('1 ulasan')
             ->assertDontSee('Rp 18.450.000')
             ->assertDontSee('Tagihan lunas');
     }

@@ -35,6 +35,7 @@
                     @if ($item->rejection_reason)<div><dt>Catatan Admin</dt><dd>{{ $item->rejection_reason }}</dd></div>@endif
                 </dl>
                 <p class="hint mt-16">Nama dan kontak Klien tidak tersedia di tampilan penyedia.</p>
+                <a class="btn btn-o" href="{{ route('venue.checklist', $item->event) }}">Lihat checklist acara</a>
             </div>
         </section>
         <section class="card">

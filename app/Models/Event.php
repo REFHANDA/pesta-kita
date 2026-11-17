@@ -116,4 +116,14 @@ class Event extends Model
     {
         return $this->hasMany(EventReview::class);
     }
+
+    /**
+     * Client-managed checklist items for this event.
+     *
+     * @return HasMany<EventChecklistItem, $this>
+     */
+    public function checklistItems(): HasMany
+    {
+        return $this->hasMany(EventChecklistItem::class);
+    }
 }

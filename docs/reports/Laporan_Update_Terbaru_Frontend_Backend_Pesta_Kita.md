@@ -135,3 +135,67 @@ Bagian 1–7 di atas adalah snapshot per 2026-11-16. Addendum ini menggantikan s
 Verifikasi setelah perbaikan: **315 tes / 1.609 assertions lulus** pada PHPUnit menggunakan SQLite in-memory; Pint lulus. Migrasi tidak dijalankan terhadap database lokal. Deadline invoice setelah H-7 memakai 24 jam sejak penerbitan dan dibatasi akhir tanggal acara karena skema belum mencatat jam acara.
 
 Pekerjaan tersisa: keputusan B1 untuk kebijakan refund final dan deployment/verifikasi migration pada lingkungan yang disetujui. Di luar alur BE-5–BE-7, yang masih belum terhubung mencakup notifikasi, rekomendasi Klien, unduh invoice/nota PDF, pengelolaan rekening payout Vendor/Venue, manajemen pengguna serta ringkasan pendapatan/rating Admin, checklist terpisah, dan editor layout venue.
+
+## 9. Addendum review progres wiring FE–BE (2026-11-17)
+
+Review ulang dilakukan terhadap laporan wiring sebelumnya, kontrak API, rute, dan implementasi pada HEAD `4614dda` (`feat(backend): implement BE-5,BE-6 and BE-7`). Status terverifikasi dari dokumentasi dan deklarasi kode:
+
+| Area | Status saat review |
+|---|---|
+| BE-3b | Terhubung: kalender ketersediaan dan alur pengajuan harga. |
+| BE-4 | Terhubung: pengajuan quote Klien, proposal Vendor/Venue, dan keputusan Admin. |
+| BE-5 | Terhubung: draft/acara, item pesanan, keputusan Admin, keberatan penyedia, dan pemantauan acara. |
+| BE-6 | Terhubung dengan batas refund: invoice, pembayaran, rekening perusahaan, dan pencairan aktif; refund baru dapat diajukan dan ditinjau. |
+| BE-7 | Terhubung: rundown dan ulasan dengan pembatasan akses sesuai peran. |
+| Wiring read-only tambahan | Daftar acara/riwayat Klien serta aktivitas dan katalog Admin menggunakan data backend; halaman katalog Admin tidak menyediakan persetujuan per item. |
+
+### Sisa integrasi frontend
+
+- Notifikasi untuk semua portal dan rekomendasi Klien.
+- Unduh invoice/nota dalam PDF.
+- Workflow pengelolaan rekening payout Vendor dan Pemilik Venue (berbeda dari rekening perusahaan yang dikelola Admin).
+- Manajemen pengguna Admin dan ringkasan pendapatan/rating pada dashboard Admin.
+- Checklist terpisah dan editor layout venue.
+- Keputusan, nominal final, dan transfer refund masih menunggu kebijakan B1.
+
+Halaman tanpa route khusus tetap dapat dirender melalui catch-all portal; karena itu keberadaan view saja tidak dihitung sebagai integrasi backend.
+
+### Status dokumen dan verifikasi
+
+Inventaris serta rekomendasi pada `Frontend_Backend_Wiring_Review_Pesta_Kita.md` dan §6–§7 `Frontend_Backend_Wiring_Readonly_Pesta_Kita.md` adalah snapshot sebelum BE-4–BE-7 selesai. Keduanya dipertahankan sebagai catatan historis; status backlog terkini selanjutnya dicatat pada §10.
+
+Laporan implementasi mencatat regresi **315 tes / 1.609 assertions** lulus pada SQLite in-memory dan Pint lulus. Pada review ini, `php artisan route:list` tidak dapat dijalankan ulang karena PHP lokal 8.2.12, sedangkan dependensi Composer mensyaratkan PHP ≥8.4.1. Migrasi BE-5–BE-7 juga belum diverifikasi pada database deployment yang disetujui.
+
+## 10. Addendum penyelesaian backlog wiring FE–BE
+
+Bagian 1–9 di atas adalah rekam historis sampai review 2026-11-17. Addendum ini mencatat implementasi backlog yang disetujui setelah review; gunakan bagian ini untuk status terkini. Tidak ada commit yang dibuat.
+
+### Cakupan yang diselesaikan
+
+| Fitur | Frontend | Backend |
+|---|---|---|
+| Notifikasi portal | Inbox, status sudah/belum dibaca, badge unread di navigasi portal. | Notifikasi tersimpan di database, hanya in-app, dan dibuat pada transisi audit penting. Tidak mengirim email/push. |
+| Rekomendasi Klien | Halaman rekomendasi dengan filter kategori, area, tanggal, dan budget. | Filter server-side atas inventori publik/terverifikasi, ketersediaan eksplisit, pengecualian item yang sudah terkait dengan acara terkonfirmasi, dan harga estimasi. Tidak membuat pesanan. |
+| Checklist acara | Klien dapat mengelola checklist; Vendor/Venue terkait dan Admin mendapat tampilan baca-saja. | Kepemilikan acara dan assignment penyedia diperiksa; perubahan berhenti setelah acara ditutup. |
+| Denah venue | Form unggah/replace serta tampilan denah venue pada detail publik. | File privat melalui media ber-policy; jenis PDF/JPG/JPEG/PNG/WebP hingga 20 MB. Akses Klien hanya untuk denah publik venue terverifikasi. Tidak ada editor visual. |
+| Rekening payout Vendor/Venue | Pengajuan dan riwayat rekening; Admin memiliki antrean review. | Rekening baru menunggu persetujuan Admin dan belum dapat digunakan untuk pencairan. Rekening terverifikasi lama tetap dapat digunakan. |
+| Pengguna Admin | Daftar, pencarian/filter, detail, dan aksi aktif/nonaktif. | Peran tidak dapat diubah lewat fitur ini; self-deactivation Admin ditolak. |
+| Dashboard Admin | Menampilkan pendapatan komisi serta ringkasan rating penyedia. | Komisi dihitung dari `commission_total` invoice berstatus `lunas`; rating berupa rata-rata ulasan tersimpan. |
+| Invoice | Aksi cetak dari halaman tagihan. | Menggunakan print/save-as-PDF browser; tidak menambah renderer PDF server-side. |
+
+Perubahan backend terkait mencakup route/controller/policy, notifikasi, checklist, form request denah, migration untuk notifikasi/checklist dan metadata review rekening, serta audit event yang diperlukan. Tes feature ditambahkan untuk rekomendasi, checklist, denah, notifikasi, rekening payout, manajemen pengguna, dan metrik dashboard.
+
+### Progres dan batas cakupan
+
+- **Backlog FE–BE yang tercantum pada review sebelumnya: selesai untuk seluruh fitur yang disetujui**, selain kebijakan refund final yang memang ditunda. Ini adalah progres 100% terhadap daftar backlog review tersebut, bukan klaim bahwa keseluruhan produk atau semua halaman prototipe sudah selesai.
+- Backend proses bisnis BE-1–BE-7 tetap tersedia; fitur baru memperluas portal yang telah terhubung. Bagian di luar backlog teridentifikasi masih dapat membutuhkan wiring tersendiri.
+- Refund tetap hanya menerima pengajuan dan review Admin sampai kebijakan B1 disetujui. Editor visual denah dan pembuatan PDF server-side tidak termasuk keputusan/lingkup implementasi.
+- Persentase keseluruhan Frontend dan Backend tidak dihitung ulang: tidak ada ukuran cakupan dan bobot fitur yang disepakati untuk seluruh produk. Angka review lama adalah snapshot dan tidak tepat dianggap sebagai persentase produk setelah backlog ini ditutup.
+
+### Verifikasi sesi implementasi
+
+- PHP lint untuk seluruh 56 file PHP yang berubah lulus; `git diff --check` juga lulus.
+- Pint tidak dapat dijalankan ulang pada sesi verifikasi ini karena runtime PHP 8.2.12 tidak memenuhi kebutuhan Pint `^8.3.0`. Sebelumnya Pint sempat berhasil dijalankan pada sesi implementasi.
+- Tes feature baru/terkait **belum dapat dijalankan pada sesi ini**: PHP lokal 8.2.12, sementara dependensi Composer mensyaratkan PHP ≥8.4.1. Kegagalan terjadi sebelum PHPUnit mengeksekusi tes; hasil tes tidak diklaim lulus.
+- Migration baru belum dijalankan pada database lokal atau deployment. Terapkan dan verifikasi melalui proses deployment yang disetujui.
+- Browser smoke/visual test belum dilakukan.

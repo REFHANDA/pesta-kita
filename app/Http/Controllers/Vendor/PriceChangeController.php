@@ -7,6 +7,7 @@ use App\Enums\PriceChangeStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Vendor\StorePriceChangeRequest;
 use App\Models\CatalogItem;
+use App\Models\AuditLog;
 use App\Models\PriceChangeRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -62,13 +63,21 @@ class PriceChangeController extends Controller
             ]);
         }
 
-        PriceChangeRequest::create([
+        $priceChange = PriceChangeRequest::create([
             'subject_type' => 'catalog_item',
             'subject_id' => $item->id,
             'old_price' => $item->catalog_price,
             'new_price' => $request->validated('new_price'),
             'reason' => $request->validated('reason'),
             'status' => PriceChangeStatus::Menunggu,
+        ]);
+        AuditLog::create([
+            'actor_id' => $request->user()->id,
+            'action' => 'price_change_submitted',
+            'subject_type' => $priceChange->getMorphClass(),
+            'subject_id' => $priceChange->id,
+            'to_status' => PriceChangeStatus::Menunggu->value,
+            'ip' => $request->ip(),
         ]);
 
         return redirect()->route('vendor.pengajuan-harga')

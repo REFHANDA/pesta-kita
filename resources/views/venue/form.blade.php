@@ -74,6 +74,12 @@ foreach ($selectedFacilities as $facility) { if (! in_array($facility, $facility
 @php($photos = $venue->media()->foto()->orderBy('sort_order')->get())
 @if($photos->isNotEmpty())<ul class="media-list mt-12">@foreach($photos as $photo)<li><img src="{{ route('media.show', $photo) }}" alt="{{ $photo->original_name ?? 'Foto venue' }}" width="96" height="96"><div class="grow"><b>{{ $photo->original_name ?? 'Foto' }}</b><small class="sub-t">{{ $photo->visibility === \App\Enums\MediaVisibility::Publik ? 'Publik' : 'Privat — tampil setelah penyedia terverifikasi' }}</small></div><form method="POST" action="{{ route('media.destroy', $photo) }}" onsubmit="return confirm('Hapus foto ini?')">@csrf @method('DELETE')<button class="btn btn-o btn-sm" type="submit">Hapus</button></form></li>@endforeach</ul>@else<p class="hint mt-12">Belum ada foto venue.</p>@endif
 </div></section>
+<section class="card mt-20"><div class="card-h"><h2>Denah venue</h2></div><div class="card-b">
+<form method="POST" action="{{ route('venue.data.denah.store', $venue) }}" enctype="multipart/form-data">@csrf
+<div class="upload-box"><span class="ic i-image" aria-hidden="true"></span><div class="grow"><label for="denah-venue"><b>Unggah denah venue</b></label><small class="sub-t">PDF, JPG, PNG, atau WebP · maksimal 20 MB. File privat dan hanya dapat diakses pihak yang berwenang.</small></div><input id="denah-venue" name="file" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" required></div>
+@error('file')<p class="field-error" role="alert">{{ $message }}</p>@enderror<div class="form-actions"><button class="btn" type="submit">Simpan denah</button></div></form>
+@if($floorPlan)<p class="mt-12"><b>Denah saat ini:</b> <a href="{{ route('media.show', $floorPlan) }}" target="_blank" rel="noopener">{{ $floorPlan->original_name ?? 'Lihat denah' }}</a></p>@else<p class="hint mt-12">Belum ada denah venue.</p>@endif
+</div></section>
 @else
 <p class="hint mt-12">Ruangan tambahan dan foto venue dapat dikelola setelah venue disimpan.</p>
 @endif

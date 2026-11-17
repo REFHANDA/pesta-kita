@@ -40,8 +40,8 @@ Jangan mengisi migration atau menambah alur final untuk hal yang masih ditunda d
 | B13 | Bukti bayar            | Bukti disimpan di disk privat.                                                      | **DISETUJUI:** retensi lima tahun sejak acara ditutup; setelahnya file dihapus dan path bukti dibersihkan. Validasi saat ini menerima JPG/JPEG/PNG/PDF maksimal 5 MB; tipe/ukuran ini mengikuti implementasi UI dan bukan keputusan kebijakan terpisah.             |
 | B14 | Verifikasi mitra       | UI: ubah data rekening butuh verifikasi ulang.                                      | **DISETUJUI (2026-11-16, Gate 4B):** Vendor wajib KTP (NIB/NPWP opsional); Venue wajib KTP + bukti venue (NPWP opsional); bukti rekening bukan persyaratan; katalog/venue tayang hanya setelah profil terverifikasi; satu dokumen aktif per jenis. Lihat bagian E. |
 | B15 | Peralatan              | Ada katalog dan form peralatan terpisah dari layanan.                               | **DISETUJUI (2026-11-16):** satu struktur katalog dengan atribut `kind`/`type`; tanpa entitas/tabel peralatan terpisah. Lihat bagian E.                                                                                                                            |
-| B16 | Denah                  | Form venue dan roadmap Tahap 7 menyebut layout.                                     | MVP cukup unggah dokumen, atau editor visual ditunda.                                                                                                                                                                                                              |
-| B17 | Rekomendasi paket      | `klien/rekomendasi` masih prototipe.                                                | Masuk MVP backend atau tetap di luar sampai ada aturan pencocokan budget.                                                                                                                                                                                          |
+| B16 | Denah                  | Form venue dan roadmap Tahap 7 menyebut layout.                                     | **DISETUJUI:** unggah dan tampilkan file denah saja. Tidak ada editor visual.                                                                                                                                                                                       |
+| B17 | Rekomendasi paket      | `klien/rekomendasi` masih prototipe.                                                | **DISETUJUI:** rekomendasi sederhana berdasarkan kategori, area, tanggal, dan budget; estimasi harga bukan penawaran final dan item tidak otomatis dipesan.                                                                                                        |
 | B18 | Lingkungan demo        | Demo bar dan tes portal mengizinkan akses tanpa login.                              | **DISETUJUI (2026-11-16):** demo bar hanya local/demo dan bukan bypass auth; tes portal diperbarui setelah auth hidup, memakai akun dan role sesuai. Lihat bagian E.                                                                                               |
 
 ## C. Alur status dan batas implementasi
@@ -141,7 +141,7 @@ Hasil implementasi, daftar perubahan, dan sisa pekerjaan dicatat dalam `docs/rep
 - Proposal Vendor/Venue hanya dapat dibuat untuk subjek milik akun login dan saat quote berstatus `diajukan`. Detail penyedia tidak menampilkan nama Klien atau nama acara.
 - Admin hanya dapat memutuskan quote berstatus `diusulkan_penyedia`; persetujuan memakai proposal terakhir tersimpan. Penolakan mewajibkan alasan. Keputusan dan perubahan status dicatat di audit log dalam transaksi.
 - Keputusan disimpan satu kali per quote. Penolakan final dan tidak ada siklus usulan ulang pada implementasi saat ini; jangan menganggap ini sebagai kebijakan daur ulang yang dapat diubah tanpa penyesuaian skema dan persetujuan produk.
-- Tidak ada notifikasi yang dikirim pada tahap ini.
+- Notifikasi status hanya dikirim di inbox aplikasi; tidak ada email atau push.
 
 ## H. Keputusan dan implementasi BE-5–BE-7 (2026-11-17)
 
@@ -152,3 +152,16 @@ Hasil implementasi, daftar perubahan, dan sisa pekerjaan dicatat dalam `docs/rep
 - Bukti pembayaran/pencairan disimpan privat dan dihapus lima tahun setelah acara ditutup.
 - Refund hanya menerima permohonan. Kebijakan, keputusan final, nominal, dan transfer tetap ditunda; UI tidak menyediakan kontrol keputusan Admin.
 - Rundown dikelola Klien dan Vendor terkait; Venue/Admin hanya membaca. Ulasan Klien tersedia setelah acara selesai dan tagihan lunas, sementara penyedia hanya melihat agregat anonim.
+
+## I. Keputusan dan implementasi backlog wiring (sesi implementasi)
+
+Implementasi backlog berikut dilakukan setelah persetujuan pengguna untuk menyelesaikan sisa integrasi frontend dan turut mencakup backend.
+
+- Notifikasi disimpan sebagai notifikasi database dan hanya ditampilkan dalam inbox portal. Tidak ada email atau push.
+- Rekomendasi membaca katalog/venue publik terverifikasi dan memfilter kategori, area, tanggal, serta budget. Tanggal mensyaratkan ketersediaan eksplisit dan mengecualikan item yang sudah terikat pada acara terkonfirmasi; harga hanya estimasi dan tidak membuat pesanan.
+- Denah venue dibatasi pada unggah/tampilan file (PDF/JPG/PNG/WebP); tidak ada editor visual. File tetap pada disk privat dan baca file melewati policy media.
+- Checklist adalah daftar tugas per acara yang dikelola Klien sampai acara ditutup; Vendor/Venue terkait dan Admin hanya membaca.
+- Perubahan rekening payout dilakukan dengan mengajukan rekening baru. Rekening baru menunggu persetujuan Admin dan tidak dapat dipakai untuk pencairan sebelum terverifikasi; rekening terverifikasi yang lama tetap tersedia.
+- Manajemen pengguna Admin hanya mengubah status aktif/nonaktif, tidak mengubah peran. Admin tidak dapat menonaktifkan akunnya sendiri.
+- Pendapatan Admin pada dashboard berarti jumlah `commission_total` dari invoice berstatus `lunas`, terpisah dari nilai total transaksi dan payout. Rating adalah rata-rata ulasan penyedia yang disimpan.
+- Refund tetap hanya berupa pengajuan dan tinjauan sampai kebijakan B1 disetujui. Cetak invoice menggunakan fitur print browser; tidak ada renderer PDF server-side.

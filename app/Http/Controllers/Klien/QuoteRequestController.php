@@ -8,6 +8,7 @@ use App\Enums\QuoteRequestStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\StoreQuoteRequest;
 use App\Models\CatalogItem;
+use App\Models\AuditLog;
 use App\Models\QuoteRequest;
 use App\Models\VenueRoom;
 use Illuminate\Database\Eloquent\Builder;
@@ -101,7 +102,7 @@ class QuoteRequestController extends Controller
                 ? $subject->catalog_price
                 : $subject->venue->rental_price;
 
-            return QuoteRequest::create([
+            $quoteRequest = QuoteRequest::create([
                 'client_id' => $request->user()->id,
                 'event_id' => $data['event_id'] ?? null,
                 'subject_type' => $subjectType,
@@ -113,6 +114,18 @@ class QuoteRequestController extends Controller
                 'catalog_price_snapshot' => $catalogPrice,
                 'status' => QuoteRequestStatus::Diajukan,
             ]);
+
+            AuditLog::create([
+                'actor_id' => $request->user()->id,
+                'action' => 'quote_request_submitted',
+                'subject_type' => $quoteRequest->getMorphClass(),
+                'subject_id' => $quoteRequest->id,
+                'from_status' => null,
+                'to_status' => QuoteRequestStatus::Diajukan->value,
+                'ip' => $request->ip(),
+            ]);
+
+            return $quoteRequest;
         });
 
         return redirect()->route('klien.penawaran.detail', $quoteRequest)

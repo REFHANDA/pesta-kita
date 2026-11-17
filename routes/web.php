@@ -14,10 +14,12 @@ use App\Http\Controllers\Admin\ProviderVerificationController;
 use App\Http\Controllers\Admin\QuoteRequestController as AdminQuoteRequestController;
 use App\Http\Controllers\Admin\RefundRequestController as AdminRefundRequestController;
 use App\Http\Controllers\Admin\RundownController as AdminRundownController;
+use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\VenueController as AdminVenueController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\Klien\CalendarController as KlienCalendarController;
 use App\Http\Controllers\Klien\CatalogController as KlienCatalogController;
 use App\Http\Controllers\Klien\DashboardController as KlienDashboardController;
@@ -26,9 +28,12 @@ use App\Http\Controllers\Klien\EventOrderItemController as KlienEventOrderItemCo
 use App\Http\Controllers\Klien\EventReviewController;
 use App\Http\Controllers\Klien\InvoiceController as KlienInvoiceController;
 use App\Http\Controllers\Klien\QuoteRequestController as KlienQuoteRequestController;
+use App\Http\Controllers\Klien\RecommendationController as KlienRecommendationController;
 use App\Http\Controllers\Klien\RefundRequestController as KlienRefundRequestController;
 use App\Http\Controllers\Klien\RundownController as KlienRundownController;
 use App\Http\Controllers\MediaController;
+use App\Http\Controllers\PortalNotificationController;
+use App\Http\Controllers\ProviderBankAccountController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Vendor\AvailabilityController as VendorAvailabilityController;
 use App\Http\Controllers\Vendor\CatalogItemController;
@@ -119,6 +124,9 @@ Route::post('/verifikasi/ajukan', [VerificationController::class, 'submit'])
 // --- Portal Klien (Penyelenggara Acara) ---
 Route::prefix('klien')->name('klien.')->middleware(['auth', 'role:klien'])->group(function () {
     Route::get('/', [KlienDashboardController::class, 'index'])->name('beranda');
+    Route::get('/notifikasi', [PortalNotificationController::class, 'index'])->name('notifikasi');
+    Route::post('/notifikasi/{notification}/baca', [PortalNotificationController::class, 'markAsRead'])->name('notifikasi.read');
+    Route::post('/notifikasi/baca-semua', [PortalNotificationController::class, 'markAllAsRead'])->name('notifikasi.read-all');
 
     // BE-3: katalog publik — filter di query backend (sebelum catch-all).
     Route::get('/katalog-vendor', [KlienCatalogController::class, 'katalogVendor'])->name('katalog.vendor');
@@ -126,6 +134,7 @@ Route::prefix('klien')->name('klien.')->middleware(['auth', 'role:klien'])->grou
     Route::get('/katalog-peralatan', [KlienCatalogController::class, 'katalogPeralatan'])->name('katalog.peralatan');
     Route::get('/katalog', [KlienCatalogController::class, 'katalog'])->name('katalog.venue');
     Route::get('/katalog-venue-detail/{venue}', [KlienCatalogController::class, 'katalogVenueDetail'])->name('katalog.venue.detail');
+    Route::get('/rekomendasi', [KlienRecommendationController::class, 'index'])->name('rekomendasi');
     Route::get('/penyedia-vendor/{profile}', [KlienCatalogController::class, 'penyediaVendor'])->name('penyedia.vendor');
     Route::get('/penyedia-venue/{profile}', [KlienCatalogController::class, 'penyediaVenue'])->name('penyedia.venue');
 
@@ -150,6 +159,10 @@ Route::prefix('klien')->name('klien.')->middleware(['auth', 'role:klien'])->grou
     Route::get('/acara/{event}/refund', [KlienRefundRequestController::class, 'create'])->name('refund.create');
     Route::post('/acara/{event}/refund', [KlienRefundRequestController::class, 'store'])->name('refund.store');
     Route::get('/acara/{event}/rundown', [KlienRundownController::class, 'show'])->name('rundown');
+    Route::get('/acara/{event}/checklist', [ChecklistController::class, 'clientIndex'])->name('checklist');
+    Route::post('/acara/{event}/checklist', [ChecklistController::class, 'store'])->name('checklist.store');
+    Route::put('/acara/{event}/checklist/{item}', [ChecklistController::class, 'update'])->name('checklist.update');
+    Route::delete('/acara/{event}/checklist/{item}', [ChecklistController::class, 'destroy'])->name('checklist.destroy');
     Route::post('/acara/{event}/rundown', [KlienRundownController::class, 'store'])->name('rundown.store');
     Route::put('/acara/{event}/rundown/{rundownItem}', [KlienRundownController::class, 'update'])->name('rundown.update');
     Route::delete('/acara/{event}/rundown/{rundownItem}', [KlienRundownController::class, 'destroy'])->name('rundown.destroy');
@@ -177,6 +190,9 @@ Route::prefix('klien')->name('klien.')->middleware(['auth', 'role:klien'])->grou
 // --- Portal Vendor (Katering, Dekorasi, Hiburan, Peralatan) ---
 Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'role:vendor'])->group(function () {
     Route::get('/', [VendorDashboardController::class, 'index'])->name('beranda');
+    Route::get('/notifikasi', [PortalNotificationController::class, 'index'])->name('notifikasi');
+    Route::post('/notifikasi/{notification}/baca', [PortalNotificationController::class, 'markAsRead'])->name('notifikasi.read');
+    Route::post('/notifikasi/baca-semua', [PortalNotificationController::class, 'markAllAsRead'])->name('notifikasi.read-all');
 
     // BE-3: unggah foto item katalog (sebelum catch-all).
     Route::post('/katalog/{item}/foto', [MediaController::class, 'storeItemPhoto'])->name('katalog.foto.store');
@@ -213,10 +229,13 @@ Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'role:vendor'])->g
     Route::post('/pesanan-detail/{orderItem}/keberatan', [VendorOrderController::class, 'storeObjection'])->name('keberatan.store');
     Route::get('/keberatan', [VendorOrderController::class, 'objections'])->name('keberatan');
     Route::get('/pencairan', [VendorPayoutController::class, 'index'])->name('pencairan');
+    Route::get('/rekening-pencairan', [ProviderBankAccountController::class, 'index'])->name('bank-accounts');
+    Route::post('/rekening-pencairan', [ProviderBankAccountController::class, 'store'])->name('bank-accounts.store');
     Route::get('/pencairan/{payout}', [VendorPayoutController::class, 'show'])->name('pencairan.detail');
     Route::get('/pencairan/{payout}/bukti', [VendorPayoutController::class, 'proof'])->name('pencairan.bukti');
     Route::get('/rundown', [VendorRundownController::class, 'index'])->name('rundown.index');
     Route::get('/rundown/{event}', [VendorRundownController::class, 'show'])->name('rundown');
+    Route::get('/checklist/{event}', [ChecklistController::class, 'providerIndex'])->name('checklist');
     Route::post('/rundown/{event}', [VendorRundownController::class, 'store'])->name('rundown.store');
     Route::put('/rundown/{event}/{rundownItem}', [VendorRundownController::class, 'update'])->name('rundown.update');
     Route::delete('/rundown/{event}/{rundownItem}', [VendorRundownController::class, 'destroy'])->name('rundown.destroy');
@@ -234,9 +253,13 @@ Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'role:vendor'])->g
 // --- Portal Pemilik Venue (Gedung, Aula, Tempat Pertemuan) ---
 Route::prefix('venue')->name('venue.')->middleware(['auth', 'role:venue'])->group(function () {
     Route::get('/', [VenueDashboardController::class, 'index'])->name('beranda');
+    Route::get('/notifikasi', [PortalNotificationController::class, 'index'])->name('notifikasi');
+    Route::post('/notifikasi/{notification}/baca', [PortalNotificationController::class, 'markAsRead'])->name('notifikasi.read');
+    Route::post('/notifikasi/baca-semua', [PortalNotificationController::class, 'markAllAsRead'])->name('notifikasi.read-all');
 
     // BE-3: unggah foto venue (sebelum catch-all).
     Route::post('/data/{venue}/foto', [MediaController::class, 'storeVenuePhoto'])->name('data.foto.store');
+    Route::post('/data/{venue}/denah', [MediaController::class, 'storeVenueFloorPlan'])->name('data.denah.store');
 
     // BE-3: CRUD venue + ruangan (sebelum catch-all).
     Route::get('/data', [VenueController::class, 'data'])->name('data');
@@ -270,9 +293,12 @@ Route::prefix('venue')->name('venue.')->middleware(['auth', 'role:venue'])->grou
     Route::get('/keberatan', [VenueOrderController::class, 'objections'])->name('keberatan');
     Route::get('/ulasan', [VenueReviewController::class, 'index'])->name('ulasan');
     Route::get('/pencairan', [VenuePayoutController::class, 'index'])->name('pencairan');
+    Route::get('/rekening-pencairan', [ProviderBankAccountController::class, 'index'])->name('bank-accounts');
+    Route::post('/rekening-pencairan', [ProviderBankAccountController::class, 'store'])->name('bank-accounts.store');
     Route::get('/pencairan/{payout}', [VenuePayoutController::class, 'show'])->name('pencairan.detail');
     Route::get('/pencairan/{payout}/bukti', [VenuePayoutController::class, 'proof'])->name('pencairan.bukti');
     Route::get('/rundown', [VenueRundownController::class, 'index'])->name('rundown');
+    Route::get('/checklist/{event}', [ChecklistController::class, 'providerIndex'])->name('checklist');
 
     Route::get('/{page}', function ($page) {
         $view = 'venue.'.$page;
@@ -286,6 +312,10 @@ Route::prefix('venue')->name('venue.')->middleware(['auth', 'role:venue'])->grou
 // --- Panel Admin (Perusahaan Pesta Kita) ---
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/', [AdminDashboardController::class, 'index'])->name('beranda');
+    Route::get('/notifikasi', [PortalNotificationController::class, 'index'])->name('notifikasi');
+    Route::post('/notifikasi/{notification}/baca', [PortalNotificationController::class, 'markAsRead'])->name('notifikasi.read');
+    Route::post('/notifikasi/baca-semua', [PortalNotificationController::class, 'markAllAsRead'])->name('notifikasi.read-all');
+    Route::get('/notifikasi-detail', fn () => redirect()->route('admin.notifikasi'))->name('notifikasi.detail.empty');
 
     // BE-3: cleaning fee & status venue individual (keputusan butir 3 & 8).
     Route::get('/admin-venue-form/{venue}', [AdminVenueController::class, 'edit'])->name('venue.edit');
@@ -345,6 +375,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/pembatalan', [AdminRefundRequestController::class, 'index'])->name('pembatalan');
     Route::get('/pembatalan/{refundRequest}', [AdminRefundRequestController::class, 'show'])->name('pembatalan.detail');
     Route::get('/rekening', [CompanyBankAccountController::class, 'index'])->name('rekening');
+    Route::get('/rekening-penyedia', [ProviderBankAccountController::class, 'adminIndex'])->name('provider-bank-accounts');
+    Route::post('/rekening-penyedia/{account}', [ProviderBankAccountController::class, 'decide'])->name('provider-bank-accounts.decide');
     Route::get('/rekening-form', [CompanyBankAccountController::class, 'create'])->name('rekening.create');
     Route::get('/rekening-form/{companyBankAccount}', [CompanyBankAccountController::class, 'edit'])->name('rekening.edit');
     Route::post('/rekening', [CompanyBankAccountController::class, 'store'])->name('rekening.store');
@@ -358,8 +390,17 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // BE-7: Admin closes completed events and monitors the shared rundown.
     Route::get('/acara', [EventCompletionController::class, 'index'])->name('acara');
     Route::get('/acara/{event}', [EventCompletionController::class, 'show'])->name('acara.detail');
+    Route::get('/acara/{event}/checklist', [ChecklistController::class, 'adminIndex'])->name('acara.checklist');
     Route::post('/acara/{event}/selesai', [EventCompletionController::class, 'complete'])->name('acara.selesai');
     Route::get('/rundown', [AdminRundownController::class, 'index'])->name('rundown');
+
+    // Account status management is intentionally limited to activation;
+    // role and profile changes remain outside this workflow.
+    Route::get('/pengguna', [UserManagementController::class, 'index'])->name('users');
+    Route::get('/pengguna-detail/{user}', [UserManagementController::class, 'show'])->name('users.detail');
+    Route::post('/pengguna/{user}/status', [UserManagementController::class, 'updateStatus'])->name('users.status');
+    Route::get('/pengguna-detail', fn () => redirect()->route('admin.users'))->name('users.detail.empty');
+    Route::get('/pengguna-form', fn () => redirect()->route('admin.users'))->name('users.form.disabled');
 
     Route::get('/{page}', function ($page) {
         $view = 'admin.'.$page;

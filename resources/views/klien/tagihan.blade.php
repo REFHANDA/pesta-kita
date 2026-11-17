@@ -2,6 +2,16 @@
 
 @section('title', 'Tagihan acara · Pesta Kita')
 
+@push('styles')
+<style>
+    @media print {
+        .sidebar, .topbar, .skip, .no-print { display: none !important; }
+        .app, .main, .content { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+        .card { break-inside: avoid; box-shadow: none !important; }
+    }
+</style>
+@endpush
+
 @php
     $payment = $invoice->latestPayment;
     $expired = $invoice->status === 'terbit' && ! $invoice->due_at->isFuture();
@@ -19,7 +29,7 @@
 
 @section('content')
 <main class="content" id="konten" tabindex="-1">
-    <div class="page-head"><div><div class="crumbs"><a href="{{ route('klien.beranda') }}">Beranda</a> / <a href="{{ route('klien.acara.detail', $invoice->event) }}">{{ $invoice->event->name }}</a> / Tagihan</div><h1>Tagihan · Versi {{ $invoice->version }}</h1><p class="sub">Terbit {{ $invoice->issued_at->translatedFormat('d M Y H:i') }} WIB</p></div><span class="badge {{ $badgeClass }}">{{ $badgeLabel }}</span></div>
+    <div class="page-head"><div><div class="crumbs"><a href="{{ route('klien.beranda') }}">Beranda</a> / <a href="{{ route('klien.acara.detail', $invoice->event) }}">{{ $invoice->event->name }}</a> / Tagihan</div><h1>Tagihan · Versi {{ $invoice->version }}</h1><p class="sub">Terbit {{ $invoice->issued_at->translatedFormat('d M Y H:i') }} WIB</p></div><div class="actions no-print"><span class="badge {{ $badgeClass }}">{{ $badgeLabel }}</span><button class="btn btn-o" type="button" onclick="window.print()">Cetak / Simpan PDF</button></div></div>
     @if (session('status'))<div class="alert" role="status">{{ session('status') }}</div>@endif
     @error('invoice')<div class="alert warn" role="alert">{{ $message }}</div>@enderror
     <div class="grid two">
@@ -49,7 +59,7 @@
             </div>
         </section>
 
-        <div class="stack">
+        <div class="stack no-print">
             @if ($payment?->status === 'menunggu_verifikasi')
                 <section class="card"><div class="card-h"><h2>Bukti pembayaran</h2><span class="badge b-warn">Menunggu verifikasi</span></div><div class="card-b"><p>Transfer {{ $payment->transferred_at?->translatedFormat('d M Y') }} · Rp {{ number_format($payment->amount, 0, ',', '.') }}</p><p>Pengirim: {{ $payment->sender_name }}</p><a class="btn btn-o" href="{{ route('klien.pembayaran.bukti', $payment) }}">Lihat bukti yang dikirim</a></div></section>
             @elseif ($payment?->status === 'ditolak')

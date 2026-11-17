@@ -70,6 +70,9 @@
                 <a href="{{ url('/venue/profil') }}" @if(request()->is('venue/profil*')) aria-current="page" @endif>
                     <span class="ic i-users" aria-hidden="true"></span>Profil Venue
                 </a>
+                <a href="{{ route('venue.bank-accounts') }}" @if(request()->is('venue/rekening-pencairan*')) aria-current="page" @endif>
+                    <span class="ic i-bank" aria-hidden="true"></span>Rekening pencairan
+                </a>
                 <a href="{{ url('/venue/notifikasi') }}" @if(request()->is('venue/notifikasi*')) aria-current="page" @endif>
                     <span class="ic i-bell" aria-hidden="true"></span>Notifikasi
                 </a>
@@ -94,8 +97,9 @@
                     <input id="cari" type="search" placeholder="Cari pesanan venue atau tanggal acara…">
                 </div>
                 <div class="top-right">
-                    <a class="icon-btn" href="{{ url('/venue/notifikasi') }}" aria-label="Notifikasi">
+                    <a class="icon-btn" href="{{ url('/venue/notifikasi') }}" aria-label="Notifikasi, {{ $unreadNotificationCount }} belum dibaca">
                         <span class="ic i-bell" aria-hidden="true"></span>
+                        @if ($unreadNotificationCount > 0)<span class="badge b-bad">{{ $unreadNotificationCount }}</span>@endif
                     </a>
                     @php($topbarName = auth()->user()->venueProfile?->business_name ?? auth()->user()->name)
                     <a class="user" href="{{ url('/venue/profil') }}">

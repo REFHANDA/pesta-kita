@@ -73,6 +73,9 @@
                 <a href="{{ url('/vendor/profil') }}" @if(request()->is('vendor/profil*')) aria-current="page" @endif>
                     <span class="ic i-users" aria-hidden="true"></span>Profil Usaha
                 </a>
+                <a href="{{ route('vendor.bank-accounts') }}" @if(request()->is('vendor/rekening-pencairan*')) aria-current="page" @endif>
+                    <span class="ic i-bank" aria-hidden="true"></span>Rekening pencairan
+                </a>
                 <a href="{{ url('/vendor/notifikasi') }}" @if(request()->is('vendor/notifikasi*')) aria-current="page" @endif>
                     <span class="ic i-bell" aria-hidden="true"></span>Notifikasi
                 </a>
@@ -97,8 +100,9 @@
                     <input id="cari" type="search" placeholder="Cari pesanan vendor atau acara…">
                 </div>
                 <div class="top-right">
-                    <a class="icon-btn" href="{{ url('/vendor/notifikasi') }}" aria-label="Notifikasi">
+                    <a class="icon-btn" href="{{ url('/vendor/notifikasi') }}" aria-label="Notifikasi, {{ $unreadNotificationCount }} belum dibaca">
                         <span class="ic i-bell" aria-hidden="true"></span>
+                        @if ($unreadNotificationCount > 0)<span class="badge b-bad">{{ $unreadNotificationCount }}</span>@endif
                     </a>
                     @php($topbarName = auth()->user()->vendorProfile?->business_name ?? auth()->user()->name)
                     <a class="user" href="{{ url('/vendor/profil') }}">

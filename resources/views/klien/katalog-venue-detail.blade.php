@@ -10,6 +10,7 @@
 @php
 $venue = $venue ?? null;
 $photos = $photos ?? collect();
+$floorPlan = $floorPlan ?? null;
 $profile = $venue?->venueProfile;
 $cleaning = $venue?->cleaning_fee;
 $fee = $venue ? intdiv($venue->rental_price * 10, 100) : 0;
@@ -41,6 +42,11 @@ $total = $venue ? $venue->rental_price + ($cleaning ?? 0) + $fee : 0;
 <section class="card"><div class="card-h"><h2>Ruangan</h2></div><div class="card-b">
 <ul class="policy">@foreach($venue->rooms as $room)<li><span class="ic i-home" aria-hidden="true"></span><span>{{ $room->name }} — kapasitas {{ number_format($room->capacity, 0, ',', '.') }} orang</span></li>@endforeach</ul>
 <p class="hint">Ketersediaan dipilih per ruangan; kalender ketersediaan tersedia pada tahap berikutnya (BE-3b).</p>
+</div></section>
+@endif
+@if($floorPlan)
+<section class="card"><div class="card-h"><h2>Denah venue</h2></div><div class="card-b">
+<p>Denah tersedia untuk membantu Anda meninjau tata ruang.</p><a class="btn btn-o" href="{{ route('media.show', $floorPlan) }}" target="_blank" rel="noopener">Lihat denah venue</a>
 </div></section>
 @endif
 <section class="card"><div class="card-h"><h2>Aturan penggunaan ruangan</h2></div><div class="card-b">

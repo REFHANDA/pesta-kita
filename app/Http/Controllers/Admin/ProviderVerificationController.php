@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\MediaVisibility;
+use App\Enums\MediaKind;
 use App\Enums\VerificationStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\RejectVerificationRequest;
@@ -115,7 +116,7 @@ class ProviderVerificationController extends Controller
             }
 
             foreach ($owners as $owner) {
-                $owner->media()->foto()
+                $owner->media()->whereIn('kind', [MediaKind::Foto, MediaKind::Denah])
                     ->where('visibility', MediaVisibility::Privat)
                     ->update(['visibility' => MediaVisibility::Publik]);
             }

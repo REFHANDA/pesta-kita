@@ -6,21 +6,21 @@ use App\Enums\Role;
 use App\Enums\VerificationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Models\EventReview;
+use App\Models\Invoice;
 use App\Models\User;
 use App\Models\VendorProfile;
 use App\Models\VenueProfile;
 use Illuminate\View\View;
 
 /**
- * Beranda Admin: ringkasan operasional nyata (pengguna, penyedia, acara,
- * antrean verifikasi). Antrean transaksi, rekap pendapatan, dan rating
- * internal belum diagregasi pada dashboard; workflow terkait tersedia
- * melalui halaman masing-masing.
+ * Beranda Admin: ringkasan operasional, komisi invoice lunas, dan rating
+ * penyedia dari ulasan klien.
  */
 class DashboardController extends Controller
 {
     /**
-     * Ringkasan operasional dan antrean verifikasi mitra.
+     * Ringkasan operasional dan agregat keuangan/rating dari data tersimpan.
      */
     public function index(): View
     {
@@ -35,6 +35,9 @@ class DashboardController extends Controller
             'penyediaTerverifikasiCount' => $terverifikasi,
             'acaraCount' => Event::count(),
             'verifikasiMenungguCount' => $menunggu,
+            'commissionRevenue' => Invoice::where('status', 'lunas')->sum('commission_total'),
+            'averageRating' => EventReview::avg('rating'),
+            'reviewCount' => EventReview::count(),
         ]);
     }
 }

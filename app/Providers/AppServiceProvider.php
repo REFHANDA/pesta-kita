@@ -32,8 +32,10 @@ use App\Policies\MediaPolicy;
 use App\Policies\ProviderProfilePolicy;
 use App\Policies\VenuePolicy;
 use App\Policies\VenueRoomPolicy;
+use App\Observers\AuditLogNotificationObserver;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -89,5 +91,16 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Media::class, MediaPolicy::class);
         Gate::policy(VendorProfile::class, ProviderProfilePolicy::class);
         Gate::policy(VenueProfile::class, ProviderProfilePolicy::class);
+        AuditLog::observe(AuditLogNotificationObserver::class);
+
+        View::composer([
+            'layouts.admin',
+            'layouts.klien',
+            'layouts.vendor',
+            'layouts.venue',
+        ], function (\Illuminate\View\View $view): void {
+            $user = auth()->user();
+            $view->with('unreadNotificationCount', $user?->unreadNotifications()->count() ?? 0);
+        });
     }
 }

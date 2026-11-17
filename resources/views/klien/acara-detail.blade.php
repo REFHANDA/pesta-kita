@@ -166,6 +166,7 @@
             @if (in_array($event->status, [\App\Enums\EventStatus::Terkonfirmasi, \App\Enums\EventStatus::Selesai, \App\Enums\EventStatus::Dinilai], true))
                 <a class="btn btn-o full" href="{{ route('klien.rundown', $event) }}">Lihat rundown</a>
             @endif
+            <a class="btn btn-o full" href="{{ route('klien.checklist', $event) }}">Kelola checklist acara</a>
             @if ($event->latestInvoice?->status === 'lunas' && in_array($event->status, [\App\Enums\EventStatus::Terkonfirmasi, \App\Enums\EventStatus::Selesai], true))
                 @if ($event->refundRequest)
                     <p class="hint">Permohonan refund tercatat dan menunggu tinjauan. Keputusan serta nominal final belum tersedia.</p>

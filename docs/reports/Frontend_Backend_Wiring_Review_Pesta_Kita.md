@@ -182,3 +182,7 @@ Halaman prototipe di atas tetap dapat dibuka (catch-all di dalam middleware role
 2. Putuskan prioritas tahap berikutnya: BE-3b (kalender + pengajuan harga, tanpa blocker keputusan) atau BE-4 (quote; perlu jawaban B7 untuk BE-5).
 3. Pertimbangkan commit bertahap (baseline frontend, BE-1, BE-2, BE-3, wiring sesi ini) atas persetujuan pengguna untuk mengunci baseline — seluruh perubahan saat ini belum di-commit.
 4. Pembersihan kecil opsional: hapus `welcome.blade.php` bawaan Laravel dan variabel CSS `--pk-z-preview` yang kini tak terpakai (menunggu instruksi).
+
+## 8. Catatan status setelah implementasi berikutnya (2026-11-17)
+
+Laporan ini adalah snapshot review wiring BE-1–BE-3 per 2026-11-16. Inventaris pada §4, sisa pekerjaan pada §6, dan rekomendasi prioritas pada §7 tidak lagi mencerminkan status terbaru: BE-3b dan BE-4–BE-7 telah diimplementasikan, dengan batas refund pada BE-6. Status backlog terbaru dicatat pada §10 `Laporan_Update_Terbaru_Frontend_Backend_Pesta_Kita.md`; gunakan bagian tersebut sebagai acuan terkini. Isi laporan ini tetap dipertahankan sebagai rekam hasil review awal.

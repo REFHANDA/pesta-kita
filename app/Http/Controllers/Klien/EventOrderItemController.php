@@ -11,6 +11,7 @@ use App\Enums\QuoteRequestStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Client\StoreOrderItemRequest;
 use App\Models\CatalogItem;
+use App\Models\AuditLog;
 use App\Models\Event;
 use App\Models\OrderItem;
 use App\Models\QuoteRequest;
@@ -127,7 +128,7 @@ class EventOrderItemController extends Controller
     {
         $this->ensureOwnedDraft($request, $event);
 
-        DB::transaction(function () use ($event): void {
+        DB::transaction(function () use ($request, $event): void {
             $lockedEvent = Event::query()->whereKey($event->id)->lockForUpdate()->firstOrFail();
             if ($lockedEvent->status !== EventStatus::Draft) {
                 throw ValidationException::withMessages([
@@ -175,6 +176,16 @@ class EventOrderItemController extends Controller
             }
 
             $lockedEvent->update(['status' => EventStatus::Diajukan]);
+
+            AuditLog::create([
+                'actor_id' => $request->user()->id,
+                'action' => 'event_submitted',
+                'subject_type' => $lockedEvent->getMorphClass(),
+                'subject_id' => $lockedEvent->id,
+                'from_status' => EventStatus::Draft->value,
+                'to_status' => EventStatus::Diajukan->value,
+                'ip' => $request->ip(),
+            ]);
         });
 
         return redirect()->route('klien.acara.detail', $event)

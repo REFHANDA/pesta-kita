@@ -67,6 +67,9 @@
             <p class="hint" style="padding:16px">Belum ada segmen rundown.</p>
         @endforelse
     </section>
+    <section class="card mt-16">
+        <div class="card-h"><div><h2>Checklist Klien</h2><p class="meta">Admin hanya dapat melihat tugas acara.</p></div><a class="btn btn-o btn-sm" href="{{ route('admin.acara.checklist', $event) }}">Lihat checklist</a></div>
+    </section>
     @if ($invoice)
         <section class="card mt-16"><div class="card-b"><b>Tagihan versi {{ $invoice->version }}</b> · {{ ucfirst(str_replace('_', ' ', $invoice->status)) }} · Rp {{ number_format($invoice->total_amount, 0, ',', '.') }}<a class="btn btn-o btn-sm ml-8" href="{{ route('admin.pembayaran.detail', $invoice) }}">Lihat tagihan</a></div></section>
     @endif

@@ -41,7 +41,7 @@ class VenueController extends Controller
     {
         Gate::authorize('create', Venue::class);
 
-        return view('venue.form', ['venue' => null]);
+        return view('venue.form', ['venue' => null, 'floorPlan' => null]);
     }
 
     /**
@@ -51,7 +51,10 @@ class VenueController extends Controller
     {
         Gate::authorize('update', $venue);
 
-        return view('venue.form', ['venue' => $venue->load('rooms', 'facilities')]);
+        return view('venue.form', [
+            'venue' => $venue->load('rooms', 'facilities'),
+            'floorPlan' => $venue->media()->denah()->first(),
+        ]);
     }
 
     /**

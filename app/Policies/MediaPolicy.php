@@ -39,8 +39,10 @@ class MediaPolicy
             return true;
         }
 
-        // Selain pemilik/Admin hanya foto yang sudah dipublikasikan.
-        if ($media->kind !== MediaKind::Foto || $media->visibility !== MediaVisibility::Publik) {
+        // Besides owners/Admin, only public photos and venue floor plans
+        // are visible to clients after provider verification.
+        if (! in_array($media->kind, [MediaKind::Foto, MediaKind::Denah], true)
+            || $media->visibility !== MediaVisibility::Publik) {
             return false;
         }
 
@@ -53,7 +55,8 @@ class MediaPolicy
 
         return match (true) {
             $owner instanceof CatalogItem => $owner->status === CatalogItemStatus::Aktif,
-            $owner instanceof Venue => $owner->verification_status === VerificationStatus::Terverifikasi,
+            $owner instanceof Venue => $owner->verification_status === VerificationStatus::Terverifikasi
+                && ($media->kind !== MediaKind::Denah || $user->role === Role::Klien),
             default => true, // foto profil penyedia terverifikasi
         };
     }
