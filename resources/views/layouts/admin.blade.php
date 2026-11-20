@@ -56,9 +56,6 @@
                 <a @if(request()->is('admin/pengajuan-harga*')) aria-current="page" @endif href="{{ url('/admin/pengajuan-harga') }}">
                     <span aria-hidden="true" class="ic i-tag"></span>Pengajuan harga
                 </a>
-                <a @if(request()->is('admin/permintaan-penawaran*')) aria-current="page" @endif href="{{ url('/admin/permintaan-penawaran') }}">
-                    <span aria-hidden="true" class="ic i-bill"></span>Peninjauan penawaran
-                </a>
                 <a @if(request()->is('admin/pengguna*') || request()->is('admin/admin-penyedia*') || request()->is('admin/mitra-detail*') || request()->is('admin/admin-venue-form*')) aria-current="page" @endif href="{{ url('/admin/pengguna') }}">
                     <span aria-hidden="true" class="ic i-users"></span>Penyedia &amp; pengguna
                 </a>

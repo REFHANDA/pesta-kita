@@ -59,7 +59,7 @@ class StoreCatalogItemRequest extends FormRequest
             'catalog_price.integer' => 'Harga harus bilangan bulat rupiah.',
             'catalog_price.min' => 'Harga tidak boleh negatif.',
             'pricing_mode.required' => 'Mode harga wajib dipilih.',
-            'pricing_mode.enum' => 'Mode harga harus tetap atau perlu penawaran.',
+            'pricing_mode.enum' => 'Mode harga harus tetap.',
             'max_per_day.integer' => 'Kuota harian harus bilangan bulat.',
             'max_per_day.min' => 'Kuota harian minimal 1.',
         ];

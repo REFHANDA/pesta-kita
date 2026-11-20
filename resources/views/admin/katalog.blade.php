@@ -37,7 +37,7 @@ $statusAktif = (string) request('status', '');
 <div aria-label="Katalog penyedia. Gulir horizontal untuk melihat seluruh kolom" class="table-wrap" role="region" tabindex="0"><table class="t-wide"><caption class="sr-only">Tabel: Katalog penyedia</caption><thead><tr><th scope="col">Item</th><th scope="col">Penyedia</th><th scope="col">Jenis</th><th scope="col">Harga aktif</th><th scope="col">Status</th><th class="col-aksi" scope="col">Aksi</th></tr></thead><tbody>
 @forelse($items as $item)
     @php([$iClass, $iLabel] = $itemBadge($item->status))
-    <tr><td><b>{{ $item->name }}</b><small>{{ $item->category }}</small></td><td>{{ $item->vendorProfile?->business_name ?? '—' }}</td><td>{{ $item->kind->name }}</td><td>{{ $item->pricing_mode === \App\Enums\PricingMode::PerluPenawaran ? 'Perlu penawaran' : $rupiah($item->catalog_price) }}</td><td><span class="badge {{ $iClass }}">{{ $iLabel }}</span></td><td class="col-aksi"><a class="btn btn-sm btn-o" href="{{ url('/admin/katalog-detail/'.$item->id) }}">Detail</a></td></tr>
+    <tr><td><b>{{ $item->name }}</b><small>{{ $item->category }}</small></td><td>{{ $item->vendorProfile?->business_name ?? '—' }}</td><td>{{ $item->kind->name }}</td><td>{{ $rupiah($item->catalog_price) }}</td><td><span class="badge {{ $iClass }}">{{ $iLabel }}</span></td><td class="col-aksi"><a class="btn btn-sm btn-o" href="{{ url('/admin/katalog-detail/'.$item->id) }}">Detail</a></td></tr>
 @empty
     <tr><td colspan="6"><p class="hint" style="padding:16px;margin:0">Belum ada item katalog tersimpan. Item muncul setelah penyedia menambahkannya lewat portal vendor.</p></td></tr>
 @endforelse

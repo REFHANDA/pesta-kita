@@ -3,10 +3,9 @@
 namespace App\Enums;
 
 /**
- * Status acara sesuai alur rancangan BACKEND_BUSINESS_RULES bagian C dan
- * halaman Klien yang sudah ada (draft, diajukan, menunggu pembayaran,
- * terkonfirmasi, selesai, dinilai, dibatalkan). BE-2 hanya menyimpan kolom
- * status; transisi dan aturannya menyusul pada BE-5.
+ * Status acara sesuai alur rancangan EMS:
+ * draft -> diajukan -> menunggu_pembayaran -> terkonfirmasi -> selesai -> dievaluasi;
+ * cabang: dibatalkan.
  */
 enum EventStatus: string
 {
@@ -15,6 +14,6 @@ enum EventStatus: string
     case MenungguPembayaran = 'menunggu_pembayaran';
     case Terkonfirmasi = 'terkonfirmasi';
     case Selesai = 'selesai';
-    case Dinilai = 'dinilai';
+    case Dievaluasi = 'dievaluasi';
     case Dibatalkan = 'dibatalkan';
 }

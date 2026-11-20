@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Klien;
 
 use App\Enums\EventStatus;
+use App\Enums\InvoiceStatus;
 use App\Http\Controllers\Controller;
+use App\Models\Invoice;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -20,6 +22,7 @@ class DashboardController extends Controller
     public function index(Request $request): View
     {
         $events = $request->user()->events()
+            ->with('orderItems')
             ->orderBy('event_date')
             ->get();
 
@@ -32,13 +35,21 @@ class DashboardController extends Controller
 
         $selesai = $events->filter(fn ($event) => in_array($event->status, [
             EventStatus::Selesai,
-            EventStatus::Dinilai,
+            EventStatus::Dievaluasi,
         ], true))->count();
+
+        $pendingInvoices = Invoice::query()
+            ->whereHas('event', fn ($q) => $q->where('client_id', $request->user()->id))
+            ->whereIn('status', [InvoiceStatus::BelumDibayar, InvoiceStatus::MenungguValidasi])
+            ->with('event')
+            ->latest()
+            ->get();
 
         return view('klien.index', [
             'events' => $events,
             'berjalanCount' => $berjalan,
             'selesaiCount' => $selesai,
+            'pendingInvoices' => $pendingInvoices,
         ]);
     }
 }

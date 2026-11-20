@@ -9,6 +9,7 @@ use App\Enums\Role;
 use App\Enums\VerificationStatus;
 use App\Models\CatalogItem;
 use App\Models\Media;
+use App\Models\Payment;
 use App\Models\User;
 use App\Models\Venue;
 
@@ -19,6 +20,7 @@ use App\Models\Venue;
  *   penyedia terverifikasi, dan subjek masih tayang (item aktif / venue
  *   tidak dinonaktifkan Admin). Kelas media ditentukan kolom kind,
  *   bukan ekstensi file.
+ * - Bukti pembayaran: hanya pemilik acara (klien) dan Admin.
  */
 class MediaPolicy
 {
@@ -27,9 +29,19 @@ class MediaPolicy
      */
     public function view(User $user, Media $media): bool
     {
-        // Admin meninjau dokumen dan foto apa pun.
+        // Admin meninjau dokumen, foto, atau bukti pembayaran apa pun.
         if ($user->role === Role::Admin) {
             return true;
+        }
+
+        // Bukti pembayaran: klien pemilik acara terkait.
+        if ($media->kind === MediaKind::BuktiPembayaran) {
+            $payment = $media->owner;
+            if ($payment instanceof Payment) {
+                return $payment->invoice?->event?->client_id === $user->id;
+            }
+
+            return false;
         }
 
         $profile = $media->providerProfile();

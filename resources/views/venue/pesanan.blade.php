@@ -3,6 +3,87 @@
 @section('title', 'Pesanan · Panel Pemilik Venue Pesta Kita')
 
 @section('content')
-<main id="konten" class="content" tabindex="-1"><div class="page-head"><div><div class="crumbs"><a href="{{ url('/venue') }}">Beranda</a> / Pesanan</div><h1>Pesanan</h1><p class="sub">Nama klien tidak ditampilkan; komunikasi lewat Pesta Kita.</p></div></div>
-<section class="card"><div class="tabs" aria-label="Status pesanan"><a href="{{ url('/venue/pesanan') }}" aria-current="page">Aktif</a><a href="{{ url('/venue/pesanan') }}?status=riwayat">Riwayat</a></div><div class="table-wrap" role="region" tabindex="0" aria-label="Daftar pesanan. Gulir horizontal untuk melihat seluruh kolom"><table class="t-wide"><caption class="sr-only">Tabel: Daftar pesanan</caption><thead><tr><th scope="col">Ruangan</th><th scope="col">Acara</th><th scope="col">Tanggal</th><th scope="col" class=num>Tamu</th><th scope="col" class=num>Hak Anda</th><th scope="col">Status</th></tr></thead><tbody><tr><td><a href="{{ url('/venue/pesanan-detail') }}"><b>Graha Melati Ballroom</b></a></td><td>PK-0412</td><td>Sabtu, 14 Nov 2026</td><td class=num>45</td><td class=num>Rp 2.720.000</td><td><span class="badge b-ok">Disetujui</span></td></tr><tr><td><a href="{{ url('/venue/pesanan-detail') }}"><b>Taman Belakang</b></a></td><td>PK-0405</td><td>Sabtu, 21 Nov 2026</td><td class=num>35</td><td class=num>Rp 850.000</td><td><span class="badge b-ok">Disetujui</span></td></tr><tr><td><a href="{{ url('/venue/pesanan-detail') }}"><b>Graha Melati Ballroom</b></a></td><td>PK-0398</td><td>Minggu, 8 Nov 2026</td><td class=num>60</td><td class=num>Rp 2.720.000</td><td><span class="badge b-ok">Terkonfirmasi</span></td></tr></tbody></table></div><div class="pager"><span>Menampilkan 3 pesanan</span><ul><li><span class="off">Sebelumnya</span></li><li><span aria-current="page">1</span></li><li><span aria-disabled="true">Berikutnya</span></li></ul></div></section></main>
+<main id="konten" class="content" tabindex="-1">
+    <div class="page-head">
+        <div>
+            <div class="crumbs"><a href="{{ url('/venue') }}">Beranda</a> / Pesanan</div>
+            <h1>Pesanan Venue</h1>
+            <p class="sub">Nama klien tidak ditampilkan; komunikasi lewat Pesta Kita.</p>
+        </div>
+    </div>
+
+    @if (session('success'))
+        <div class="alert alert-success mb-16"><span class="ic i-check" aria-hidden="true"></span><span>{{ session('success') }}</span></div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger mb-16"><span class="ic i-info" aria-hidden="true"></span><span>{{ session('error') }}</span></div>
+    @endif
+
+    <section class="card">
+        <div class="tabs" aria-label="Status pesanan">
+            <a href="{{ url('/venue/pesanan') }}" @if($statusTab !== 'riwayat') aria-current="page" @endif>Aktif</a>
+            <a href="{{ url('/venue/pesanan') }}?status=riwayat" @if($statusTab === 'riwayat') aria-current="page" @endif>Riwayat</a>
+        </div>
+
+        <div class="table-wrap" role="region" tabindex="0" aria-label="Daftar pesanan venue">
+            <table class="t-wide">
+                <caption class="sr-only">Tabel: Daftar pesanan venue</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Ruangan</th>
+                        <th scope="col">Acara</th>
+                        <th scope="col">Tanggal</th>
+                        <th scope="col" class="num">Tamu</th>
+                        <th scope="col" class="num">Hak Anda</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($orderItems as $item)
+                        @php
+                            $roomName = $item->subject?->name ?? 'Ruangan #'.$item->id;
+                            $eventLabel = 'Acara #'.$item->event_id;
+                            $dateStr = $item->usage_date ? $item->usage_date->format('D, d M Y') : ($item->event?->event_date?->format('D, d M Y') ?? '-');
+                            $price = $item->provider_price ?? $item->catalog_price_snapshot ?? 0;
+                            $badgeClass = match($item->status->value) {
+                                'menunggu_review' => 'badge b-warn',
+                                'disetujui', 'terkonfirmasi', 'selesai' => 'badge b-ok',
+                                'ditolak', 'dibatalkan' => 'badge b-bad',
+                                'dialihkan' => 'badge b-info',
+                                default => 'badge',
+                            };
+                        @endphp
+                        <tr>
+                            <td>
+                                <a href="{{ route('venue.pesanan.show', $item) }}">
+                                    <b>{{ $roomName }}</b>
+                                </a>
+                            </td>
+                            <td>{{ $eventLabel }}</td>
+                            <td>{{ $dateStr }}</td>
+                            <td class="num">{{ $item->event?->guest_count ?? '-' }}</td>
+                            <td class="num">Rp {{ number_format($price, 0, ',', '.') }}</td>
+                            <td><span class="{{ $badgeClass }}">{{ str_replace('_', ' ', ucfirst($item->status->value)) }}</span></td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center p-16">Tidak ada pesanan venue pada daftar ini.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        @if($orderItems->hasPages())
+            <div class="pager">
+                <span>Menampilkan {{ $orderItems->firstItem() }}–{{ $orderItems->lastItem() }} dari {{ $orderItems->total() }} pesanan</span>
+                {{ $orderItems->links() }}
+            </div>
+        @else
+            <div class="pager">
+                <span>Menampilkan {{ $orderItems->total() }} pesanan</span>
+            </div>
+        @endif
+    </section>
+</main>
 @endsection

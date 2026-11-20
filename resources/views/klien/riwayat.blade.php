@@ -11,7 +11,7 @@ $badgeFor = fn ($status) => match ($status) {
     \App\Enums\EventStatus::MenungguPembayaran => ['b-warn', 'Menunggu pembayaran'],
     \App\Enums\EventStatus::Terkonfirmasi => ['b-ok', 'Terkonfirmasi'],
     \App\Enums\EventStatus::Selesai => ['b-ok', 'Selesai'],
-    \App\Enums\EventStatus::Dinilai => ['b-brand', 'Dinilai'],
+    \App\Enums\EventStatus::Dievaluasi => ['b-brand', 'Dievaluasi'],
     \App\Enums\EventStatus::Dibatalkan => ['b-bad', 'Dibatalkan'],
 };
 @endphp

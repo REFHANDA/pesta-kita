@@ -63,7 +63,39 @@ $total = $venue ? $venue->rental_price + ($cleaning ?? 0) + $fee : 0;
 <p class="mb-8"><span class="badge b-warn">Perlu konfirmasi</span></p>
 <div class="warn-box mt-12">Ketersediaan venue perlu dikonfirmasi sebelum pesanan dapat diproses. Kalender ketersediaan akan tersedia pada tahap berikutnya (BE-3b).</div>
 </div></section>
-<section class="card"><div class="card-h"><h2>Tambahkan ke acara</h2></div><div class="card-b"><p class="hint">Penambahan venue ke acara draft tersedia pada tahap berikutnya (BE-4/BE-5). Pesanan kelak ditinjau dan dibayar lewat Pesta Kita dalam satu tagihan gabungan, bukan langsung ke penyedia.</p></div></section>
+<section class="card"><div class="card-h"><h2>Tambahkan ke acara</h2></div><div class="card-b">
+@if(isset($draftEvents) && $draftEvents->isNotEmpty())
+@if($venue->rooms->isNotEmpty())
+<form method="POST" action="{{ route('klien.acara.pesanan.store', $draftEvents->first()) }}" id="form-tambah-venue">
+    @csrf
+    <div class="field mb-12">
+        <label for="event_select_venue">Pilih Acara Draft</label>
+        <select class="input" id="event_select_venue" onchange="document.getElementById('form-tambah-venue').action = '/klien/acara/' + this.value + '/pesanan';">
+            @foreach($draftEvents as $draftEvent)
+            <option value="{{ $draftEvent->id }}">{{ $draftEvent->name }} ({{ $draftEvent->event_date?->format('d/m/Y') ?? 'Belum ada tgl' }})</option>
+            @endforeach
+        </select>
+    </div>
+    <div class="field mb-12">
+        <label for="room_select">Pilih Ruangan</label>
+        <select class="input" id="room_select" name="subject_id">
+            @foreach($venue->rooms as $room)
+            <option value="{{ $room->id }}">{{ $room->name }} (Kapasitas {{ $room->capacity }} orang)</option>
+            @endforeach
+        </select>
+    </div>
+    <input type="hidden" name="subject_type" value="venue_room">
+    <input type="hidden" name="quantity" value="1">
+    <button type="submit" class="btn full">Tambah Venue ke Acara</button>
+</form>
+@else
+<p class="hint">Venue ini belum memiliki data ruangan aktif.</p>
+@endif
+@else
+<p class="hint">Anda belum memiliki konsep acara berstatus draft. Buat konsep acara terlebih dahulu untuk memesan venue ini.</p>
+<a class="btn btn-o full mt-8" href="{{ route('klien.acara.baru') }}">Buat Konsep Acara</a>
+@endif
+</div></section>
 <section class="card"><div class="card-h"><h2>Status penyedia</h2></div><div class="card-b"><p class="mb-8"><span class="badge b-ok">Terverifikasi</span></p><p class="hint">Status verifikasi mengikuti keputusan Admin Pesta Kita. Kontak pribadi penyedia tidak ditampilkan.</p></div></section>
 </aside></div>
 @endif

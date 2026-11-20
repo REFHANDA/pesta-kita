@@ -1,18 +1,147 @@
 @extends('layouts.admin')
 
-@section('title', 'Tagihan &amp; pembayaran · Admin Pesta Kita')
+@section('title', 'Tagihan & Pembayaran · Admin Pesta Kita')
 
 @section('content')
 <main class="content" id="konten" tabindex="-1">
-<div class="page-head"><div><div class="crumbs"><a href="{{ url('/admin') }}">Admin</a> / Tagihan &amp; pembayaran</div><h1>Tagihan &amp; pembayaran</h1></div></div>
-<div class="data-note" role="note"><span class="ic i-info" aria-hidden="true"></span><p><b>Halaman ini masih berupa prototipe frontend.</b> Ringkasan, daftar tagihan, dan status di bawah adalah contoh statis. Data pembayaran, nomor tagihan, dan status final mengikuti sistem setelah backend transaksi tersedia.</p></div>
-<div class="grid stats three"><div class="card stat"><span class="ic-box"><span class="ic i-bill"></span></span><div><div class="lbl">Menunggu pembayaran</div><div class="val">8</div></div></div><div class="card stat"><span class="ic-box"><span class="ic i-clip"></span></span><div><div class="lbl">Bukti perlu validasi</div><div class="val">4</div></div></div><div class="card stat"><span class="ic-box"><span class="ic i-ok"></span></span><div><div class="lbl">Lunas bulan ini</div><div class="val">52</div></div></div></div>
-<section class="card"><div aria-label="Navigasi status" class="tabs" role="navigation"><a href="{{ url('/admin/pembayaran') }}" aria-current="page">Semua</a><a href="{{ url('/admin/pembayaran') }}?status=menunggu-pembayaran">Menunggu pembayaran</a><a href="{{ url('/admin/pembayaran') }}?status=menunggu-validasi">Menunggu validasi <span class="n">4</span></a><a href="{{ url('/admin/pembayaran') }}?status=lunas">Lunas</a><a href="{{ url('/admin/pembayaran') }}?status=kedaluwarsa">Kedaluwarsa</a></div>
-<form class="toolbar" onsubmit="return false"><input class="input" aria-label="Cari nomor tagihan atau acara" placeholder="Cari nomor tagihan / acara"/><select aria-label="Filter status pembayaran" class="input"><option>Semua status</option><option>Menunggu validasi</option><option>Belum dibayar</option><option>Lunas</option><option>Ditolak</option></select><button class="btn btn-o">Terapkan</button></form>
-<div aria-label="Tagihan &amp; pembayaran. Gulir horizontal untuk melihat seluruh kolom" class="table-wrap" role="region" tabindex="0"><table class="t-wide"><caption class="sr-only">Tabel: Tagihan &amp; pembayaran</caption><thead><tr><th scope="col">Nomor tagihan</th><th scope="col">Acara</th><th scope="col">Total transfer</th><th scope="col">Rekening tujuan</th><th scope="col">Batas bayar</th><th scope="col">Status</th><th class="col-aksi" scope="col">Aksi</th></tr></thead><tbody>
-<tr><td><b>PK/2026/11/0028</b><small>Versi 1</small></td><td>Pesta Kebun Raka<small>12 Nov 2026 · 120 tamu</small></td><td>Rp 11.500.427</td><td>BCA ···· 1208</td><td>05 Nov, 14:00</td><td><span class="badge b-warn">Menunggu validasi</span></td><td class="col-aksi"><a class="btn btn-sm" href="{{ url('/admin/pembayaran-detail') }}">Periksa</a></td></tr>
-<tr><td><b>PK/2026/11/0027</b><small>Versi 1</small></td><td>Ulang Tahun Naya<small>15 Nov 2026 · 80 tamu</small></td><td>Rp 7.250.193</td><td>Mandiri ···· 4401</td><td>06 Nov, 10:00</td><td><span class="badge b-warn">Menunggu validasi</span></td><td class="col-aksi"><a class="btn btn-sm" href="{{ url('/admin/pembayaran-detail') }}">Periksa</a></td></tr>
-<tr><td><b>PK/2026/11/0026</b></td><td>Garden Party Dimas<small>20 Nov 2026 · 150 tamu</small></td><td>Rp 14.200.000</td><td>BRI ···· 7710</td><td>—</td><td><span class="badge b-ok">Lunas</span></td><td class="col-aksi"><a class="btn btn-o btn-sm" href="{{ url('/admin/pembayaran-detail') }}">Detail</a></td></tr>
-</tbody></table></div></section>
+    <div class="page-head">
+        <div>
+            <div class="crumbs"><a href="{{ url('/admin') }}">Admin</a> / Tagihan &amp; Pembayaran</div>
+            <h1>Tagihan &amp; Pembayaran</h1>
+        </div>
+    </div>
+
+    @if(session('success'))
+    <div class="alert alert-success" style="background:#dcfce7;color:#166534;padding:12px 16px;border-radius:8px;margin-bottom:20px;border:1px solid #bbf7d0;">
+        {{ session('success') }}
+    </div>
+    @endif
+
+    <div class="grid stats three">
+        <div class="card stat">
+            <span class="ic-box"><span class="ic i-bill"></span></span>
+            <div>
+                <div class="lbl">Menunggu pembayaran</div>
+                <div class="val">{{ $countMenungguPembayaran }}</div>
+            </div>
+        </div>
+        <div class="card stat">
+            <span class="ic-box"><span class="ic i-clip"></span></span>
+            <div>
+                <div class="lbl">Bukti perlu validasi</div>
+                <div class="val">{{ $countMenungguValidasi }}</div>
+            </div>
+        </div>
+        <div class="card stat">
+            <span class="ic-box"><span class="ic i-ok"></span></span>
+            <div>
+                <div class="lbl">Lunas bulan ini</div>
+                <div class="val">{{ $countLunasBulanIni }}</div>
+            </div>
+        </div>
+    </div>
+
+    <section class="card">
+        <div aria-label="Navigasi status" class="tabs" role="navigation">
+            <a href="{{ route('admin.pembayaran.index') }}" class="{{ $statusTab === 'semua' ? 'active' : '' }}" {{ $statusTab === 'semua' ? 'aria-current="page"' : '' }}>Semua</a>
+            <a href="{{ route('admin.pembayaran.index', ['status' => 'menunggu-pembayaran']) }}" class="{{ $statusTab === 'menunggu-pembayaran' ? 'active' : '' }}" {{ $statusTab === 'menunggu-pembayaran' ? 'aria-current="page"' : '' }}>Menunggu pembayaran</a>
+            <a href="{{ route('admin.pembayaran.index', ['status' => 'menunggu-validasi']) }}" class="{{ $statusTab === 'menunggu-validasi' ? 'active' : '' }}" {{ $statusTab === 'menunggu-validasi' ? 'aria-current="page"' : '' }}>
+                Menunggu validasi
+                @if($countMenungguValidasi > 0)
+                <span class="n">{{ $countMenungguValidasi }}</span>
+                @endif
+            </a>
+            <a href="{{ route('admin.pembayaran.index', ['status' => 'lunas']) }}" class="{{ $statusTab === 'lunas' ? 'active' : '' }}" {{ $statusTab === 'lunas' ? 'aria-current="page"' : '' }}>Lunas</a>
+            <a href="{{ route('admin.pembayaran.index', ['status' => 'kedaluwarsa']) }}" class="{{ $statusTab === 'kedaluwarsa' ? 'active' : '' }}" {{ $statusTab === 'kedaluwarsa' ? 'aria-current="page"' : '' }}>Kedaluwarsa</a>
+        </div>
+
+        <form class="toolbar" method="GET" action="{{ route('admin.pembayaran.index') }}">
+            <input type="hidden" name="status" value="{{ $statusTab }}">
+            <input class="input" name="q" value="{{ $q }}" aria-label="Cari nomor tagihan atau acara" placeholder="Cari nomor tagihan / nama acara..."/>
+            <button class="btn btn-o" type="submit">Cari</button>
+            @if(!empty($q))
+            <a href="{{ route('admin.pembayaran.index', ['status' => $statusTab]) }}" class="btn btn-o">Reset</a>
+            @endif
+        </form>
+
+        <div aria-label="Tagihan &amp; pembayaran. Gulir horizontal untuk melihat seluruh kolom" class="table-wrap" role="region" tabindex="0">
+            <table class="t-wide">
+                <caption class="sr-only">Tabel: Tagihan &amp; pembayaran</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Nomor tagihan</th>
+                        <th scope="col">Acara</th>
+                        <th scope="col" class="num">Total transfer</th>
+                        <th scope="col">Rekening tujuan</th>
+                        <th scope="col">Batas bayar</th>
+                        <th scope="col">Status</th>
+                        <th class="col-aksi" scope="col">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($invoices as $invoice)
+                    @php
+                        $payment = $invoice->latestPayment;
+                        $badgeClass = match($invoice->status) {
+                            \App\Enums\InvoiceStatus::Lunas => 'b-ok',
+                            \App\Enums\InvoiceStatus::MenungguValidasi => 'b-warn',
+                            \App\Enums\InvoiceStatus::BelumDibayar => 'b-warn',
+                            \App\Enums\InvoiceStatus::Kedaluwarsa, \App\Enums\InvoiceStatus::Dibatalkan => 'b-bad',
+                        };
+                    @endphp
+                    <tr>
+                        <td>
+                            <b>{{ $invoice->invoice_number }}</b>
+                            <small>Versi {{ $invoice->version }}</small>
+                        </td>
+                        <td>
+                            <b>{{ $invoice->event?->name ?? 'Acara' }}</b>
+                            <small>Klien: {{ $invoice->event?->client?->name ?? '-' }} · {{ $invoice->event?->event_date?->translatedFormat('d M Y') ?? '-' }}</small>
+                        </td>
+                        <td class="num">
+                            <b>Rp {{ number_format($invoice->transfer_total, 0, ',', '.') }}</b>
+                        </td>
+                        <td>
+                            @if($payment?->companyBankAccount)
+                                {{ $payment->companyBankAccount->bank_name }} ···· {{ substr($payment->companyBankAccount->account_number, -4) }}
+                            @else
+                                —
+                            @endif
+                        </td>
+                        <td>
+                            @if($invoice->status === \App\Enums\InvoiceStatus::Lunas)
+                                Lunas {{ $invoice->paid_at?->translatedFormat('d M, H:i') }}
+                            @elseif($invoice->due_at)
+                                {{ $invoice->due_at->translatedFormat('d M, H:i') }}
+                            @else
+                                —
+                            @endif
+                        </td>
+                        <td>
+                            <span class="badge {{ $badgeClass }}">{{ $invoice->status->label() }}</span>
+                        </td>
+                        <td class="col-aksi">
+                            <a class="btn {{ $invoice->status === \App\Enums\InvoiceStatus::MenungguValidasi ? '' : 'btn-o' }} btn-sm" href="{{ route('admin.pembayaran.show', $invoice) }}">
+                                {{ $invoice->status === \App\Enums\InvoiceStatus::MenungguValidasi ? 'Periksa' : 'Detail' }}
+                            </a>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="7" style="text-align:center;padding:24px;color:var(--sub, #64748b);">
+                            Tidak ada data tagihan atau pembayaran yang ditemukan.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        @if($invoices->hasPages())
+        <div style="padding:16px;">
+            {{ $invoices->links() }}
+        </div>
+        @endif
+    </section>
 </main>
 @endsection

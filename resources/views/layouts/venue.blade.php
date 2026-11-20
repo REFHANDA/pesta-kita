@@ -38,9 +38,6 @@
                 <a href="{{ url('/venue/pengajuan-harga') }}" @if(request()->is('venue/pengajuan-harga*')) aria-current="page" @endif>
                     <span class="ic i-tag" aria-hidden="true"></span>Pengajuan Harga
                 </a>
-                <a href="{{ url('/venue/permintaan-penawaran') }}" @if(request()->is('venue/permintaan-penawaran*')) aria-current="page" @endif>
-                    <span class="ic i-bill" aria-hidden="true"></span>Permintaan Penawaran
-                </a>
             </nav>
 
             <p class="nav-label">Operasional Reservasi</p>

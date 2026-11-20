@@ -12,4 +12,5 @@ enum MediaKind: string
 {
     case Foto = 'foto';
     case DokumenVerifikasi = 'dokumen_verifikasi';
+    case BuktiPembayaran = 'bukti_pembayaran';
 }

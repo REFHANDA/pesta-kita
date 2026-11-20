@@ -41,9 +41,6 @@
                 <a href="{{ url('/vendor/pengajuan-harga') }}" @if(request()->is('vendor/pengajuan-harga*')) aria-current="page" @endif>
                     <span class="ic i-tag" aria-hidden="true"></span>Pengajuan Harga
                 </a>
-                <a href="{{ url('/vendor/permintaan-penawaran') }}" @if(request()->is('vendor/permintaan-penawaran*')) aria-current="page" @endif>
-                    <span class="ic i-bill" aria-hidden="true"></span>Permintaan Penawaran
-                </a>
             </nav>
 
             <p class="nav-label">Operasional Acara</p>

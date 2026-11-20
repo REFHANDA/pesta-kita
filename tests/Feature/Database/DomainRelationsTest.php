@@ -2,18 +2,23 @@
 
 namespace Tests\Feature\Database;
 
-use App\Enums\QuoteRequestStatus;
 use App\Models\AuditLog;
 use App\Models\AvailabilityDay;
+use App\Models\Cancellation;
 use App\Models\CatalogItem;
+use App\Models\CompanyBankAccount;
+use App\Models\Disbursement;
+use App\Models\Evaluation;
+use App\Models\EvaluationItem;
 use App\Models\Event;
+use App\Models\Invoice;
+use App\Models\InvoiceItem;
 use App\Models\Media;
 use App\Models\OrderItem;
 use App\Models\OrderObjection;
+use App\Models\Payment;
 use App\Models\PriceChangeRequest;
-use App\Models\QuoteDecision;
-use App\Models\QuoteProposal;
-use App\Models\QuoteRequest;
+use App\Models\RundownItem;
 use App\Models\User;
 use App\Models\VendorProfile;
 use App\Models\Venue;
@@ -26,7 +31,7 @@ use Tests\TestCase;
 
 /**
  * BE-2 C.6 / instruksi §8: relasi domain — polymorphic morph resolves
- * dengan alias enforceMorphMap, serta rantai quote/event/order item.
+ * dengan alias enforceMorphMap, serta relasi event dan order item.
  */
 class DomainRelationsTest extends TestCase
 {
@@ -81,12 +86,6 @@ class DomainRelationsTest extends TestCase
         $this->assertInstanceOf(Event::class, $log->subject);
     }
 
-    public function test_quote_request_subject_morph_resolves(): void
-    {
-        $quote = QuoteRequest::factory()->create();
-        $this->assertInstanceOf(CatalogItem::class, $quote->subject);
-    }
-
     public function test_morph_aliases_are_stored_not_class_names(): void
     {
         $media = Media::factory()->create();
@@ -97,52 +96,21 @@ class DomainRelationsTest extends TestCase
         $this->assertSame('catalog_item', $item->subject_type);
     }
 
-    // ---- 13. Relasi quote, event, dan order item valid ----
-
-    public function test_quote_request_without_proposal_or_decision(): void
-    {
-        $quote = QuoteRequest::factory()->create();
-
-        $this->assertCount(0, $quote->proposals);
-        $this->assertNull($quote->decision);
-    }
-
-    public function test_quote_request_with_proposal(): void
-    {
-        $quote = QuoteRequest::factory()->denganProposal()->create();
-
-        $this->assertCount(1, $quote->proposals);
-        $this->assertInstanceOf(QuoteProposal::class, $quote->proposals->first());
-        $this->assertSame(QuoteRequestStatus::DiusulkanPenyedia, $quote->fresh()->status);
-    }
-
-    public function test_quote_request_with_decision(): void
-    {
-        $quote = QuoteRequest::factory()->denganKeputusan()->create();
-
-        $this->assertInstanceOf(QuoteDecision::class, $quote->decision);
-        $this->assertSame(QuoteRequestStatus::DisetujuiAdmin, $quote->fresh()->status);
-    }
-
-    public function test_event_has_quote_requests_and_order_items(): void
+    public function test_event_has_order_items(): void
     {
         $event = Event::factory()->create();
-        QuoteRequest::factory()->create(['event_id' => $event->id]);
         OrderItem::factory()->create(['event_id' => $event->id]);
 
         $this->assertInstanceOf(User::class, $event->client);
-        $this->assertCount(1, $event->quoteRequests);
         $this->assertCount(1, $event->orderItems);
     }
 
-    public function test_order_item_has_objections_and_optional_quote_request(): void
+    public function test_order_item_has_objections(): void
     {
-        $quote = QuoteRequest::factory()->create();
-        $item = OrderItem::factory()->create(['quote_request_id' => $quote->id]);
+        $item = OrderItem::factory()->create();
         OrderObjection::factory()->create(['order_item_id' => $item->id]);
 
         $this->assertCount(1, $item->objections);
-        $this->assertInstanceOf(QuoteRequest::class, $item->quoteRequest);
     }
 
     public function test_event_can_reference_multiple_venues_via_order_items(): void
@@ -175,5 +143,60 @@ class DomainRelationsTest extends TestCase
         $this->assertCount(1, $profile->venues);
         $this->assertCount(1, $venue->rooms);
         $this->assertCount(1, $venue->facilities);
+    }
+
+    public function test_invoice_has_items_and_event(): void
+    {
+        $invoice = Invoice::factory()->create();
+        InvoiceItem::factory()->create(['invoice_id' => $invoice->id]);
+        InvoiceItem::factory()->kebersihan()->create(['invoice_id' => $invoice->id]);
+
+        $this->assertInstanceOf(Event::class, $invoice->event);
+        $this->assertCount(2, $invoice->items);
+    }
+
+    public function test_payment_belongs_to_invoice_and_bank_account(): void
+    {
+        $payment = Payment::factory()->create();
+
+        $this->assertInstanceOf(Invoice::class, $payment->invoice);
+        $this->assertInstanceOf(CompanyBankAccount::class, $payment->companyBankAccount);
+    }
+
+    public function test_cancellation_belongs_to_event_and_invoice(): void
+    {
+        $cancellation = Cancellation::factory()->create();
+
+        $this->assertInstanceOf(Event::class, $cancellation->event);
+        $this->assertInstanceOf(Invoice::class, $cancellation->invoice);
+    }
+
+    public function test_disbursement_belongs_to_order_item_and_provider_morph(): void
+    {
+        $vendor = VendorProfile::factory()->create();
+        $disbursement = Disbursement::factory()->create([
+            'provider_type' => 'vendor_profile',
+            'provider_id' => $vendor->id,
+        ]);
+
+        $this->assertInstanceOf(OrderItem::class, $disbursement->orderItem);
+        $this->assertInstanceOf(VendorProfile::class, $disbursement->provider);
+    }
+
+    public function test_rundown_item_belongs_to_event_and_creator(): void
+    {
+        $item = RundownItem::factory()->create();
+
+        $this->assertInstanceOf(Event::class, $item->event);
+        $this->assertInstanceOf(User::class, $item->creator);
+    }
+
+    public function test_evaluation_has_items_and_belongs_to_event(): void
+    {
+        $eval = Evaluation::factory()->create();
+        EvaluationItem::factory()->create(['evaluation_id' => $eval->id]);
+
+        $this->assertInstanceOf(Event::class, $eval->event);
+        $this->assertCount(1, $eval->items);
     }
 }

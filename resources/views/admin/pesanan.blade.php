@@ -4,7 +4,154 @@
 
 @section('content')
 <main class="content" id="konten" tabindex="-1">
-<div class="page-head"><div><div class="crumbs"><a href="{{ url('/admin') }}">Admin</a> / Review pesanan</div><h1>Review pesanan</h1><p class="sub">Pesanan dari acara yang sudah diajukan klien. Acara draft belum perlu direview.</p></div><a class="btn btn-o" href="{{ url('/admin/admin-pesanan-venue') }}">Pesanan venue</a></div>
-<p class="deadline"><span class="chip">SLA review 24 jam</span> 3 pesanan menunggu review. Pesanan yang melewati batas ditandai <span class="badge b-bad">Mendesak</span>.</p><div class="alert"><span class="ic i-info" aria-hidden="true"></span><span>Buka tiap pesanan untuk melihat objek, nilai, dan konsekuensinya sebelum menyetujui atau menolak.</span></div><section class="card"><div aria-label="Filter status" class="tabs" role="navigation"><a href="{{ url('/admin/pesanan') }}" aria-current="page">Semua diajukan</a><a href="{{ url('/admin/pesanan') }}?status=menunggu-review">Menunggu review<span class="n">3</span></a><a href="{{ url('/admin/pesanan') }}?status=disetujui">Disetujui<span class="n">5</span></a><a href="{{ url('/admin/pesanan') }}?status=terkonfirmasi">Terkonfirmasi<span class="n">8</span></a><a href="{{ url('/admin/pesanan') }}?status=selesai">Selesai</a><a href="{{ url('/admin/pesanan') }}?status=ditolak">Ditolak</a><a href="{{ url('/admin/pesanan') }}?status=dialihkan">Dialihkan</a><a href="{{ url('/admin/pesanan') }}?status=dibatalkan">Dibatalkan</a></div><form class="toolbar" onsubmit="return false"><label class="sr-only" for="q">Cari nama acara</label><input class="input" id="q" placeholder="Cari nama acara…"/><label class="sr-only" for="j">Jenis</label><select aria-label="Jenis" class="input" id="j"><option>Semua jenis</option><option>Layanan vendor</option><option>Venue</option><option>Peralatan</option></select><button class="btn btn-o">Terapkan</button></form><div aria-label="Tabel pesanan" class="table-wrap" role="region" tabindex="0"><table class="t-wide"><caption class="sr-only">Pesanan dari acara yang sudah diajukan</caption><thead><tr><th scope="col">Item &amp; penyedia</th><th scope="col">Acara &amp; klien</th><th scope="col">Tanggal</th><th class="num" scope="col">Harga penyedia</th><th scope="col">Status</th></tr></thead><tbody><tr><td><a class="fw-7 no-ul" href="{{ url('/admin/pesanan-detail') }}">Katering prasmanan ×1</a><span class="sub-t">Dapur Nusantara</span></td><td>Ulang Tahun ke-7 Nadia<span class="sub-t">Dewi Lestari</span></td><td>12 Nov 2026</td><td class="num">Rp 3.200.000</td><td><span class="badge b-warn">Menunggu review</span></td></tr><tr><td><a class="fw-7 no-ul" href="{{ url('/admin/pesanan-detail') }}">Aula serbaguna</a><span class="sub-t">Gedung Serbaguna Melati</span></td><td>Ulang Tahun ke-7 Nadia<span class="sub-t">Dewi Lestari</span></td><td>12 Nov 2026</td><td class="num">Rp 4.500.000</td><td><span class="badge b-warn">Menunggu review</span></td></tr><tr><td><a class="fw-7 no-ul" href="{{ url('/admin/pesanan-detail') }}">Sound system ×2</a><span class="sub-t">Sewa Audio Jaya</span></td><td>Pesta Kebun Raka<span class="sub-t">Andi Pratama</span></td><td>20 Nov 2026</td><td class="num">Rp 1.800.000</td><td><span class="badge b-ok">Disetujui</span></td></tr><tr><td><a class="fw-7 no-ul" href="{{ url('/admin/pesanan-detail') }}">Dekorasi balon dan backdrop</a><span class="sub-t">Kreasi Pesta</span></td><td>Pesta Kebun Raka<span class="sub-t">Andi Pratama</span></td><td>20 Nov 2026</td><td class="num">Rp 2.100.000</td><td><span class="badge b-ok">Terkonfirmasi</span></td></tr><tr><td><a class="fw-7 no-ul" href="{{ url('/admin/pesanan-detail') }}">Photo booth</a><span class="sub-t">Foto Ceria</span></td><td>Syukuran Lulus Kuliah Sari<span class="sub-t">Sari Wulandari</span></td><td>28 Nov 2026</td><td class="num">Rp 1.500.000</td><td><span class="badge b-warn">Menunggu review</span></td></tr><tr><td><a class="fw-7 no-ul" href="{{ url('/admin/pesanan-detail') }}">Katering prasmanan ×1</a><span class="sub-t">Dapur Nusantara</span></td><td>Ulang Tahun Bima<span class="sub-t">Rina Kusuma</span></td><td>03 Des 2026</td><td class="num">Rp 2.900.000</td><td><span class="badge b-bad">Ditolak</span></td></tr><tr><td><a class="fw-7 no-ul" href="{{ url('/admin/pesanan-detail') }}">Meja bundar ×10</a><span class="sub-t">Sewa Audio Jaya</span></td><td>Ulang Tahun Bima<span class="sub-t">Rina Kusuma</span></td><td>03 Des 2026</td><td class="num">Rp 750.000</td><td><span class="badge b-ok">Terkonfirmasi</span></td></tr></tbody></table></div><div class="pager"><span>Menampilkan 1–7 dari 21 pesanan</span><ul><li><span class="off">Sebelumnya</span></li><li><span aria-current="page"><span class="sr-only">Halaman </span>1</span></li><li><a href="{{ url('/admin/pesanan') }}?halaman=2">2</a></li><li><a href="{{ url('/admin/pesanan') }}?halaman=3">3</a></li><li><a href="{{ url('/admin/pesanan') }}?halaman=2">Berikutnya</a></li></ul></div></section>
+    <div class="page-head">
+        <div>
+            <div class="crumbs"><a href="{{ url('/admin') }}">Admin</a> / Review pesanan</div>
+            <h1>Review pesanan</h1>
+            <p class="sub">Pesanan dari acara yang sudah diajukan klien. Acara draft belum perlu direview.</p>
+        </div>
+        <a class="btn btn-o" href="{{ url('/admin/pesanan?j=venue') }}">Pesanan venue</a>
+    </div>
+
+    @if (session('success'))
+        <div class="alert alert-success mb-16"><span class="ic i-check" aria-hidden="true"></span><span>{{ session('success') }}</span></div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger mb-16"><span class="ic i-info" aria-hidden="true"></span><span>{{ session('error') }}</span></div>
+    @endif
+
+    <p class="deadline">
+        <span class="chip">SLA review 24 jam</span>
+        {{ $counts['menunggu_review'] }} pesanan menunggu review.
+        Pesanan yang melewati batas ditandai <span class="badge b-bad">Mendesak</span>.
+    </p>
+
+    <div class="alert">
+        <span class="ic i-info" aria-hidden="true"></span>
+        <span>Buka tiap pesanan untuk melihat objek, nilai, dan konsekuensinya sebelum menyetujui atau menolak.</span>
+    </div>
+
+    <section class="card">
+        <div aria-label="Filter status" class="tabs" role="navigation">
+            <a href="{{ url('/admin/pesanan') }}" @if($activeStatus === 'semua' || !$activeStatus) aria-current="page" @endif>
+                Semua diajukan<span class="n">{{ $counts['total'] }}</span>
+            </a>
+            <a href="{{ url('/admin/pesanan') }}?status=menunggu-review" @if($activeStatus === 'menunggu-review' || $activeStatus === 'menunggu_review') aria-current="page" @endif>
+                Menunggu review<span class="n">{{ $counts['menunggu_review'] }}</span>
+            </a>
+            <a href="{{ url('/admin/pesanan') }}?status=disetujui" @if($activeStatus === 'disetujui') aria-current="page" @endif>
+                Disetujui<span class="n">{{ $counts['disetujui'] }}</span>
+            </a>
+            <a href="{{ url('/admin/pesanan') }}?status=terkonfirmasi" @if($activeStatus === 'terkonfirmasi') aria-current="page" @endif>
+                Terkonfirmasi<span class="n">{{ $counts['terkonfirmasi'] }}</span>
+            </a>
+            <a href="{{ url('/admin/pesanan') }}?status=selesai" @if($activeStatus === 'selesai') aria-current="page" @endif>
+                Selesai<span class="n">{{ $counts['selesai'] }}</span>
+            </a>
+            <a href="{{ url('/admin/pesanan') }}?status=ditolak" @if($activeStatus === 'ditolak') aria-current="page" @endif>
+                Ditolak<span class="n">{{ $counts['ditolak'] }}</span>
+            </a>
+            <a href="{{ url('/admin/pesanan') }}?status=dialihkan" @if($activeStatus === 'dialihkan') aria-current="page" @endif>
+                Dialihkan<span class="n">{{ $counts['dialihkan'] }}</span>
+            </a>
+            <a href="{{ url('/admin/pesanan') }}?status=dibatalkan" @if($activeStatus === 'dibatalkan') aria-current="page" @endif>
+                Dibatalkan<span class="n">{{ $counts['dibatalkan'] }}</span>
+            </a>
+        </div>
+
+        <form class="toolbar" method="GET" action="{{ url('/admin/pesanan') }}">
+            @if($activeStatus && $activeStatus !== 'semua')
+                <input type="hidden" name="status" value="{{ $activeStatus }}"/>
+            @endif
+            <label class="sr-only" for="q">Cari nama acara atau klien</label>
+            <input class="input" id="q" name="q" value="{{ $search }}" placeholder="Cari nama acara atau klien…"/>
+            <label class="sr-only" for="j">Jenis</label>
+            <select aria-label="Jenis" class="input" id="j" name="j">
+                <option value="">Semua jenis</option>
+                <option value="layanan" @selected($type === 'layanan')>Layanan vendor</option>
+                <option value="venue" @selected($type === 'venue')>Venue</option>
+                <option value="peralatan" @selected($type === 'peralatan')>Peralatan</option>
+            </select>
+            <button class="btn btn-o" type="submit">Terapkan</button>
+        </form>
+
+        <div aria-label="Tabel pesanan" class="table-wrap" role="region" tabindex="0">
+            <table class="t-wide">
+                <caption class="sr-only">Pesanan dari acara yang sudah diajukan</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Item &amp; penyedia</th>
+                        <th scope="col">Acara &amp; klien</th>
+                        <th scope="col">Tanggal</th>
+                        <th class="num" scope="col">Harga penyedia</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($orderItems as $item)
+                        @php
+                            $subjectName = $item->subject?->name ?? 'Item #'.$item->id;
+                            $providerName = $item->provider?->business_name ?? $item->provider?->name ?? 'Penyedia';
+                            $eventName = $item->event?->name ?? 'Acara #'.$item->event_id;
+                            $clientName = $item->event?->client?->name ?? 'Klien';
+                            $dateStr = $item->usage_date ? $item->usage_date->format('d M Y') : ($item->event?->event_date?->format('d M Y') ?? '-');
+                            $price = $item->provider_price ?? $item->catalog_price_snapshot ?? 0;
+                            $badgeClass = match($item->status->value) {
+                                'menunggu_review' => 'badge b-warn',
+                                'disetujui', 'terkonfirmasi', 'selesai' => 'badge b-ok',
+                                'ditolak', 'dibatalkan' => 'badge b-bad',
+                                'dialihkan' => 'badge b-info',
+                                default => 'badge',
+                            };
+                            $isUrgent = $item->status === \App\Enums\OrderItemStatus::MenungguReview
+                                && $item->review_due_at
+                                && now()->greaterThan($item->review_due_at);
+                        @endphp
+                        <tr>
+                            <td>
+                                <a class="fw-7 no-ul" href="{{ route('admin.pesanan.show', $item) }}">
+                                    {{ $subjectName }}
+                                    @if($item->quantity > 1) ×{{ $item->quantity }} @endif
+                                </a>
+                                <span class="sub-t">{{ $providerName }}</span>
+                            </td>
+                            <td>
+                                {{ $eventName }}
+                                <span class="sub-t">{{ $clientName }}</span>
+                            </td>
+                            <td>{{ $dateStr }}</td>
+                            <td class="num">
+                                Rp {{ number_format($item->lineTotal(), 0, ',', '.') }}
+                                @if($item->quantity > 1)
+                                    <span class="sub-t">@ Rp {{ number_format($price, 0, ',', '.') }}</span>
+                                @endif
+                            </td>
+                            <td>
+                                <span class="{{ $badgeClass }}">{{ str_replace('_', ' ', ucfirst($item->status->value)) }}</span>
+                                @if($isUrgent)
+                                    <span class="badge b-bad">Mendesak</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="text-center p-16">Tidak ada pesanan pada filter ini.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        @if($orderItems->hasPages())
+            <div class="pager">
+                <span>Menampilkan {{ $orderItems->firstItem() }}–{{ $orderItems->lastItem() }} dari {{ $orderItems->total() }} pesanan</span>
+                {{ $orderItems->links() }}
+            </div>
+        @else
+            <div class="pager">
+                <span>Menampilkan {{ $orderItems->total() }} pesanan</span>
+            </div>
+        @endif
+    </section>
 </main>
 @endsection

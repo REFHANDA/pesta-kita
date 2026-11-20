@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\OrderObjectionCategory;
+use App\Enums\OrderObjectionStatus;
 use Database\Factories\OrderObjectionFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,11 +11,23 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Keberatan penyedia atas item pesanan. Menjadi catatan untuk Admin dan
- * tidak mengubah status pesanan otomatis. Nilai status/admin_decision
- * belum menjadi himpunan tertutup pada rancangan, sehingga tetap string.
+ * Keberatan penyedia atas item pesanan sesuai rancangan EMS.
+ * Kategori: alat_rusak, jadwal_bentrok, kapasitas, lainnya.
+ * Status: diajukan, ditinjau, diterima, ditolak.
  */
-#[Fillable(['order_item_id', 'provider_user_id', 'reason', 'status', 'admin_decision', 'decided_at'])]
+#[Fillable([
+    'order_item_id',
+    'provider_user_id',
+    'category',
+    'reason',
+    'evidence_media_id',
+    'is_emergency',
+    'status',
+    'decision_reason',
+    'reviewed_by',
+    'admin_decision',
+    'decided_at',
+])]
 class OrderObjection extends Model
 {
     /** @use HasFactory<OrderObjectionFactory> */
@@ -27,6 +41,9 @@ class OrderObjection extends Model
     protected function casts(): array
     {
         return [
+            'category' => OrderObjectionCategory::class,
+            'status' => OrderObjectionStatus::class,
+            'is_emergency' => 'boolean',
             'decided_at' => 'datetime',
         ];
     }
@@ -49,5 +66,25 @@ class OrderObjection extends Model
     public function providerUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'provider_user_id');
+    }
+
+    /**
+     * Bukti media (wajib jika keberatan darurat).
+     *
+     * @return BelongsTo<Media, $this>
+     */
+    public function evidence(): BelongsTo
+    {
+        return $this->belongsTo(Media::class, 'evidence_media_id');
+    }
+
+    /**
+     * Admin yang meninjau dan memutuskan keberatan.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function reviewer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
     }
 }

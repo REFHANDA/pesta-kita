@@ -94,16 +94,6 @@ class CatalogItem extends Model
     }
 
     /**
-     * Permintaan penawaran yang menunjuk item ini.
-     *
-     * @return MorphMany<QuoteRequest, $this>
-     */
-    public function quoteRequests(): MorphMany
-    {
-        return $this->morphMany(QuoteRequest::class, 'subject');
-    }
-
-    /**
      * Item pesanan yang mengacu item ini.
      *
      * @return MorphMany<OrderItem, $this>

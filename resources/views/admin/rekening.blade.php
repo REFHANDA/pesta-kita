@@ -4,9 +4,59 @@
 
 @section('content')
 <main class="content page-refined" id="konten" tabindex="-1">
-<div class="page-head"><div><div class="crumbs"><a href="{{ url('/admin') }}">Admin</a> / Penyedia &amp; katalog / Rekening perusahaan</div><h1>Rekening perusahaan</h1><p class="sub">Kelola rekening tujuan pembayaran klien. Hanya rekening aktif yang ditampilkan saat klien membayar.</p></div><a class="btn" href="{{ url('/admin/rekening-form') }}?mode=tambah">＋ Tambah rekening</a></div><div class="grid two account-grid">
-<section class="card account-card"><div class="card-h"><h2>BCA</h2><span class="badge b-ok">Aktif · Urutan 1</span></div><p class="big-num">•••• •••• 1208</p><p>PT Pesta Kita Indonesia</p><div class="toolbar"><a class="btn btn-o" href="{{ url('/admin/rekening-form') }}">Edit</a><button class="btn btn-danger" type="button" data-confirm="Nonaktifkan rekening ini?" data-text="Rekening tidak lagi tampil saat klien membayar. Pembayaran yang sudah tercatat tidak berubah. Rekening tidak dapat dihapus agar riwayat pembayaran tetap utuh." data-label="Nonaktifkan" data-tone="bad" data-done="Rekening dinonaktifkan dan dicatat di log aktivitas.">Nonaktifkan</button></div></section>
-<section class="card account-card"><div class="card-h"><h2>Bank Mandiri</h2><span class="badge b-ok">Aktif · Urutan 2</span></div><p class="big-num">•••• •••• 4401</p><p>PT Pesta Kita Indonesia</p><div class="toolbar"><a class="btn btn-o" href="{{ url('/admin/rekening-form') }}">Edit</a><button class="btn btn-danger" type="button" data-confirm="Nonaktifkan rekening ini?" data-text="Rekening tidak lagi tampil saat klien membayar. Pembayaran yang sudah tercatat tidak berubah. Rekening tidak dapat dihapus agar riwayat pembayaran tetap utuh." data-label="Nonaktifkan" data-tone="bad" data-done="Rekening dinonaktifkan dan dicatat di log aktivitas.">Nonaktifkan</button></div></section>
-<section class="card account-card"><div class="card-h"><h2>BRI</h2><span class="badge">Nonaktif</span></div><p class="big-num">•••• •••• 7710</p><p>PT Pesta Kita Indonesia</p><div class="toolbar"><a class="btn btn-o" href="{{ url('/admin/rekening-form') }}">Edit</a><button class="btn" type="button" data-confirm="Aktifkan rekening ini?" data-text="Rekening tampil kembali sebagai pilihan tujuan transfer klien." data-label="Aktifkan" data-done="Rekening diaktifkan dan dicatat di log aktivitas.">Aktifkan</button></div></section></div><div class="alert">Rekening yang pernah dipakai transaksi sebaiknya dinonaktifkan, bukan dihapus, agar riwayat pembayaran tetap utuh.</div>
+    <div class="page-head">
+        <div>
+            <div class="crumbs"><a href="{{ url('/admin') }}">Admin</a> / Penyedia &amp; katalog / Rekening perusahaan</div>
+            <h1>Rekening perusahaan</h1>
+            <p class="sub">Kelola rekening tujuan pembayaran klien. Hanya rekening aktif yang ditampilkan saat klien membayar.</p>
+        </div>
+        <a class="btn" href="{{ route('admin.rekening.create') }}">＋ Tambah rekening</a>
+    </div>
+
+    @if(session('success'))
+    <div class="alert alert-success mb-16" style="background:#dcfce7;color:#166534;padding:12px 16px;border-radius:8px;border:1px solid #bbf7d0;margin-bottom:16px;">
+        {{ session('success') }}
+    </div>
+    @endif
+
+    <div class="grid two account-grid">
+        @forelse($accounts as $account)
+        <section class="card account-card">
+            <div class="card-h">
+                <h2>{{ $account->bank_name }}</h2>
+                @if($account->is_active)
+                <span class="badge b-ok">Aktif · Urutan {{ $account->sort_order }}</span>
+                @else
+                <span class="badge b-bad">Nonaktif · Urutan {{ $account->sort_order }}</span>
+                @endif
+            </div>
+            <p class="big-num">{{ $account->account_number }}</p>
+            <p>{{ $account->account_name }}</p>
+            <div class="toolbar" style="margin-top:16px;display:flex;gap:8px;">
+                <a class="btn btn-o btn-sm" href="{{ route('admin.rekening.edit', $account) }}">Edit</a>
+                <form action="{{ route('admin.rekening.toggle', $account) }}" method="POST" style="display:inline;">
+                    @csrf
+                    @if($account->is_active)
+                    <button class="btn btn-danger btn-sm" type="submit" onclick="return confirm('Nonaktifkan rekening ini? Rekening tidak lagi tampil pada pilihan pembayaran klien.');">
+                        Nonaktifkan
+                    </button>
+                    @else
+                    <button class="btn btn-sm" type="submit" onclick="return confirm('Aktifkan rekening ini? Rekening akan tampil kembali pada pilihan pembayaran klien.');">
+                        Aktifkan
+                    </button>
+                    @endif
+                </form>
+            </div>
+        </section>
+        @empty
+        <div class="card card-b" style="grid-column:1/-1;">
+            <p class="hint">Belum ada rekening perusahaan yang terdaftar. Tambahkan rekening pertama Anda.</p>
+        </div>
+        @endforelse
+    </div>
+
+    <div class="alert mt-16" style="margin-top:20px;">
+        Rekening yang pernah dipakai transaksi sebaiknya dinonaktifkan, bukan dihapus, agar riwayat bukti pembayaran tetap utuh dan terhubung.
+    </div>
 </main>
 @endsection

@@ -4,18 +4,24 @@ namespace App\Providers;
 
 use App\Models\AuditLog;
 use App\Models\AvailabilityDay;
+use App\Models\Cancellation;
 use App\Models\CatalogItem;
 use App\Models\ClientProfile;
 use App\Models\CompanyBankAccount;
+use App\Models\Disbursement;
+use App\Models\Evaluation;
+use App\Models\EvaluationItem;
 use App\Models\Event;
+use App\Models\Invoice;
+use App\Models\InvoiceItem;
 use App\Models\Media;
 use App\Models\OrderItem;
 use App\Models\OrderObjection;
+use App\Models\Payment;
 use App\Models\PriceChangeRequest;
 use App\Models\ProviderBankAccount;
-use App\Models\QuoteDecision;
-use App\Models\QuoteProposal;
-use App\Models\QuoteRequest;
+use App\Models\RundownItem;
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\VendorProfile;
 use App\Models\Venue;
@@ -23,6 +29,7 @@ use App\Models\VenueFacility;
 use App\Models\VenueProfile;
 use App\Models\VenueRoom;
 use App\Policies\CatalogItemPolicy;
+use App\Policies\InvoicePolicy;
 use App\Policies\MediaPolicy;
 use App\Policies\ProviderProfilePolicy;
 use App\Policies\VenuePolicy;
@@ -63,17 +70,24 @@ class AppServiceProvider extends ServiceProvider
             'price_change_request' => PriceChangeRequest::class,
             'availability_day' => AvailabilityDay::class,
             'event' => Event::class,
-            'quote_request' => QuoteRequest::class,
-            'quote_proposal' => QuoteProposal::class,
-            'quote_decision' => QuoteDecision::class,
             'order_item' => OrderItem::class,
             'order_objection' => OrderObjection::class,
             'audit_log' => AuditLog::class,
+            'invoice' => Invoice::class,
+            'invoice_item' => InvoiceItem::class,
+            'payment' => Payment::class,
+            'cancellation' => Cancellation::class,
+            'disbursement' => Disbursement::class,
+            'rundown_item' => RundownItem::class,
+            'evaluation' => Evaluation::class,
+            'evaluation_item' => EvaluationItem::class,
+            'setting' => Setting::class,
         ]);
 
         // BE-3: policy eksplisit (tanpa auto-discovery) untuk katalog,
         // venue, ruangan, media, dan verifikasi penyedia.
         Gate::policy(CatalogItem::class, CatalogItemPolicy::class);
+        Gate::policy(Invoice::class, InvoicePolicy::class);
         Gate::policy(Venue::class, VenuePolicy::class);
         Gate::policy(VenueRoom::class, VenueRoomPolicy::class);
         Gate::policy(Media::class, MediaPolicy::class);

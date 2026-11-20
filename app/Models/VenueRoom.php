@@ -53,16 +53,6 @@ class VenueRoom extends Model
     }
 
     /**
-     * Permintaan penawaran yang menunjuk ruangan ini.
-     *
-     * @return MorphMany<QuoteRequest, $this>
-     */
-    public function quoteRequests(): MorphMany
-    {
-        return $this->morphMany(QuoteRequest::class, 'subject');
-    }
-
-    /**
      * Item pesanan yang mengacu ruangan ini.
      *
      * @return MorphMany<OrderItem, $this>

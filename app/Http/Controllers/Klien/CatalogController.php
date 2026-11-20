@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Klien;
 
 use App\Enums\CatalogKind;
+use App\Enums\EventStatus;
 use App\Enums\MediaVisibility;
 use App\Enums\VerificationStatus;
 use App\Http\Controllers\Controller;
@@ -51,6 +52,7 @@ class CatalogController extends Controller
             'item' => $item,
             'vendor' => $item->vendorProfile,
             'photos' => $this->publicPhotos($item),
+            'draftEvents' => $request->user()?->events()->where('status', EventStatus::Draft->value)->orderBy('name')->get() ?? collect(),
         ]);
     }
 
@@ -88,6 +90,7 @@ class CatalogController extends Controller
         return view('klien.katalog-venue-detail', [
             'venue' => $venue,
             'photos' => $this->publicPhotos($venue),
+            'draftEvents' => $request->user()?->events()->where('status', EventStatus::Draft->value)->orderBy('name')->get() ?? collect(),
         ]);
     }
 

@@ -124,7 +124,7 @@ $kalConfig = json_encode([
                             </div>
                             <p class="hint mt-12">Tanggal terpilih: <span id="kal-form-date-view">—</span></p>
                             <input type="hidden" name="date" id="kal-form-date" value="">
-                            <div class="warn-box mt-12">Status manual adalah gambaran jadwal, bukan jaminan. Konfirmasi final tetap lewat proses penawaran dan persetujuan Admin.</div>
+                            <div class="warn-box mt-12">Status manual adalah gambaran jadwal, bukan jaminan. Konfirmasi final dilakukan saat pemesanan diajukan dan disetujui Admin.</div>
                         </form>
                     </div>
                 </section>

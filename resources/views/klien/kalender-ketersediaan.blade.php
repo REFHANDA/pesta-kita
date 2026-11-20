@@ -11,7 +11,7 @@ $statusToKey = [
     \App\Enums\AvailabilityStatus::BelumDikonfirmasi->value => 'belum',
 ];
 $toDays = fn ($days) => (object) $days->mapWithKeys(fn ($day) => [$day->date->toDateString() => $statusToKey[$day->status->value] ?? 'belum'])->all();
-$datasets = collect($items
+$datasets = $customDatasets ?? collect($items
     ->map(fn ($item) => [
         'key' => 'item-'.$item->id,
         'kategori' => 'vendor',
@@ -45,21 +45,21 @@ $kalConfig = json_encode([
         <div>
             <div class="crumbs"><a href="{{ url('/klien') }}">Beranda</a> / <a href="{{ url('/klien/katalog') }}">Vendor &amp; venue</a> / Kalender ketersediaan</div>
             <h1>Kalender ketersediaan</h1>
-            <p class="sub">Lihat gambaran jadwal ketersediaan Vendor dan Venue sebelum mengajukan permintaan penawaran. Ketersediaan tetap perlu dikonfirmasi Pesta Kita sebelum pesanan disahkan.</p>
+            <p class="sub">Lihat gambaran jadwal ketersediaan Vendor dan Venue sebelum memesan. Ketersediaan tanggal akan dicek dan dikonfirmasi saat pengajuan acara.</p>
         </div>
         <div class="actions"><a class="btn btn-o" href="{{ url('/klien/katalog') }}">Kembali ke katalog</a></div>
     </div>
 
     <div class="data-note" role="note">
         <span class="ic i-info" aria-hidden="true"></span>
-        <p><b>Jadwal diisi manual oleh penyedia.</b> Status tersedia/tidak tersedia pada kalender ini adalah gambaran dari penyedia, bukan jaminan dan bukan berarti tanggal sudah dipesan. Konfirmasi final tetap lewat proses permintaan penawaran dan persetujuan Admin Pesta Kita.</p>
+        <p><b>Jadwal diisi manual oleh penyedia.</b> Status tersedia/tidak tersedia pada kalender ini adalah gambaran dari penyedia. Konfirmasi ketersediaan final dilakukan saat acara diajukan dan disetujui Admin Pesta Kita.</p>
     </div>
 
     @if(count($datasets) === 0)
     <div class="empty-state card mt-16">
         <span class="ic i-cal" aria-hidden="true"></span>
         <h2>Belum ada jadwal yang dapat ditampilkan</h2>
-        <p>Vendor dan venue yang tampil di katalog belum menandai tanggal ketersediaan. Silakan ajukan permintaan penawaran untuk mendapatkan konfirmasi.</p>
+        <p>Vendor dan venue yang tampil di katalog belum menandai tanggal ketersediaan.</p>
     </div>
     @else
 
@@ -119,7 +119,7 @@ $kalConfig = json_encode([
 
                     <div class="kal-nodata" id="kal-nodata" hidden>
                         <p><b>Informasi ketersediaan belum tersedia untuk pilihan ini.</b></p>
-                        <p class="hint">Penyedia ini belum menandai tanggal. Silakan ajukan permintaan penawaran untuk mendapatkan konfirmasi.</p>
+                        <p class="hint">Penyedia ini belum menandai tanggal. Ketersediaan akan diperiksa saat Anda mengajukan acara.</p>
                     </div>
                 </div>
             </section>
@@ -133,10 +133,10 @@ $kalConfig = json_encode([
                 </section>
 
                 <section class="card">
-                    <div class="card-h"><h2>Ajukan permintaan penawaran</h2></div>
+                    <div class="card-h"><h2>Tambah ke acara</h2></div>
                     <div class="card-b">
-                        <p class="hint">Status ketersediaan di atas adalah gambaran dari penyedia dan tetap perlu dikonfirmasi. Proses permintaan penawaran sedang dikembangkan (BE-4); untuk saat ini halaman tersebut masih prototipe.</p>
-                        <a class="btn mt-12" id="kal-quote-link" data-base="{{ url('/klien/permintaan-penawaran') }}" href="{{ url('/klien/permintaan-penawaran') }}">Lihat prototipe permintaan penawaran</a>
+                        <p class="hint">Pilih tanggal yang sesuai, lalu tambahkan item atau venue ini ke acara Anda.</p>
+                        <a class="btn mt-12" id="kal-quote-link" href="{{ url('/klien/acara') }}">Lihat acara saya</a>
                     </div>
                 </section>
             </aside>

@@ -2,7 +2,10 @@
 
 use App\Http\Controllers\Admin\ActivityLogController as AdminActivityLogController;
 use App\Http\Controllers\Admin\CatalogController as AdminCatalogController;
+use App\Http\Controllers\Admin\CompanyBankAccountController as AdminCompanyBankAccountController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\OrderReviewController as AdminOrderReviewController;
+use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\PriceChangeController as AdminPriceChangeController;
 use App\Http\Controllers\Admin\ProviderVerificationController;
 use App\Http\Controllers\Admin\VenueController as AdminVenueController;
@@ -13,18 +16,18 @@ use App\Http\Controllers\Klien\CalendarController as KlienCalendarController;
 use App\Http\Controllers\Klien\CatalogController as KlienCatalogController;
 use App\Http\Controllers\Klien\DashboardController as KlienDashboardController;
 use App\Http\Controllers\Klien\EventController as KlienEventController;
-use App\Http\Controllers\Klien\QuoteRequestController as KlienQuoteRequestController;
+use App\Http\Controllers\Klien\InvoiceController as KlienInvoiceController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Vendor\AvailabilityController as VendorAvailabilityController;
 use App\Http\Controllers\Vendor\CatalogItemController;
 use App\Http\Controllers\Vendor\DashboardController as VendorDashboardController;
+use App\Http\Controllers\Vendor\OrderController as VendorOrderController;
 use App\Http\Controllers\Vendor\PriceChangeController as VendorPriceChangeController;
-use App\Http\Controllers\Vendor\QuoteRequestController as VendorQuoteRequestController;
 use App\Http\Controllers\Venue\AvailabilityController as VenueAvailabilityController;
 use App\Http\Controllers\Venue\DashboardController as VenueDashboardController;
+use App\Http\Controllers\Venue\OrderController as VenueOrderController;
 use App\Http\Controllers\Venue\PriceChangeController as VenuePriceChangeController;
-use App\Http\Controllers\Venue\QuoteRequestController as VenueQuoteRequestController;
 use App\Http\Controllers\Venue\VenueController;
 use App\Http\Controllers\Venue\VenueRoomController;
 use App\Http\Controllers\VerificationController;
@@ -110,21 +113,30 @@ Route::prefix('klien')->name('klien.')->middleware(['auth', 'role:klien'])->grou
     // BE-3b: kalender ketersediaan read-only (sebelum catch-all).
     Route::get('/kalender-ketersediaan', [KlienCalendarController::class, 'index'])->name('kalender');
 
-    // Wiring read-only: daftar acara nyata milik akun login (sebelum catch-all).
-    // Halaman detail/pesanan/tagihan acara masih prototipe BE-4–BE-7.
+    // Wiring acara Klien: buat konsep draft, pemesanan, dan pengajuan acara
     Route::get('/acara', [KlienEventController::class, 'index'])->name('acara');
     Route::get('/riwayat', [KlienEventController::class, 'riwayat'])->name('riwayat');
+    Route::get('/acara-baru', [KlienEventController::class, 'create'])->name('acara.baru');
+    Route::post('/acara', [KlienEventController::class, 'store'])->name('acara.store');
+    Route::get('/acara/{event}/edit', [KlienEventController::class, 'edit'])->name('acara.edit');
+    Route::put('/acara/{event}', [KlienEventController::class, 'update'])->name('acara.update');
+    Route::delete('/acara/{event}', [KlienEventController::class, 'destroy'])->name('acara.destroy');
+    Route::post('/acara/{event}/pesanan', [KlienEventController::class, 'addItem'])->name('acara.pesanan.store');
+    Route::delete('/acara/{event}/pesanan/{orderItem}', [KlienEventController::class, 'removeItem'])->name('acara.pesanan.destroy');
+    Route::post('/acara/{event}/ajukan', [KlienEventController::class, 'submit'])->name('acara.ajukan');
 
-    // Wiring read-only: halaman status per acara + detail satu acara nyata
-    // milik akun login, dan permintaan penawaran (quote_requests) milik
-    // sendiri. Alur tulis (buat acara, ajukan/putus penawaran) BE-4/BE-5.
+    // Halaman status per acara + detail satu acara nyata milik akun login.
     Route::get('/acara-detail/{event}', [KlienEventController::class, 'show'])->name('acara.detail');
     Route::get('/acara-draft', [KlienEventController::class, 'draft'])->name('acara.draft');
     Route::get('/acara-diajukan', [KlienEventController::class, 'diajukan'])->name('acara.diajukan');
     Route::get('/acara-terkonfirmasi', [KlienEventController::class, 'terkonfirmasi'])->name('acara.terkonfirmasi');
     Route::get('/acara-dibatalkan', [KlienEventController::class, 'dibatalkan'])->name('acara.dibatalkan');
-    Route::get('/permintaan-penawaran', [KlienQuoteRequestController::class, 'index'])->name('penawaran');
-    Route::get('/permintaan-penawaran-detail/{quoteRequest}', [KlienQuoteRequestController::class, 'show'])->name('penawaran.detail');
+
+    // FASE 5: Tagihan klien, bayar / upload bukti transfer, dan cetak HTML (print-friendly)
+    Route::get('/tagihan/{invoice}', [KlienInvoiceController::class, 'show'])->name('tagihan.show');
+    Route::post('/tagihan/{invoice}/bayar', [KlienInvoiceController::class, 'pay'])->name('tagihan.pay');
+    Route::get('/tagihan/{invoice}/cetak', [KlienInvoiceController::class, 'print'])->name('tagihan.print');
+    Route::get('/tagihan/{invoice}/nota', [KlienInvoiceController::class, 'receipt'])->name('tagihan.receipt');
 
     Route::get('/{page}', function ($page) {
         $view = 'klien.'.$page;
@@ -163,10 +175,11 @@ Route::prefix('vendor')->name('vendor.')->middleware(['auth', 'role:vendor'])->g
     Route::get('/pengajuan-harga', [VendorPriceChangeController::class, 'index'])->name('pengajuan-harga');
     Route::post('/pengajuan-harga', [VendorPriceChangeController::class, 'store'])->name('pengajuan-harga.store');
 
-    // Wiring read-only: permintaan penawaran masuk atas item katalog milik
-    // vendor login (sebelum catch-all). Alur tulis usulan harga BE-4.
-    Route::get('/permintaan-penawaran', [VendorQuoteRequestController::class, 'index'])->name('penawaran');
-    Route::get('/permintaan-penawaran-detail/{quoteRequest}', [VendorQuoteRequestController::class, 'show'])->name('penawaran.detail');
+    // FASE 4: pesanan vendor (read-only) + ajukan keberatan (sebelum catch-all).
+    Route::get('/pesanan', [VendorOrderController::class, 'index'])->name('pesanan');
+    Route::get('/pesanan/{orderItem}', [VendorOrderController::class, 'show'])->name('pesanan.show');
+    Route::get('/pesanan-detail/{orderItem}', [VendorOrderController::class, 'show'])->name('pesanan.detail');
+    Route::post('/pesanan/{orderItem}/keberatan', [VendorOrderController::class, 'storeObjection'])->name('pesanan.keberatan.store');
 
     Route::get('/{page}', function ($page) {
         $view = 'vendor.'.$page;
@@ -204,10 +217,11 @@ Route::prefix('venue')->name('venue.')->middleware(['auth', 'role:venue'])->grou
     Route::get('/pengajuan-harga', [VenuePriceChangeController::class, 'index'])->name('pengajuan-harga');
     Route::post('/pengajuan-harga', [VenuePriceChangeController::class, 'store'])->name('pengajuan-harga.store');
 
-    // Wiring read-only: permintaan penawaran masuk atas ruangan venue milik
-    // login (sebelum catch-all). Alur tulis usulan harga BE-4.
-    Route::get('/permintaan-penawaran', [VenueQuoteRequestController::class, 'index'])->name('penawaran');
-    Route::get('/permintaan-penawaran-detail/{quoteRequest}', [VenueQuoteRequestController::class, 'show'])->name('penawaran.detail');
+    // FASE 4: pesanan venue (read-only) + ajukan keberatan (sebelum catch-all).
+    Route::get('/pesanan', [VenueOrderController::class, 'index'])->name('pesanan');
+    Route::get('/pesanan/{orderItem}', [VenueOrderController::class, 'show'])->name('pesanan.show');
+    Route::get('/pesanan-detail/{orderItem}', [VenueOrderController::class, 'show'])->name('pesanan.detail');
+    Route::post('/pesanan/{orderItem}/keberatan', [VenueOrderController::class, 'storeObjection'])->name('pesanan.keberatan.store');
 
     Route::get('/{page}', function ($page) {
         $view = 'venue.'.$page;
@@ -251,6 +265,33 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // penyedia, harga lewat pengajuan harga, venue lewat formulir venue.
     Route::get('/katalog', [AdminCatalogController::class, 'index'])->name('katalog');
     Route::get('/katalog-detail/{item}', [AdminCatalogController::class, 'show'])->name('katalog.detail');
+
+    // FASE 4: Review pesanan Admin, keputusan keberatan, dan buat ulang tagihan (sebelum catch-all).
+    Route::get('/pesanan', [AdminOrderReviewController::class, 'index'])->name('pesanan');
+    Route::get('/pesanan/{orderItem}', [AdminOrderReviewController::class, 'show'])->name('pesanan.show');
+    Route::get('/pesanan-detail/{orderItem}', [AdminOrderReviewController::class, 'show'])->name('pesanan.detail');
+    Route::get('/admin-pesanan-venue', [AdminOrderReviewController::class, 'index'])->name('pesanan.venue');
+    Route::post('/pesanan/{orderItem}/setujui', [AdminOrderReviewController::class, 'approve'])->name('pesanan.approve');
+    Route::post('/pesanan/{orderItem}/tolak', [AdminOrderReviewController::class, 'reject'])->name('pesanan.reject');
+    Route::post('/pesanan/{orderItem}/alihkan', [AdminOrderReviewController::class, 'reassign'])->name('pesanan.reassign');
+    Route::post('/keberatan/{objection}/putuskan', [AdminOrderReviewController::class, 'decideObjection'])->name('keberatan.decide');
+    Route::post('/tagihan/{invoice}/buat-ulang', [AdminOrderReviewController::class, 'reissueInvoice'])->name('tagihan.reissue');
+
+    // FASE 5: Validasi pembayaran oleh Admin dan cetak dokumen
+    Route::get('/pembayaran', [AdminPaymentController::class, 'index'])->name('pembayaran.index');
+    Route::get('/pembayaran/{invoice}', [AdminPaymentController::class, 'show'])->name('pembayaran.show');
+    Route::post('/pembayaran/{payment}/validasi', [AdminPaymentController::class, 'validatePayment'])->name('pembayaran.validate');
+    Route::get('/tagihan/{invoice}/cetak', [AdminPaymentController::class, 'print'])->name('tagihan.print');
+    Route::get('/tagihan/{invoice}/nota', [AdminPaymentController::class, 'receipt'])->name('tagihan.receipt');
+
+    // FASE 5: CRUD rekening perusahaan
+    Route::get('/rekening', [AdminCompanyBankAccountController::class, 'index'])->name('rekening.index');
+    Route::get('/rekening-form', [AdminCompanyBankAccountController::class, 'create'])->name('rekening.create');
+    Route::post('/rekening', [AdminCompanyBankAccountController::class, 'store'])->name('rekening.store');
+    Route::get('/rekening/{rekening}/edit', [AdminCompanyBankAccountController::class, 'edit'])->name('rekening.edit');
+    Route::put('/rekening/{rekening}', [AdminCompanyBankAccountController::class, 'update'])->name('rekening.update');
+    Route::match(['post', 'patch'], '/rekening/{rekening}/toggle', [AdminCompanyBankAccountController::class, 'toggle'])->name('rekening.toggle');
+    Route::delete('/rekening/{rekening}', [AdminCompanyBankAccountController::class, 'destroy'])->name('rekening.destroy');
 
     Route::get('/{page}', function ($page) {
         $view = 'admin.'.$page;

@@ -48,16 +48,6 @@ class CatalogItemFactory extends Factory
     }
 
     /**
-     * Harga perlu penawaran, bukan harga tetap.
-     */
-    public function perluPenawaran(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'pricing_mode' => PricingMode::PerluPenawaran,
-        ]);
-    }
-
-    /**
      * Item menunggu persetujuan Admin.
      */
     public function menungguPersetujuan(): static

@@ -3,16 +3,19 @@
 namespace App\Enums;
 
 /**
- * Status item pesanan (BACKEND_BUSINESS_RULES bagian C):
- * menunggu_admin -> disetujui atau ditolak; jika disetujui,
- * masa_keberatan -> mengikat. Masa keberatan (B7) belum dihitung pada
- * BE-2; kolom objection_deadline hanya tersedia nullable.
+ * Status item pesanan sesuai dokumen rancangan EMS:
+ * menunggu_review -> disetujui -> terkonfirmasi -> selesai;
+ * cabang: ditolak, dialihkan, dibatalkan.
+ * Masa keberatan dihitung dari approved_at + objection_window_hours, bukan status.
  */
 enum OrderItemStatus: string
 {
-    case MenungguAdmin = 'menunggu_admin';
+    case Draft = 'draft';
+    case MenungguReview = 'menunggu_review';
     case Disetujui = 'disetujui';
+    case Terkonfirmasi = 'terkonfirmasi';
+    case Selesai = 'selesai';
     case Ditolak = 'ditolak';
-    case MasaKeberatan = 'masa_keberatan';
-    case Mengikat = 'mengikat';
+    case Dialihkan = 'dialihkan';
+    case Dibatalkan = 'dibatalkan';
 }

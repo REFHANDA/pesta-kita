@@ -8,7 +8,7 @@ Sumber: `docs/AI_AGENT_CONTEXT.md` bagian 4, roadmap Tahap 6, dan teks yang suda
 2. Klien membayar satu tagihan gabungan untuk satu acara.
 3. Pembayaran MVP adalah transfer manual ke rekening perusahaan. Tidak ada payment gateway sampai pengguna menyetujui.
 4. Komisi 10% ditambahkan pada tagihan Klien. Komisi tidak dipotong dari hak Vendor atau Pemilik Venue.
-5. Tiga nominal wajib terpisah: harga katalog, harga usulan penyedia, harga final yang disahkan Admin. Frontend tidak menetapkan harga final.
+5. Harga penyedia adalah harga aktif yang disetujui Admin, dikunci saat pesanan disetujui. Tidak ada alur request quote/usulan penawaran harga.
 6. Pencairan hak penyedia dilakukan Admin setelah acara selesai.
 7. Kontak pribadi penyedia (telepon, email usaha, penanggung jawab, rekening utuh) tidak ditampilkan ke Klien.
 8. Ulasan hanya setelah acara selesai dan transaksi memenuhi syarat. Penyedia melihat agregat, tanpa identitas Klien. Penilaian untuk Pesta Kita dan umpan balik aplikasi bersifat internal.
@@ -19,80 +19,76 @@ Sumber: `docs/AI_AGENT_CONTEXT.md` bagian 4, roadmap Tahap 6, dan teks yang suda
 13. Akun Admin tidak dibuat dari formulir daftar publik. UI daftar hanya menawarkan Klien, Vendor, dan Pemilik Venue.
 14. Satu akun pada UI daftar memilih tepat satu peran.
 
-## B. Keputusan yang masih terbuka
+## B. Keputusan Bisnis (Disinkronkan dengan Dokumen Rancangan EMS)
 
-Jangan mengisi migration dengan angka atau status di bawah ini sebelum ada jawaban.
+Seluruh keputusan di bawah ini telah diputuskan sesuai Dokumen Perancangan EMS Kelompok 3 (rancangan resmi):
 
-| No  | Topik                  | Bukti di UI                                                                         | Yang perlu diputuskan                                                                                                                                                                                                                                              |
-| --- | ---------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| B1  | Kebijakan refund       | Daftar admin masih memakai contoh 70%. Detail menolak perhitungan lokal.            | Persentase, batas hari sebelum acara, kompensasi penyedia, dan siapa yang boleh menolak.                                                                                                                                                                           |
-| B2  | Kode unik              | Roadmap menyebut tiga digit. Contoh tagihan menampilkan total berakhiran 427.       | Panjang kode, keunikan per tagihan terbuka, dan apakah kode masuk ke total transfer.                                                                                                                                                                               |
-| B3  | Dasar komisi           | Baris venue, katering, dan sound punya kolom biaya layanan. Baris kebersihan tidak. | Komisi 10% hanya dari harga final penyedia, bukan dari kebersihan, deposit, atau kode unik. Usulan ini masih asumsi sampai disetujui.                                                                                                                              |
-| B4  | Biaya kebersihan       | Form venue: biaya kebersihan hanya diubah Admin.                                    | **DISETUJUI (2026-11-16):** opsional, dicatat terpisah dari harga sewa, boleh kosong/tidak dikenakan; snapshot transaksi menyusul di BE-6. Lihat bagian E.                                                                                                         |
-| B5  | Deposit venue          | Form venue punya field deposit. Tagihan contoh tidak memuat deposit.                | Deposit masuk MVP atau ditunda.                                                                                                                                                                                                                                    |
-| B6  | Jumlah venue per acara | Tagihan contoh memuat satu venue dan beberapa item vendor.                          | Satu venue aktif per acara, atau lebih dari satu.                                                                                                                                                                                                                  |
-| B7  | Masa keberatan         | README dan dashboard vendor menyebut 24 jam.                                        | Apakah 24 jam dihitung sejak persetujuan Admin, dan apakah tagihan baru terbit setelah masa itu selesai untuk semua item. Teks `klien/acara-diajukan` sudah mengarah ke aturan itu.                                                                                |
-| B8  | Versi tagihan          | Admin dapat “buat ulang tagihan”; setelah lunas terkunci.                           | Kapan versi baru boleh terbit, dan apa yang terjadi pada bukti pembayaran versi lama.                                                                                                                                                                              |
-| B9  | Batas bayar            | Contoh menampilkan tanggal dan jam 23.59 WIB.                                       | Rumus jatuh tempo relatif terhadap tanggal acara.                                                                                                                                                                                                                  |
-| B10 | Status kedaluwarsa     | Roadmap pembayaran menyebut kedaluwarsa jika didukung.                              | Apakah tagihan yang lewat jatuh tempo membatalkan pesanan atau hanya menolak pembayaran baru.                                                                                                                                                                      |
-| B11 | Kalender dipesan       | Tahap 5.6 menunda status booked dan diblokir.                                       | Penyedia boleh menandai tidak tersedia. Status dipesan hanya berasal dari pesanan terkonfirmasi. Perlu konfirmasi.                                                                                                                                                 |
-| B12 | Unggah media           | Profil menandai JPG/PNG 5 MB sebagai konfigurasi contoh.                            | **DISETUJUI (2026-11-16, Gate 4B):** foto JPG/JPEG/PNG/WebP maks 5 MB, maks 10 per subjek; dokumen verifikasi PDF/JPG/JPEG/PNG maks 5 MB; disk `private` dengan `serve=false`; foto menjadi publik hanya setelah penyedia terverifikasi. Lihat bagian E.           |
-| B13 | Bukti bayar            | Roadmap: format dan batas ukuran harus tampil.                                      | Tipe (JPG, PNG, PDF), ukuran maksimum, dan masa simpan.                                                                                                                                                                                                            |
-| B14 | Verifikasi mitra       | UI: ubah data rekening butuh verifikasi ulang.                                      | **DISETUJUI (2026-11-16, Gate 4B):** Vendor wajib KTP (NIB/NPWP opsional); Venue wajib KTP + bukti venue (NPWP opsional); bukti rekening bukan persyaratan; katalog/venue tayang hanya setelah profil terverifikasi; satu dokumen aktif per jenis. Lihat bagian E. |
-| B15 | Peralatan              | Ada katalog dan form peralatan terpisah dari layanan.                               | **DISETUJUI (2026-11-16):** satu struktur katalog dengan atribut `kind`/`type`; tanpa entitas/tabel peralatan terpisah. Lihat bagian E.                                                                                                                            |
-| B16 | Denah                  | Form venue dan roadmap Tahap 7 menyebut layout.                                     | MVP cukup unggah dokumen, atau editor visual ditunda.                                                                                                                                                                                                              |
-| B17 | Rekomendasi paket      | `klien/rekomendasi` masih prototipe.                                                | Masuk MVP backend atau tetap di luar sampai ada aturan pencocokan budget.                                                                                                                                                                                          |
-| B18 | Lingkungan demo        | Demo bar dan tes portal mengizinkan akses tanpa login.                              | **DISETUJUI (2026-11-16):** demo bar hanya local/demo dan bukan bypass auth; tes portal diperbarui setelah auth hidup, memakai akun dan role sesuai. Lihat bagian E.                                                                                               |
+| No  | Topik                  | Status Keputusan | Ringkasan Ketetapan Rancangan |
+| --- | ---------------------- | ---------------- | ----------------------------- |
+| B1  | Kebijakan refund       | **DIPUTUSKAN**   | Persentase refund dari grand total berdasarkan sisa hari: ≥30 hari (90%), 14–29 hari (70%), 7–13 hari (50%), 3–6 hari (25%), <3 hari (0%). Refund klien = grand total × p + kode unik dikembalikan penuh. Kompensasi penyedia = harga penyedia × (1 − p). Pendapatan perusahaan = (komisi + kebersihan) × (1 − p). Force majeure/kesalahan vendor: p = 100%, kompensasi 0. Snapshot disimpan di record pembatalan. |
+| B2  | Kode unik              | **DIPUTUSKAN**   | 3 digit acak (001–999), unik di antara tagihan belum dibayar / menunggu validasi. Bukan pendapatan dan tidak masuk dasar komisi. Total transfer = grand total + kode unik. Dapat dinonaktifkan via settings. |
+| B3  | Dasar komisi           | **DIPUTUSKAN**   | Komisi platform 10% dihitung dari total baris pesanan (`lineTotal` = `provider_price` × `quantity`, di mana `provider_price` adalah harga satuan), dibulatkan ke rupiah terdekat (half-up: `round((lineTotal * commissionPercent) / 100, 0, PHP_ROUND_HALF_UP)`), ditambahkan ke tagihan klien (tidak dipotong dari hak penyedia). Biaya kebersihan dan kode unik tidak dikenakan komisi. |
+| B4  | Biaya kebersihan       | **DIPUTUSKAN**   | Nominal tetap per venue (`venues.cleaning_fee`), hanya diubah Admin. Satu baris per acara untuk venue terpilih; jika null/0 = tidak dikenakan. |
+| B5  | Deposit venue          | **DIPUTUSKAN**   | Tidak ada deposit; hanya harga sewa venue + biaya kebersihan opsional. |
+| B6  | Jumlah venue per acara | **DIPUTUSKAN**   | Maksimal satu venue per acara; satu venue satu tanggal satu pesanan penahan (`hold_key`). |
+| B7  | Masa keberatan         | **DIPUTUSKAN**   | Masa keberatan penyedia adalah 24 jam setelah pesanan disetujui Admin. Keberatan wajib kategori + alasan dan diputuskan Admin. Masa keberatan bukan status pesanan terpisah, melainkan window waktu (`approved_at + objection_window_hours`). |
+| B8  | Versi tagihan          | **DIPUTUSKAN**   | Tagihan belum dibayar dapat dibuat ulang sebagai versi baru (versi lama dibatalkan). Setelah lunas, isi tagihan terkunci permanen. |
+| B9  | Batas bayar            | **DIPUTUSKAN**   | Batas bayar adalah 48 jam sejak tagihan terbit otomatis (`settings.payment_deadline_hours`). |
+| B10 | Status kedaluwarsa     | **DIPUTUSKAN**   | Tagihan belum dibayar lewat 48 jam menjadi `kedaluwarsa` (job tiap jam), pesanan dibatalkan, slot tanggal venue dan stok dilepas. |
+| B11 | Kalender dipesan       | **DIPUTUSKAN**   | Status menahan slot/tanggal berlaku untuk pesanan berstatus `menunggu_review`, `disetujui`, dan `terkonfirmasi`. |
+| B12 | Unggah media           | **DIPUTUSKAN**   | Foto: JPG/PNG/WebP maks 5 MB. Dokumen: PDF/JPG/PNG maks 5 MB. Bukti transfer: JPG/PNG/PDF maks 5 MB di disk `private`. |
+| B13 | Bukti bayar            | **DIPUTUSKAN**   | Format JPG/PNG/PDF maks 5 MB disk `private` via `Media`. Verifikasi Admin mencocokkan jumlah transfer persis. |
+| B14 | Verifikasi mitra       | **DIPUTUSKAN**   | Vendor wajib KTP; Venue wajib KTP + bukti venue; katalog tayang hanya setelah terverifikasi. |
+| B15 | Peralatan              | **DIPUTUSKAN**   | Satu entitas `catalog_items` dengan kolom `kind` (`layanan`/`peralatan`). |
+| B16 | Denah / Layout         | **DIPUTUSKAN**   | Minimal catatan/unggah media layout ruangan venue (tanpa editor visual interaktif). |
+| B17 | Rekomendasi paket      | **DIPUTUSKAN**   | Alokasi budget bawaan (Venue 35%, Catering 30%, Dekorasi 15%, Hiburan 10%, Peralatan 5%, Cadangan 5%), keluaran 3 paket: Hemat, Seimbang, Premium. |
+| B18 | Lingkungan demo        | **DIPUTUSKAN**   | Demo bar hanya aktif pada environment `local`/`demo`. |
 
-## C. Usulan alur status (rancangan, belum diterapkan)
+## C. Alur Status Sistem
 
-### Acara
+### Acara (`events`)
 
-`draft` → `diajukan` → `menunggu_pembayaran` → `terkonfirmasi` → `selesai` → `dinilai`
+`draft` → `diajukan` → `menunggu_pembayaran` → `terkonfirmasi` → `selesai` → `dievaluasi`
+Cabang: `dibatalkan` (sebelum lunas otomatis, setelah lunas via pengajuan pembatalan).
 
-Cabang: `dibatalkan` dari status yang kebijakannya mengizinkan. Halaman Klien yang sudah ada: draft, diajukan, menunggu pembayaran, terkonfirmasi, dibatalkan, riwayat, dan evaluasi.
+### Item pesanan (`order_items`)
 
-### Item pesanan
+`menunggu_review` → `disetujui` → `terkonfirmasi` → `selesai`
+Cabang: `ditolak`, `dialihkan`, `dibatalkan`. (Catatan: `masa_keberatan` bukan status, melainkan window waktu 24 jam setelah `disetujui`).
 
-`menunggu_admin` → `disetujui` atau `ditolak` → jika disetujui, `masa_keberatan` → `mengikat`.
+### Tagihan (`invoices`)
 
-Penolakan satu item tidak otomatis membatalkan acara. UI `acara-diajukan` menampilkan item ditolak dan meminta keputusan Klien.
+`belum_dibayar` → `menunggu_validasi` → `lunas`
+Cabang: `kedaluwarsa`, `dibatalkan`.
 
-### Permintaan penawaran
+### Pembayaran (`payments`)
 
-`diajukan` → `diusulkan_penyedia` → `disetujui_admin` atau `ditolak_admin`.
+`menunggu_validasi` → `valid` atau `ditolak` (klien unggah ulang).
 
-Harga katalog tetap tersimpan sebagai snapshot. Harga usulan tidak menjadi harga final sebelum keputusan Admin.
+### Keberatan (`order_objections`)
 
-### Tagihan dan pembayaran
+`diajukan` → `ditinjau` → `diterima` atau `ditolak`.
 
-`menunggu_pembayaran` → `bukti_diunggah` → `menunggu_verifikasi` → `lunas` atau `bukti_ditolak`.
+### Pembatalan (`cancellations`)
 
-`bukti_ditolak` kembali ke unggah ulang. Status lunas hanya ditulis server setelah Admin mengesahkan jumlah yang cocok, termasuk kode unik.
+`diajukan` → `ditinjau` → `disetujui` → `refund_diproses` → `refund_selesai` (atau `ditolak`).
 
-### Refund
+### Pencairan (`disbursements`)
 
-`diajukan` → `ditinjau` → `disetujui` atau `ditolak` → `diproses` → `selesai`.
+`belum_cair` → `cair`.
 
-Nominal disetujui diisi server dari snapshot kebijakan, bukan dari input Admin yang bebas tanpa jejak. Jika B1 belum dijawab, field nominal tetap kosong dan aksi final ditahan.
-
-### Pencairan
-
-`menunggu_acara_selesai` → `menunggu_admin` → `diproses` → `berhasil` atau `gagal`.
-
-Jenis yang terlihat di UI: hak atas pesanan, dan kompensasi pembatalan. Hak pesanan sama dengan harga final penyedia, tanpa potongan komisi.
-
-### Pengajuan harga katalog
+### Pengajuan harga katalog (`price_change_requests`)
 
 `menunggu` → `disetujui` atau `ditolak`. Harga aktif berubah hanya saat disetujui.
 
 ### Verifikasi penyedia
 
-`menunggu` → `terverifikasi` atau `ditolak`, plus `nonaktif` yang menyembunyikan katalog tanpa menghapus riwayat.
+`menunggu` → `terverifikasi` atau `ditolak`, plus `nonaktif`.
 
 ## D. Konsistensi uang
 
 - Simpan rupiah sebagai bilangan bulat. Jangan memakai float.
+- Konvensi harga dan kuantitas pesanan: `order_items.provider_price` adalah harga satuan (unit price). Total baris hak penyedia adalah `lineTotal() = provider_price × quantity` (kuantitas default minimal 1). Komisi platform dihitung dari total baris menggunakan pembulatan half-up (`round((lineTotal * commissionPercent) / 100, 0, PHP_ROUND_HALF_UP)`). Pada tagihan (`invoice_items`), baris bertipe `harga_penyedia` mencatat nominal `lineTotal()`, dan untuk item peralatan dengan kuantitas > 1 dicantumkan format deskripsi "Nama item x{qty}".
 - Setiap tagihan menyimpan snapshot baris: harga final penyedia, komisi, kebersihan, biaya lain, kode unik, total.
 - Perubahan status finansial terjadi di dalam transaksi database, dengan kunci baris tagihan, dan penolakan jika status saat ini tidak mengizinkan aksi.
 - Satu tagihan aktif per acara. Versi lama tetap tersimpan dan tidak menerima pembayaran baru.

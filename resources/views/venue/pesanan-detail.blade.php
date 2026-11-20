@@ -1,26 +1,243 @@
 @extends('layouts.venue')
 
-@section('title', 'Detail pesanan venue · Panel Pemilik Venue Pesta Kita')
+@section('title', 'Detail Pesanan Venue · Panel Pemilik Venue Pesta Kita')
 
 @section('content')
+@php
+    $orderItem = $orderItem ?? null;
+    $event = $event ?? ($orderItem?->event ?? null);
+    $roomName = $orderItem?->subject?->name ?? ($orderItem ? 'Ruangan #'.$orderItem->id : '-');
+    $eventLabel = $orderItem ? 'Acara #'.$orderItem->event_id : '-';
+    $dateStr = $orderItem?->usage_date ? $orderItem->usage_date->format('l, d F Y') : ($event?->event_date?->format('l, d F Y') ?? '-');
+    $badgeClass = match($orderItem?->status?->value) {
+        'menunggu_review' => 'badge b-warn',
+        'disetujui', 'terkonfirmasi', 'selesai' => 'badge b-ok',
+        'ditolak', 'dibatalkan' => 'badge b-bad',
+        'dialihkan' => 'badge b-info',
+        default => 'badge',
+    };
+@endphp
+
 <main id="konten" class="content" tabindex="-1">
-<div class="page-head"><div><div class="crumbs"><a href="{{ url('/venue') }}">Beranda</a> / <a href="{{ url('/venue/pesanan') }}">Pesanan</a> / PK-0418</div><h1>Detail pesanan venue</h1><p class="sub">Rincian reservasi, kebutuhan ruangan, nilai hak penyedia, dan status operasional.</p></div></div>
+    <div class="page-head">
+        <div>
+            <div class="crumbs">
+                <a href="{{ url('/venue') }}">Beranda</a> /
+                <a href="{{ route('venue.pesanan') }}">Pesanan</a> /
+                {{ $eventLabel }}
+            </div>
+            <h1>Detail pesanan venue</h1>
+            <p class="sub">Rincian reservasi, kebutuhan ruangan, nilai hak penyedia, dan status operasional.</p>
+        </div>
+        <a class="btn btn-o" href="{{ route('venue.pesanan') }}">Kembali</a>
+    </div>
 
-<div class="order-banner"><div><span class="eyebrow">Pesanan venue · PK-0418</span><h2>Resepsi pernikahan · Acara #E-0418</h2><p>Sabtu, 21 November 2026 · Graha Melati Ballroom</p></div><div class="order-banner-side"><span class="badge b-ok">Disetujui</span><b class="amount">Rp 7.850.000</b><small class="sub">Hak penyedia (harga penuh)</small></div></div>
-<div class="grid order-layout">
- <div class="stack">
-  <section class="card"><div class="card-h"><h2>Informasi pemesanan</h2><span class="badge b-ok">Jadwal terkonfirmasi</span></div><div class="card-b"><dl class="dl"><div><dt>Nomor pesanan</dt><dd>PK-0418</dd></div><div><dt>Tanggal acara</dt><dd>Sabtu, 21 November 2026</dd></div><div><dt>Waktu acara</dt><dd>10.00–16.00 WIB</dd></div><div><dt>Waktu akses persiapan</dt><dd>07.00 WIB</dd></div><div><dt>Jumlah tamu</dt><dd>180 orang</dd></div><div><dt>Tata letak</dt><dd>Round table · 18 meja</dd></div><div><dt>Area digunakan</dt><dd>Ballroom utama + foyer</dd></div><div><dt>Durasi sewa</dt><dd>8 jam</dd></div></dl><div class="note"><b>Catatan dari Pesta Kita:</b> Klien meminta area khusus untuk keluarga inti dan jalur akses kursi roda tetap terbuka.</div></div></section>
-  <section class="card"><div class="card-h"><h2>Rincian biaya venue</h2><span class="sub">Rincian transaksi</span></div><div class="table-wrap" role="region" tabindex="0" aria-label="Rincian biaya venue. Gulir horizontal untuk melihat seluruh kolom"><table><caption class="sr-only">Tabel: Rincian biaya venue</caption><thead><tr><th scope="col">Komponen</th><th scope="col" class="num">Jumlah</th></tr></thead><tbody><tr><td>Sewa Graha Melati Ballroom</td><td class="num">Rp 7.500.000</td></tr><tr><td>Biaya kebersihan</td><td class="num">Rp 350.000</td></tr></tbody><tfoot><tr><th scope="row">Total hak penyedia</th><th scope="row" class="num">Rp 7.850.000</th></tr></tfoot></table></div><div class="card-b"><p class="hint">Pencairan dilakukan setelah acara ditandai selesai oleh Pesta Kita sesuai ketentuan kemitraan.</p></div></section>
-  <section class="card"><div class="card-h"><h2>Rundown dan kebutuhan ruangan</h2><a class="btn btn-o btn-sm" href="{{ url('/venue/rundown') }}">Lihat rundown</a></div><div class="card-b"><ul class="timeline"><li class="done"><b>07.00 · Akses venue dibuka</b><small>Persiapan dekorasi dan vendor</small></li><li class="done"><b>10.00 · Penerimaan tamu</b><small>Area foyer dan ballroom siap</small></li><li><b>12.00 · Acara utama</b><small>Layout round table, 18 meja</small></li><li><b>16.00 · Acara selesai</b><small>Persiapan pembersihan venue</small></li></ul></div></section>
-  <section class="card"><div class="card-h"><h2>Ajukan keberatan</h2></div><div class="card-b"><p class="sub">Masa keberatan sampai 11 November 2026 pukul 14.20 WIB. Keberatan menjadi catatan untuk Admin dan tidak mengubah status pesanan sampai diputuskan.</p><form class="form-grid" onsubmit="return false"><div class="field"><label for="kategori">Kategori keberatan</label><select class="input" id="kategori"><option>Jadwal bentrok</option><option>Kapasitas / tata letak</option><option>Kondisi fasilitas</option><option>Ketentuan penggunaan venue</option><option>Lainnya</option></select></div><div class="field"><label for="bukti-order">Bukti pendukung (opsional)</label><input class="input" id="bukti-order" type="file"></div><div class="field full"><label for="alasan">Alasan keberatan</label><textarea class="input" id="alasan" rows="3" placeholder="Jelaskan kendala yang perlu ditinjau Admin"></textarea></div><div class="field full"><button class="btn btn-bad" type="submit" data-confirm="Kirim keberatan ke Admin?" data-text="Keberatan wajib beralasan, tidak mengubah status pesanan, dan baru berlaku setelah Admin memutuskan." data-label="Kirim keberatan" data-done="Keberatan terkirim ke Admin dan dicatat di log aktivitas." data-need="main form textarea" data-need-msg="Keterangan keberatan wajib diisi.">Kirim keberatan ke Admin</button></div></form></div></section>
- </div>
- <aside class="stack">
-  <section class="card"><div class="card-h"><h2>Status pesanan</h2></div><div class="card-b"><ul class="timeline"><li class="done"><b>Pesanan diterima</b><small>08 November 2026 · 10.12</small></li><li class="done"><b>Disetujui Pesta Kita</b><small>09 November 2026 · 15.30</small></li><li class="pending"><b>Masa keberatan</b><small>Berakhir 11 November 2026 · 14.20</small></li><li><b>Acara berlangsung</b><small>21 November 2026</small></li><li><b>Pencairan</b><small>Setelah acara dinyatakan selesai</small></li></ul></div></section>
-  <section class="card"><div class="card-h"><h2>Informasi acara</h2></div><div class="card-b"><div class="profile-mini"><span class="avatar">#</span><div><b>Acara #E-0418</b><small>Identitas klien tidak ditampilkan</small></div></div><dl class="side-dl"><div><dt>Kontak</dt><dd>Melalui Pesta Kita</dd></div><div><dt>Permintaan khusus</dt><dd>Area keluarga inti dan akses kursi roda</dd></div></dl><p class="hint">Komunikasi dan perubahan permintaan dilakukan melalui Admin Pesta Kita.</p></div></section>
-  <section class="card"><div class="card-h"><h2>Pencairan</h2></div><div class="card-b"><span class="lbl">Estimasi hak penyedia</span><div class="big-num">Rp 7.850.000</div><span class="badge b-warn">Belum dapat dicairkan</span><p class="hint">Menunggu acara selesai dan validasi Pesta Kita.</p><a class="btn btn-o block-btn" href="{{ url('/venue/pencairan') }}">Lihat pencairan</a></div></section>
-  <section class="card"><div class="card-h"><h2>Butuh bantuan?</h2></div><div class="card-b"><p class="sub">Hubungi Admin untuk perubahan jadwal atau kebutuhan teknis.</p><b>0341-555-0123</b></div></section>
- </aside>
-</div>
+    @if (session('success'))
+        <div class="alert alert-success mb-16"><span class="ic i-check" aria-hidden="true"></span><span>{{ session('success') }}</span></div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger mb-16"><span class="ic i-info" aria-hidden="true"></span><span>{{ session('error') }}</span></div>
+    @endif
+    @if ($errors->any())
+        <div class="alert alert-danger mb-16">
+            <span class="ic i-info" aria-hidden="true"></span>
+            <span>{{ $errors->first() }}</span>
+        </div>
+    @endif
 
+    @if(!$orderItem)
+        <div class="card card-b">
+            <p>Pilih pesanan dari <a href="{{ route('venue.pesanan') }}">daftar pesanan venue</a> untuk melihat detail.</p>
+        </div>
+    @else
+    <div class="order-banner">
+        <div>
+            <span class="eyebrow">Pesanan venue · {{ $eventLabel }}</span>
+            <h2>{{ $roomName }}</h2>
+            <p>{{ $dateStr }}</p>
+        </div>
+        <div class="order-banner-side">
+            <span class="{{ $badgeClass }}">{{ str_replace('_', ' ', ucfirst($orderItem->status->value)) }}</span>
+            <b class="amount">Rp {{ number_format($orderItem->lineTotal(), 0, ',', '.') }}</b>
+            <small class="sub">Hak penyedia (harga penuh)</small>
+        </div>
+    </div>
+
+    <div class="grid order-layout">
+        <div class="stack">
+            <section class="card">
+                <div class="card-h">
+                    <h2>Informasi pemesanan</h2>
+                </div>
+                <div class="card-b">
+                    @if($orderItem->status === \App\Enums\OrderItemStatus::Disetujui && $deadline)
+                        @php
+                            $diffHours = (int) now()->diffInHours($deadline, false);
+                        @endphp
+                        @if($diffHours > 0)
+                            <p class="deadline">
+                                <span class="chip">Sisa {{ $diffHours }} jam</span>
+                                Masa keberatan berakhir <time datetime="{{ $deadline->toIso8601String() }}">{{ $deadline->format('d/m/Y H:i') }} WIB</time>
+                            </p>
+                        @else
+                            <p class="deadline">
+                                <span class="chip">Masa keberatan selesai</span>
+                                Berakhir pada {{ $deadline->format('d/m/Y H:i') }} WIB
+                            </p>
+                        @endif
+                    @endif
+
+                    <dl class="dl">
+                        <div><dt>Acara</dt><dd>{{ $eventLabel }}</dd></div>
+                        <div><dt>Tanggal acara</dt><dd>{{ $dateStr }}</dd></div>
+                        <div><dt>Ruangan</dt><dd>{{ $roomName }}</dd></div>
+                        <div><dt>Jumlah tamu</dt><dd>{{ $event->guest_count }} orang</dd></div>
+                        <div><dt>Tema acara</dt><dd>{{ $event->theme ?? '-' }}</dd></div>
+                    </dl>
+
+                    @if($event->description)
+                        <div class="note mt-16">
+                            <b>Catatan dari Pesta Kita:</b> {{ $event->description }}
+                        </div>
+                    @endif
+                </div>
+            </section>
+
+            @if($latestObjection)
+                <section class="card">
+                    <div class="card-h">
+                        <h2>Riwayat keberatan Anda</h2>
+                        <span class="badge {{ $latestObjection->status->value === 'diterima' ? 'b-ok' : ($latestObjection->status->value === 'ditolak' ? 'b-bad' : 'b-warn') }}">
+                            {{ ucfirst($latestObjection->status->value) }}
+                        </span>
+                    </div>
+                    <div class="card-b">
+                        <dl class="dl">
+                            <div><dt>Kategori</dt><dd>{{ ucfirst(str_replace('_', ' ', $latestObjection->category?->value ?? 'lainnya')) }}</dd></div>
+                            <div><dt>Alasan</dt><dd>{{ $latestObjection->reason }}</dd></div>
+                            <div><dt>Waktu diajukan</dt><dd>{{ $latestObjection->created_at->format('d/m/Y H:i') }} WIB</dd></div>
+                        </dl>
+                        @if($latestObjection->decision_reason)
+                            <div class="note-box mt-16">
+                                <b>Keputusan Admin:</b> {{ $latestObjection->decision_reason }}
+                            </div>
+                        @else
+                            <p class="hint mt-8">Keberatan sedang ditinjau oleh Admin Pesta Kita. Status pesanan tetap aktif sampai ada keputusan.</p>
+                        @endif
+                    </div>
+                </section>
+            @endif
+
+            @if($canFileObjection && (!$latestObjection || in_array($latestObjection->status->value, ['ditolak'])))
+                <section class="card">
+                    <div class="card-h">
+                        <h2>Ajukan keberatan</h2>
+                    </div>
+                    <div class="card-b">
+                        @if($isEmergency)
+                            <p class="sub mb-16 text-danger"><b>Keberatan darurat:</b> Wajib melampirkan bukti kendala (kerusakan fasilitas/force majeure) untuk ditinjau Admin.</p>
+                        @else
+                            <p class="sub mb-16">Masa keberatan untuk meninjau ketersediaan venue. Keberatan menjadi catatan untuk Admin dan tidak mengubah status pesanan sampai diputuskan.</p>
+                        @endif
+
+                        <form class="form-grid" method="POST" action="{{ route('venue.pesanan.keberatan.store', $orderItem) }}" enctype="multipart/form-data">
+                            @csrf
+                            <input type="hidden" name="is_emergency" value="{{ $isEmergency ? 1 : 0 }}"/>
+
+                            <div class="field">
+                                <label for="kategori">Kategori keberatan</label>
+                                <select class="input" id="kategori" name="category" required>
+                                    <option value="jadwal_bentrok">Jadwal bentrok</option>
+                                    <option value="kapasitas">Kapasitas / tata letak</option>
+                                    <option value="alat_rusak">Kondisi fasilitas / alat rusak</option>
+                                    <option value="lainnya">Lainnya</option>
+                                </select>
+                            </div>
+
+                            <div class="field">
+                                <label for="bukti-order">Bukti pendukung @if($isEmergency) <span class="text-danger">(wajib)</span> @else (opsional) @endif</label>
+                                <input class="input" id="bukti-order" name="evidence" type="file" accept=".jpg,.jpeg,.png,.pdf" @if($isEmergency) required @endif/>
+                            </div>
+
+                            <div class="field full">
+                                <label for="alasan">Alasan keberatan (wajib)</label>
+                                <textarea class="input" id="alasan" name="reason" rows="3" placeholder="Jelaskan kendala venue yang perlu ditinjau Admin…" required></textarea>
+                            </div>
+
+                            <div class="field full">
+                                <button class="btn btn-bad" type="submit" onclick="return confirm('Kirim keberatan ke Admin? Status pesanan tetap aktif sampai Admin memutuskan.');">
+                                    Kirim keberatan ke Admin
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            @endif
+        </div>
+
+        <aside class="stack">
+            <section class="card">
+                <div class="card-h"><h2>Status pesanan</h2></div>
+                <div class="card-b">
+                    <ul class="timeline">
+                        <li class="done">
+                            <b>Pesanan diajukan klien</b>
+                            <small>{{ $orderItem->created_at->format('d M Y · H:i') }}</small>
+                        </li>
+                        <li class="{{ $orderItem->approved_at ? 'done' : 'pending' }}">
+                            <b>Disetujui Pesta Kita</b>
+                            <small>{{ $orderItem->approved_at ? $orderItem->approved_at->format('d M Y · H:i') : 'Menunggu review Admin' }}</small>
+                        </li>
+                        <li class="{{ $orderItem->status === \App\Enums\OrderItemStatus::Terkonfirmasi || $orderItem->status === \App\Enums\OrderItemStatus::Selesai ? 'done' : 'pending' }}">
+                            <b>Pembayaran klien &amp; Konfirmasi</b>
+                            <small>{{ $orderItem->status === \App\Enums\OrderItemStatus::Terkonfirmasi ? 'Terkonfirmasi lunas' : 'Menunggu pembayaran' }}</small>
+                        </li>
+                        <li class="{{ $orderItem->status === \App\Enums\OrderItemStatus::Selesai ? 'done' : '' }}">
+                            <b>Acara berlangsung</b>
+                            <small>{{ $dateStr }}</small>
+                        </li>
+                        <li>
+                            <b>Pencairan hak venue</b>
+                            <small>Setelah acara dinyatakan selesai oleh Admin</small>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-h"><h2>Informasi acara</h2></div>
+                <div class="card-b">
+                    <div class="profile-mini">
+                        <span class="avatar">#</span>
+                        <div>
+                            <b>{{ $eventLabel }}</b>
+                            <small>Identitas klien dirahasiakan</small>
+                        </div>
+                    </div>
+                    <dl class="side-dl mt-16">
+                        <div><dt>Kontak</dt><dd>Melalui Pesta Kita</dd></div>
+                    </dl>
+                    <p class="hint">Komunikasi dan koordinasi dilakukan melalui Admin Pesta Kita.</p>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-h"><h2>Pencairan</h2></div>
+                <div class="card-b">
+                    <span class="lbl">Hak penyedia venue (harga sewa)</span>
+                    <div class="big-num">Rp {{ number_format($orderItem->lineTotal(), 0, ',', '.') }}</div>
+                    <p class="hint">Dicairkan setelah acara selesai dan divalidasi oleh Admin Pesta Kita.</p>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-h"><h2>Butuh bantuan?</h2></div>
+                <div class="card-b">
+                    <p class="sub">Hubungi Admin untuk perubahan jadwal atau kebutuhan teknis.</p>
+                </div>
+            </section>
+        </aside>
+    </div>
+    @endif
 </main>
 @endsection

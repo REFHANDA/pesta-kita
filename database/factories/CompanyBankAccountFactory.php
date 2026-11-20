@@ -22,6 +22,7 @@ class CompanyBankAccountFactory extends Factory
             'account_number' => fake()->numerify('##########'),
             'account_name' => 'PT Pesta Kita',
             'is_active' => true,
+            'sort_order' => fake()->numberBetween(0, 10),
         ];
     }
 

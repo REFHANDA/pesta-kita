@@ -3,12 +3,14 @@
 namespace Tests\Feature\Database;
 
 use App\Enums\CatalogKind;
+use App\Enums\DisbursementType;
 use App\Models\AvailabilityDay;
 use App\Models\CatalogItem;
+use App\Models\Disbursement;
+use App\Models\Evaluation;
+use App\Models\Event;
+use App\Models\Invoice;
 use App\Models\OrderItem;
-use App\Models\QuoteDecision;
-use App\Models\QuoteProposal;
-use App\Models\QuoteRequest;
 use App\Models\User;
 use App\Models\VendorProfile;
 use App\Models\Venue;
@@ -53,18 +55,6 @@ class SchemaIntegrityTest extends TestCase
     {
         $this->expectException(QueryException::class);
         OrderItem::factory()->create(['event_id' => 999_999]);
-    }
-
-    public function test_quote_proposal_rejects_orphan_quote_request(): void
-    {
-        $this->expectException(QueryException::class);
-        QuoteProposal::factory()->create(['quote_request_id' => 999_999]);
-    }
-
-    public function test_quote_decision_rejects_orphan_quote_request(): void
-    {
-        $this->expectException(QueryException::class);
-        QuoteDecision::factory()->create(['quote_request_id' => 999_999]);
     }
 
     // ---- 2. Unique availability (subject, date) ----
@@ -139,16 +129,6 @@ class SchemaIntegrityTest extends TestCase
 
         $this->assertSame(0, VenueRoom::where('venue_id', $venue->id)->count());
         $this->assertSame(0, VenueFacility::where('venue_id', $venue->id)->count());
-    }
-
-    public function test_deleting_quote_request_cascades_proposals(): void
-    {
-        $quote = QuoteRequest::factory()->create();
-        QuoteProposal::factory()->create(['quote_request_id' => $quote->id]);
-
-        $quote->delete();
-
-        $this->assertSame(0, QuoteProposal::where('quote_request_id', $quote->id)->count());
     }
 
     // ---- 7. cleaning_fee dan deposit_amount menerima null (B4/B5) ----
@@ -232,14 +212,79 @@ class SchemaIntegrityTest extends TestCase
         $this->assertNotNull(Venue::withTrashed()->find($venue->id));
     }
 
-    // ---- 14. Satu keputusan final per quote request ----
+    // ---- 12. Unique hold_key pada order_items untuk menahan tanggal venue ----
 
-    public function test_only_one_final_decision_per_quote_request(): void
+    public function test_order_item_hold_key_is_unique_when_not_null(): void
     {
-        $quote = QuoteRequest::factory()->create();
-        QuoteDecision::factory()->create(['quote_request_id' => $quote->id]);
+        $item1 = OrderItem::factory()->create(['hold_key' => 'venue:1:2026-12-25']);
+        $this->assertNotNull($item1->hold_key);
 
         $this->expectException(QueryException::class);
-        QuoteDecision::factory()->create(['quote_request_id' => $quote->id]);
+        OrderItem::factory()->create(['hold_key' => 'venue:1:2026-12-25']);
+    }
+
+    public function test_order_item_hold_key_allows_multiple_nulls(): void
+    {
+        $item1 = OrderItem::factory()->create(['hold_key' => null]);
+        $item2 = OrderItem::factory()->create(['hold_key' => null]);
+
+        $this->assertNull($item1->hold_key);
+        $this->assertNull($item2->hold_key);
+    }
+
+    // ---- 13. Unique disbursement per order_item dan type ----
+
+    public function test_disbursement_is_unique_per_order_item_and_type(): void
+    {
+        $orderItem = OrderItem::factory()->create();
+        Disbursement::factory()->create([
+            'order_item_id' => $orderItem->id,
+            'type' => DisbursementType::HakPesanan,
+        ]);
+
+        $this->expectException(QueryException::class);
+        Disbursement::factory()->create([
+            'order_item_id' => $orderItem->id,
+            'type' => DisbursementType::HakPesanan,
+        ]);
+    }
+
+    // ---- 14. Unique evaluation per event ----
+
+    public function test_evaluation_is_unique_per_event(): void
+    {
+        $event = Event::factory()->create();
+        Evaluation::factory()->create(['event_id' => $event->id]);
+
+        $this->expectException(QueryException::class);
+        Evaluation::factory()->create(['event_id' => $event->id]);
+    }
+
+    // ---- 15. Seluruh kolom nominal finansial baru bertipe integer ----
+
+    public function test_new_financial_columns_are_stored_as_integers(): void
+    {
+        $invoice = Invoice::factory()->create([
+            'subtotal_provider' => 10_000_000,
+            'total_commission' => 1_000_000,
+            'cleaning_fee' => 500_000,
+            'grand_total' => 11_500_000,
+            'unique_code' => 342,
+            'transfer_total' => 11_500_342,
+        ]);
+
+        $this->assertIsInt($invoice->subtotal_provider);
+        $this->assertIsInt($invoice->total_commission);
+        $this->assertIsInt($invoice->cleaning_fee);
+        $this->assertIsInt($invoice->grand_total);
+        $this->assertIsInt($invoice->unique_code);
+        $this->assertIsInt($invoice->transfer_total);
+
+        $orderItem = OrderItem::factory()->disetujui()->create();
+        $this->assertIsInt($orderItem->provider_price);
+        $this->assertIsInt($orderItem->commission);
+
+        $event = Event::factory()->create(['budget' => 50_000_000]);
+        $this->assertIsInt($event->budget);
     }
 }

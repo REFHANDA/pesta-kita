@@ -30,26 +30,52 @@ class OrderItemFactory extends Factory
             'provider_id' => VendorProfile::factory(),
             'subject_type' => 'catalog_item',
             'subject_id' => CatalogItem::factory(),
-            'quote_request_id' => null,
+            'quantity' => 1,
+            'usage_date' => null,
             'catalog_price_snapshot' => fake()->numberBetween(500_000, 25_000_000),
-            'proposed_price_snapshot' => null,
-            'final_price' => null,
-            'status' => OrderItemStatus::MenungguAdmin,
+            'provider_price' => null,
+            'commission' => 0,
+            'status' => OrderItemStatus::MenungguReview,
             'rejection_reason' => null,
-            // B7: hanya kolom nullable, tanpa logika kedaluwarsa.
+            'admin_note' => null,
+            'reviewed_by' => null,
+            'reviewed_at' => null,
+            'review_due_at' => null,
+            'approved_at' => null,
             'objection_deadline' => null,
+            'replaced_by_order_item_id' => null,
+            'hold_key' => null,
         ];
     }
 
     /**
-     * Item disetujui Admin dengan harga final terkunci.
+     * Item berstatus draft (ditambahkan ke acara draft sebelum diajukan).
+     */
+    public function draft(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => OrderItemStatus::Draft,
+            'provider_price' => null,
+            'commission' => 0,
+            'hold_key' => null,
+        ]);
+    }
+
+    /**
+     * Item disetujui Admin dengan harga penyedia terkunci dan komisi 10%.
      */
     public function disetujui(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'status' => OrderItemStatus::Disetujui,
-            'final_price' => fake()->numberBetween(500_000, 25_000_000),
-        ]);
+        return $this->state(function (array $attributes) {
+            $price = fake()->numberBetween(500_000, 25_000_000);
+
+            return [
+                'status' => OrderItemStatus::Disetujui,
+                'provider_price' => $price,
+                'commission' => (int) round($price * 0.10),
+                'approved_at' => now(),
+            ];
+        });
     }
 
     /**

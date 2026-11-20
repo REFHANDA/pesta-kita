@@ -90,26 +90,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Permintaan penawaran yang diajukan akun Klien (BE-2).
-     *
-     * @return HasMany<QuoteRequest, $this>
-     */
-    public function quoteRequests(): HasMany
-    {
-        return $this->hasMany(QuoteRequest::class, 'client_id');
-    }
-
-    /**
-     * Keputusan penawaran yang dibuat akun Admin (BE-2).
-     *
-     * @return HasMany<QuoteDecision, $this>
-     */
-    public function quoteDecisions(): HasMany
-    {
-        return $this->hasMany(QuoteDecision::class, 'admin_id');
-    }
-
-    /**
      * Pengajuan harga yang ditinjau akun Admin (BE-2).
      *
      * @return HasMany<PriceChangeRequest, $this>

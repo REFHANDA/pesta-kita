@@ -6,12 +6,12 @@ use Database\Factories\CompanyBankAccountFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * Rekening perusahaan tujuan transfer Klien. Dipilih Klien saat membayar
- * (alur pembayaran BE-6); dikelola Admin lewat admin/rekening.
+ * Rekening perusahaan tujuan transfer klien (pembayaran manual).
  */
-#[Fillable(['bank_name', 'account_number', 'account_name', 'is_active'])]
+#[Fillable(['bank_name', 'account_number', 'account_name', 'is_active', 'sort_order'])]
 class CompanyBankAccount extends Model
 {
     /** @use HasFactory<CompanyBankAccountFactory> */
@@ -26,6 +26,17 @@ class CompanyBankAccount extends Model
     {
         return [
             'is_active' => 'boolean',
+            'sort_order' => 'integer',
         ];
+    }
+
+    /**
+     * Pembayaran yang ditujukan ke rekening ini.
+     *
+     * @return HasMany<Payment, $this>
+     */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
     }
 }

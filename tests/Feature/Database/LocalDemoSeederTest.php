@@ -5,8 +5,8 @@ namespace Tests\Feature\Database;
 use App\Models\AvailabilityDay;
 use App\Models\CatalogItem;
 use App\Models\Event;
-use App\Models\QuoteProposal;
-use App\Models\QuoteRequest;
+use App\Models\OrderItem;
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\Venue;
 use App\Models\VenueFacility;
@@ -48,14 +48,7 @@ class LocalDemoSeederTest extends TestCase
         $this->assertSame(4, VenueFacility::count());
         $this->assertSame(3, AvailabilityDay::count());
         $this->assertSame(1, Event::count());
-        $this->assertSame(1, QuoteRequest::count());
-        $this->assertSame(1, QuoteProposal::count());
-
-        // Data saling terhubung: penawaran menunjuk katalog dan acara.
-        $quote = QuoteRequest::first();
-        $this->assertInstanceOf(CatalogItem::class, $quote->subject);
-        $this->assertNotNull($quote->event_id);
-        $this->assertCount(1, $quote->proposals);
+        $this->assertSame(3, OrderItem::count());
     }
 
     public function test_seeder_is_idempotent(): void
@@ -85,8 +78,8 @@ class LocalDemoSeederTest extends TestCase
             'venue_facilities' => VenueFacility::count(),
             'availability_days' => AvailabilityDay::count(),
             'events' => Event::count(),
-            'quote_requests' => QuoteRequest::count(),
-            'quote_proposals' => QuoteProposal::count(),
+            'order_items' => OrderItem::count(),
+            'settings' => Setting::count(),
         ];
     }
 }

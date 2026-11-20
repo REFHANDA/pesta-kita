@@ -24,6 +24,7 @@ class EventFactory extends Factory
             'name' => fake()->words(3, true),
             'event_date' => fake()->dateTimeBetween('+1 week', '+6 months')->format('Y-m-d'),
             'guest_count' => fake()->numberBetween(50, 500),
+            'budget' => fake()->numberBetween(20, 150) * 1_000_000,
             'theme' => fake()->word(),
             'description' => fake()->sentence(),
             'status' => EventStatus::Draft,

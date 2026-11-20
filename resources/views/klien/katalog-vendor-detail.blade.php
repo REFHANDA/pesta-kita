@@ -34,15 +34,40 @@ $fee = $item ? intdiv($item->catalog_price * 10, 100) : 0;
 </div></section>
 </div><aside class="stack">
 <section class="card"><div class="card-h"><h2>Harga</h2></div><div class="card-b">
-@if($item->pricing_mode === \App\Enums\PricingMode::PerluPenawaran)
-<span class="ptag ptag-quote">Perlu penawaran</span><p class="lead mt-12">Harga disusun berdasarkan penawaran penyedia untuk kebutuhan acara Anda, lalu disahkan Admin.</p>
-@else
 <span class="ptag ptag-fixed">Harga katalog</span><div class="price-xl mt-12">Rp {{ number_format($item->catalog_price + $fee, 0, ',', '.') }} <small>estimasi total / acara</small></div>
 <table class="break mt-12"><tr><td>Harga katalog</td><td>Rp {{ number_format($item->catalog_price, 0, ',', '.') }}</td></tr><tr><td>Biaya layanan Pesta Kita (10%)</td><td>Rp {{ number_format($fee, 0, ',', '.') }}</td></tr><tr class="t"><td>Estimasi total Klien</td><td>Rp {{ number_format($item->catalog_price + $fee, 0, ',', '.') }}</td></tr></table>
-@endif
 <p class="hint">Estimasi; harga akhir ditetapkan sistem setelah pesanan disetujui Admin.</p>
 </div></section>
-<section class="card"><div class="card-h"><h2>Tambahkan ke acara</h2></div><div class="card-b"><p class="hint">Penambahan item ke acara draft tersedia pada tahap berikutnya (BE-4/BE-5). Pesanan kelak ditinjau dan dibayar lewat Pesta Kita dalam satu tagihan gabungan, bukan langsung ke penyedia.</p></div></section>
+<section class="card"><div class="card-h"><h2>Tambahkan ke acara</h2></div><div class="card-b">
+@if(isset($draftEvents) && $draftEvents->isNotEmpty())
+<form method="POST" action="{{ route('klien.acara.pesanan.store', $draftEvents->first()) }}" id="form-tambah-acara">
+    @csrf
+    <div class="field mb-12">
+        <label for="event_select">Pilih Acara Draft</label>
+        <select class="input" id="event_select" onchange="document.getElementById('form-tambah-acara').action = '/klien/acara/' + this.value + '/pesanan';">
+            @foreach($draftEvents as $draftEvent)
+            <option value="{{ $draftEvent->id }}">{{ $draftEvent->name }} ({{ $draftEvent->event_date?->format('d/m/Y') ?? 'Belum ada tgl' }})</option>
+            @endforeach
+        </select>
+    </div>
+    <input type="hidden" name="subject_type" value="catalog_item">
+    <input type="hidden" name="subject_id" value="{{ $item->id }}">
+    @if($item->kind->value === 'peralatan')
+    <div class="field mb-12">
+        <label for="qty">Jumlah Unit</label>
+        <input class="input" id="qty" type="number" name="quantity" value="1" min="1" max="{{ $item->max_per_day ?? 999 }}">
+        @if($item->max_per_day)<p class="hint">Maksimal stok harian: {{ $item->max_per_day }} unit.</p>@endif
+    </div>
+    @else
+    <input type="hidden" name="quantity" value="1">
+    @endif
+    <button type="submit" class="btn full">Tambah ke Acara</button>
+</form>
+@else
+<p class="hint">Anda belum memiliki konsep acara berstatus draft. Buat konsep acara terlebih dahulu untuk memesan item ini.</p>
+<a class="btn btn-o full mt-8" href="{{ route('klien.acara.baru') }}">Buat Konsep Acara</a>
+@endif
+</div></section>
 <section class="card"><div class="card-h"><h2>Status penyedia</h2></div><div class="card-b"><p class="mb-8"><span class="badge b-ok">Terverifikasi</span></p><p class="hint">Status verifikasi mengikuti keputusan Admin Pesta Kita. Kontak pribadi penyedia tidak ditampilkan.</p></div></section>
 </aside></div>
 @endif

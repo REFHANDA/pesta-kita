@@ -61,8 +61,8 @@ class KlienEventListTest extends TestCase
 
         Event::factory()->create([
             'client_id' => $user->id,
-            'name' => 'Wedding Sudah Dinilai',
-            'status' => EventStatus::Dinilai,
+            'name' => 'Wedding Sudah Dievaluasi',
+            'status' => EventStatus::Dievaluasi,
         ]);
         Event::factory()->create([
             'client_id' => $user->id,
@@ -81,8 +81,8 @@ class KlienEventListTest extends TestCase
 
         $this->actingAs($user)->get('/klien/riwayat')
             ->assertOk()
-            ->assertSee('Wedding Sudah Dinilai')
-            ->assertSee('Dinilai')
+            ->assertSee('Wedding Sudah Dievaluasi')
+            ->assertSee('Dievaluasi')
             ->assertSee('Seminar Batal Dibatalkan')
             ->assertSee('Dibatalkan')
             ->assertDontSee('Undangan Masih Draft')

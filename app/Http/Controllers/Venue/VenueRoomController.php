@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Gate;
 
 /**
  * BE-3: kelola ruangan venue milik sendiri. Ruangan yang sudah dipakai
- * pesanan/penawaran tidak dapat dihapus (integritas riwayat BE-2);
+ * pesanan tidak dapat dihapus (integritas riwayat BE-2);
  * ketersediaan harian ruangan ikut dibersihkan saat ruangan dihapus.
  */
 class VenueRoomController extends Controller
@@ -43,15 +43,15 @@ class VenueRoomController extends Controller
     }
 
     /**
-     * Hapus ruangan bila belum dipakai pesanan/penawaran.
+     * Hapus ruangan bila belum dipakai pesanan.
      */
     public function destroy(Request $request, VenueRoom $room): RedirectResponse
     {
         Gate::authorize('delete', $room);
 
-        if ($room->orderItems()->exists() || $room->quoteRequests()->exists()) {
+        if ($room->orderItems()->exists()) {
             return redirect()->back()->withErrors([
-                'room' => 'Ruangan sudah digunakan dalam pesanan atau penawaran dan tidak dapat dihapus.',
+                'room' => 'Ruangan sudah digunakan dalam pesanan dan tidak dapat dihapus.',
             ]);
         }
 

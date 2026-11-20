@@ -4,7 +4,7 @@ namespace Tests\Feature\Venue;
 
 use App\Enums\VerificationStatus;
 use App\Models\AvailabilityDay;
-use App\Models\QuoteRequest;
+use App\Models\OrderItem;
 use App\Models\User;
 use App\Models\Venue;
 use App\Models\VenueFacility;
@@ -208,12 +208,17 @@ class VenueCrudTest extends TestCase
         $this->assertSame(1, $venue->rooms()->count());
     }
 
-    public function test_ruangan_terpakai_penawaran_tidak_dapat_dihapus(): void
+    public function test_ruangan_terpakai_pesanan_tidak_dapat_dihapus(): void
     {
         $owner = User::factory()->venue()->create();
         $venue = Venue::factory()->create(['venue_profile_id' => $owner->venueProfile->id]);
         $room = VenueRoom::factory()->create(['venue_id' => $venue->id]);
-        QuoteRequest::factory()->create(['subject_type' => 'venue_room', 'subject_id' => $room->id]);
+        OrderItem::factory()->create([
+            'subject_type' => 'venue_room',
+            'subject_id' => $room->id,
+            'provider_type' => 'venue_profile',
+            'provider_id' => $owner->venueProfile->id,
+        ]);
 
         $this->actingAs($owner)->delete("/venue/ruangan/{$room->id}")
             ->assertSessionHasErrors('room');

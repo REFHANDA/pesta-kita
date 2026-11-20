@@ -27,7 +27,7 @@ $photos = $photos ?? collect();
 <section class="card"><div class="card-h"><h2>Layanan dari penyedia ini</h2></div><div class="card-b">
 @if($items->isNotEmpty())
 <ul class="pkg-list">@foreach($items as $item)
-<li class="pkg"><div class="pkg-h"><h3><a href="{{ route('klien.katalog.vendor.detail', $item) }}">{{ $item->name }}</a></h3><span class="pr">@if($item->pricing_mode === \App\Enums\PricingMode::PerluPenawaran)Perlu penawaran @else Rp {{ number_format($item->catalog_price, 0, ',', '.') }} @endif</span></div><ul><li>{{ $item->category }}@if($item->description) — {{ \Illuminate\Support\Str::limit($item->description ?? '', 100) }}@endif</li></ul></li>
+<li class="pkg"><div class="pkg-h"><h3><a href="{{ route('klien.katalog.vendor.detail', $item) }}">{{ $item->name }}</a></h3><span class="pr">Rp {{ number_format($item->catalog_price, 0, ',', '.') }}</span></div><ul><li>{{ $item->category }}@if($item->description) — {{ \Illuminate\Support\Str::limit($item->description ?? '', 100) }}@endif</li></ul></li>
 @endforeach</ul>
 <p class="hint mt-12">Harga katalog belum termasuk biaya layanan Pesta Kita; rincian estimasi ada di halaman detail item.</p>
 @else

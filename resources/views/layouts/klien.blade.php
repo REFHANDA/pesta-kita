@@ -58,9 +58,6 @@
                 <a href="{{ url('/klien/pesanan') }}" @if(request()->is('klien/pesanan*') || request()->is('klien/tagihan*') || request()->is('klien/rundown*')) aria-current="page" @endif>
                     <span class="ic i-clip" aria-hidden="true"></span>Pesanan &amp; tagihan
                 </a>
-                <a href="{{ url('/klien/permintaan-penawaran') }}" @if(request()->is('klien/permintaan-penawaran*')) aria-current="page" @endif>
-                    <span class="ic i-tag" aria-hidden="true"></span>Permintaan penawaran
-                </a>
             </nav>
 
             <p class="nav-label">Akun</p>
