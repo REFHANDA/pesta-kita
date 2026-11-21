@@ -1,0 +1,223 @@
+/* Pesta Kita - Klien. Tambahan di atas admin.css + penyedia.css. */
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.ev{display:flex;flex-direction:column;padding:20px;gap:6px;text-decoration:none;color:var(--ink)}
+.ev h2{font-size:19px;font-weight:800}.ev p{margin:0;color:var(--muted);font-size:14.5px}.ev .foot{margin-top:auto;padding-top:14px;display:flex;gap:8px}
+a.ev:hover,a.cat:hover{border-color:var(--field)}
+.cat{padding:0;overflow:hidden;display:flex;flex-direction:column;text-decoration:none;color:var(--ink)}
+.cat .ph{height:120px;background:var(--brand-50);display:grid;place-items:center;color:var(--brand)}.cat .ph .ic{width:40px;height:40px}
+.cat .bd{padding:16px 20px 20px;display:flex;flex-direction:column;gap:4px;flex:1}.cat h2{font-size:18px;font-weight:800}.cat p{margin:0;color:var(--muted);font-size:14px}
+.cat .price{margin-top:auto;padding-top:10px;font:800 20px "Bricolage Grotesque",sans-serif;color:var(--brand)}.cat .price small{font:500 13px Figtree,sans-serif;color:var(--muted)}
+.steps{display:flex;list-style:none;margin:0;padding:20px;overflow-x:auto}
+.steps li{flex:1;min-width:120px;position:relative;padding-top:30px;font-size:13.5px;font-weight:600;color:var(--muted);text-align:center}
+.steps li:before{content:"";position:absolute;top:8px;left:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:#fff;border:2px solid var(--line);z-index:1}
+.steps li:after{content:"";position:absolute;top:14px;left:-50%;width:100%;height:2px;background:var(--line)}
+.steps li:first-child:after{display:none}
+.steps li.done:before,.steps li.now:before{background:var(--brand);border-color:var(--brand)}.steps li.done:after,.steps li.now:after{background:var(--brand)}
+.steps li.now{color:var(--brand);font-weight:800}.steps li.now:before{box-shadow:0 0 0 5px var(--brand-50)}
+.next{border-left:5px solid var(--accent)}
+.sum{width:100%}.sum td{padding:10px 20px}.sum tr.t td{font:800 18px "Bricolage Grotesque",sans-serif;border-top:2px solid var(--ink);border-bottom:0}
+.rek{background:var(--brand-50);border-radius:12px;padding:12px 14px;margin-bottom:10px}.rek b{display:block}
+.pay{font:800 28px "Bricolage Grotesque",sans-serif;color:var(--brand)}
+@media (max-width:1100px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.cards{grid-template-columns:1fr}}
+
+/* ===== Tambahan v2: halaman klien lanjutan ===== */
+.lead{max-width:68ch;margin:0}
+.narrow{max-width:760px}
+.pill-row{display:flex;gap:8px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;min-height:36px;padding:0 14px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font-weight:600;font-size:14px;color:var(--ink);text-decoration:none}
+.pill:hover{border-color:var(--field)}.pill[aria-current=true]{background:var(--brand);border-color:var(--brand);color:#fff}
+.ok-box,.bad-box,.warn-box{border-radius:12px;padding:12px 14px;font-size:14.5px;border:1px solid}
+.ok-box{background:#ecfdf5;border-color:#6ee7b7;color:#064e3b}.bad-box{background:#fef2f2;border-color:#fca5a5;color:#7f1d1d}.warn-box{background:#fffbeb;border-color:#fcd34d;color:#78350f}
+.rating-mini{color:#92400e;font-weight:700;font-size:13.5px}
+.inline-form{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}.inline-form .field{flex:0 1 240px}
+.plain-list{list-style:none;margin:0;padding:0}
+
+/* rincian harga */
+.break{width:100%;font-size:14.5px}.break td{padding:6px 0;border:0}.break td:last-child{text-align:right;white-space:nowrap}
+.break tr.t td{border-top:1px solid var(--line);padding-top:10px;font-weight:800}
+.price-xl{font:800 30px/1.1 "Bricolage Grotesque",sans-serif;color:var(--brand)}
+.price-xl small{font:500 14px Figtree,sans-serif;color:var(--muted)}
+.hero-ph{height:200px;border-radius:12px;background:var(--brand-50);display:grid;place-items:center;color:var(--brand);margin-bottom:18px}.hero-ph .ic{width:56px;height:56px}
+.cat .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+
+/* denah ruangan */
+.palette{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.denah{position:relative;width:100%;aspect-ratio:16/10;border:1.5px solid var(--field);border-radius:12px;background-color:#fff;background-image:linear-gradient(rgba(30,22,51,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(30,22,51,.06) 1px,transparent 1px);background-size:10% 10%;overflow:hidden}
+.denah .el{position:absolute;transform:translate(-50%,-50%);display:grid;place-items:center;font-size:10px;line-height:1.1;text-align:center;padding:1px;overflow:hidden}
+.el.panggung{width:32%;aspect-ratio:3/1;background:#5b2a86;color:#fff;border-radius:6px}
+.el.meja_bundar{width:9%;aspect-ratio:1;background:#f5b83d;color:#1e1633;border-radius:50%}
+.el.meja_persegi{width:15%;aspect-ratio:2.5/1;background:#f0cf8a;color:#1e1633;border-radius:4px}
+.el.kursi{width:2.6%;aspect-ratio:1;background:#8a7fa0;border-radius:3px}
+.el.meja_kue{width:8%;aspect-ratio:1;background:#d6336c;color:#fff;border-radius:8px}
+.el.prasmanan{width:22%;aspect-ratio:5/1;background:#1f8a5b;color:#fff;border-radius:4px}
+.el.area_bermain{width:22%;aspect-ratio:3/2;background:rgba(31,138,91,.14);color:#145c3d;border:1.5px dashed #1f8a5b;border-radius:10px}
+.el.photo_booth{width:9%;aspect-ratio:1;background:#3b1763;color:#fff;border-radius:6px}
+.el.pintu{width:8%;aspect-ratio:2.5/1;background:#1e1633;color:#fff;border-radius:4px}
+.denah-sum{font-size:13px;color:var(--muted);margin:8px 0 0}
+
+/* rekomendasi */
+.alloc{display:flex;height:14px;border-radius:999px;overflow:hidden;margin:14px 0 8px;background:var(--line)}
+.alloc span{display:block;height:100%}
+.alloc-leg{display:flex;gap:6px 18px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:0;padding:0;list-style:none}
+.alloc-leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px}
+.pkt{display:flex;flex-direction:column}
+.pkt-h{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.pkt-h h2{font-size:22px;font-weight:800}.pkt-h p{margin:0;font-size:13.5px;color:var(--muted)}
+.pkt ul{list-style:none;margin:0;padding:0 20px}
+.pkt li{padding:14px 0;border-bottom:1px solid var(--line)}.pkt li:last-child{border-bottom:0}
+.pkt label.row{display:flex;gap:12px;align-items:flex-start;cursor:pointer}
+.pkt input[type=checkbox]{width:20px;height:20px;margin-top:2px;accent-color:var(--brand);flex:none}
+.pkt .slot{display:block;font-size:12.5px;color:var(--muted)}.pkt .nm{font-weight:700}
+.pkt .who2{display:block;font-size:13px;color:var(--muted)}.pkt .pr{margin-left:auto;font-weight:800;white-space:nowrap}
+.pkt li.kosong{color:var(--muted);font-size:14px}
+.pkt-f{margin-top:auto;padding:16px 20px 20px;border-top:1px solid var(--line)}
+.pkt-f .tot{display:flex;justify-content:space-between;align-items:baseline;font-weight:700}.pkt-f .tot b{font:800 22px "Bricolage Grotesque",sans-serif}
+.pkt-f .sisa{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin:2px 0 14px}
+.pkt-f .btn{width:100%}
+
+/* rundown */
+.rd{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.rd-i{display:grid;grid-template-columns:78px minmax(0,1fr);gap:14px}
+.rd-t{font:800 20px "Bricolage Grotesque",sans-serif;padding-top:16px;text-align:right}.rd-t small{display:block;font:500 12.5px Figtree,sans-serif;color:var(--muted)}
+.rd-c{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.rd-c.bentrok{border-color:#f59e0b;background:#fffdf5}
+.rd-c h2{font-size:16.5px;font-weight:800;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.rd-c p{margin:4px 0 0;font-size:14px;color:var(--muted)}.rd-c .warn-t{font-size:13px;margin-top:6px;display:block}
+.rd-c details summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.rd-c details summary::-webkit-details-marker{display:none}
+.rd-c .ubah{font-size:13.5px;font-weight:700;color:var(--brand);text-decoration:underline;white-space:nowrap}
+.rd-c form{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);display:grid;gap:12px}
+.two-f{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* evaluasi */
+.eval{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.eval>li{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px 20px}
+.eval>li.now{border-left:5px solid var(--accent)}.eval>li.lock{opacity:.62}
+.eval .eh{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.eval .eh small{display:block;color:var(--muted);font-size:13px}.eval .eh b{font-size:16px}
+.eval form{margin-top:16px;display:grid;gap:16px}
+.rate{border:0;margin:0;padding:0}.rate legend{font-weight:600;font-size:14px;margin-bottom:8px;padding:0}
+.rate .opts{display:flex;gap:8px}.rate label{cursor:pointer}
+.rate input{position:absolute;opacity:0;width:1px;height:1px}
+.rate label span{display:grid;place-items:center;width:48px;height:48px;border-radius:12px;border:1.5px solid var(--field);background:#fff;font-weight:800;font-size:17px}
+.rate input:checked+span{background:var(--accent);border-color:var(--accent);color:#3a2a00}
+.rate input:focus-visible+span{outline:3px solid var(--brand);outline-offset:2px}
+.rate .ends{display:flex;justify-content:space-between;max-width:288px;font-size:12.5px;color:var(--muted);margin-top:6px}
+.progress{height:8px;border-radius:999px;background:var(--line);overflow:hidden;margin-top:10px}.progress i{display:block;height:100%;background:var(--brand)}
+
+/* refund & pembatalan */
+.tier{width:100%;font-size:14px}.tier th,.tier td{padding:8px 12px}.tier tr.cur td{background:var(--brand-50);font-weight:800;color:var(--brand-d)}
+.danger-zone{border-color:#fecaca}
+.btn-bad.full{width:100%}
+textarea.input{height:auto;padding:10px 14px;resize:vertical;width:100%}
+
+/* nota */
+.nota-h{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:24px 24px 18px;border-bottom:2px solid var(--ink)}
+.nota-h h2{font-size:24px}.nota-h .no{font:800 15px "Bricolage Grotesque",sans-serif;color:var(--muted);margin-top:4px}
+.stamp{align-self:flex-start;border:2.5px solid #059669;color:#047857;border-radius:10px;padding:6px 16px;font:800 20px "Bricolage Grotesque",sans-serif;transform:rotate(-4deg)}
+
+/* notifikasi */
+.notif{display:block;padding:16px 20px;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink);border-left:5px solid transparent}
+.notif:last-child{border-bottom:0}.notif:hover{background:var(--bg)}
+.notif.new{border-left-color:var(--accent);background:#fffdf7}
+.notif b{display:block}.notif span{display:block;color:#3a3150;font-size:14.5px}.notif small{display:block;color:var(--muted);margin-top:4px}
+.notif:not(.new) b,.notif:not(.new) span{opacity:.78}
+
+/* auth */
+.guest{min-height:100vh;display:grid;place-items:center;padding:32px 16px;background:var(--bg)}
+.guest .box{width:100%;max-width:520px}.guest .brand{padding:0 0 16px}
+.guest .card{padding:28px}.guest h1{font-size:26px;font-weight:800;margin-bottom:16px}
+.role-opts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;border:0;margin:0 0 4px;padding:0}
+.role-opts legend{font-weight:600;font-size:14px;margin-bottom:8px;padding:0}
+.role-opts label{display:block;cursor:pointer;border:1.5px solid var(--line);border-radius:12px;padding:12px;background:#fff}
+.role-opts input{position:absolute;opacity:0}
+.role-opts b{display:block;font-size:14px}.role-opts small{color:var(--muted);font-size:12.5px}
+.role-opts label:has(input:checked){border-color:var(--brand);background:var(--brand-50)}
+.role-opts label:has(input:focus-visible){outline:3px solid var(--brand);outline-offset:2px}
+@media (max-width:700px){.role-opts{grid-template-columns:1fr}.two-f{grid-template-columns:1fr}.rd-i{grid-template-columns:58px minmax(0,1fr)}.rd-t{font-size:17px}}
+
+/* perbaikan lebar kolom & header */
+.stack{grid-template-columns:minmax(0,1fr)}
+.tier th{white-space:normal}
+.page-head>div:first-child{flex:1 1 320px;min-width:0}
+.el.pintu{width:10%}
+@media (max-width:1100px){.two,.cols2{grid-template-columns:minmax(0,1fr)!important}}
+
+/* =====================================================================
+   Penyelarasan tata letak Klien — irama jarak, ukuran kartu/tabel,
+   hierarki, responsif. Menggantikan seluruh style inline struktural.
+   ===================================================================== */
+:root{--gap-section:24px}
+@media (max-width:760px){:root{--gap-section:20px}}
+
+/* utilitas (pengganti style="") */
+.m-0{margin:0}.mt-8{margin-top:8px}.mt-12{margin-top:12px}.mt-16{margin-top:16px}.mt-20{margin-top:20px}
+.mb-8{margin-bottom:8px}.mb-12{margin-bottom:12px}.mb-16{margin-bottom:16px}
+.stack.gap-16{gap:16px}.fs-sm{font-size:12.5px}.link-plain{color:inherit}.self-start{align-self:start}
+.help{display:block;font-weight:400;color:var(--muted);font-size:13.5px}
+.lbl-sm{font-weight:600;font-size:14px}
+.col-fill{display:flex;flex-direction:column;flex:1}
+.grow-300{flex:1 1 220px;max-width:300px}
+.w-420{max-width:420px}.w-440{max-width:440px}
+.note-plain{background:#fff;border:1px solid var(--line)}
+.pill-bar{padding:14px var(--pad-card);border-bottom:1px solid var(--line)}
+
+/* irama vertikal: satu jarak antarbagian di seluruh halaman */
+.content{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--gap-section);align-content:start;padding-top:32px;padding-bottom:48px}
+.content>*{margin-top:0;margin-bottom:0}
+.grid,.stack,.cards{gap:var(--gap-section)}
+.stack.gap-16{gap:16px}
+
+/* grid: varian lebar kolom */
+.stats.s3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.cols2{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+.two.two-wide{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)}
+
+/* ukuran kartu: padding sisi mengikuti --pad-card (24 px; 16 px di ponsel) */
+.ev{padding:var(--pad-card)}
+.cat .bd{padding:16px var(--pad-card) var(--pad-card)}
+.pkt-h{padding:var(--pad-card-v) var(--pad-card)}
+.pkt ul{padding:0 var(--pad-card)}
+.pkt-f{padding:16px var(--pad-card) var(--pad-card)}
+.eval>li{padding:var(--pad-card-v) var(--pad-card)}
+.notif{padding:16px var(--pad-card)}
+.steps{padding:var(--pad-card-v) var(--pad-card)}
+.nota-h{padding:var(--pad-card) var(--pad-card) 18px}
+.tabs.card{border-radius:var(--r);padding-left:var(--pad-card);padding-right:var(--pad-card)}
+.card>.tabs,.card>.toolbar{padding-left:var(--pad-card);padding-right:var(--pad-card)}
+
+/* hierarki: judul kartu seragam */
+.card-h h2,.card>h2,.card-b>h2{font-size:18px;font-weight:800;line-height:1.25}
+.ev h2{font-size:19px}.cat h2{font-size:18px}
+
+/* tabel: sisi sejajar dengan isi kartu; tabel lebar digulir, bukan dipadatkan */
+.card th:first-child,.card td:first-child{padding-left:var(--pad-card)}
+.card th:last-child,.card td:last-child{padding-right:var(--pad-card)}
+.card-b .break td:first-child,.card-b .sum td:first-child{padding-left:0}
+.card-b .break td:last-child,.card-b .sum td:last-child{padding-right:0}
+.card-b .tier th:first-child,.card-b .tier td:first-child{padding-left:12px}
+.card-b .tier th:last-child,.card-b .tier td:last-child{padding-right:12px}
+.table-wrap table.t-wide{min-width:600px}
+.table-wrap:focus-visible{outline:3px solid var(--brand);outline-offset:-3px}
+
+/* responsif */
+@media (max-width:760px){
+ .content{padding-top:24px;padding-bottom:36px}
+ .cards{grid-template-columns:1fr}
+ .stats.s3{grid-template-columns:minmax(0,1fr)}
+ .page-head>.actions,.page-head>.btn{width:100%}
+ .page-head>.actions .btn{flex:1 1 auto}
+ .toolbar .input{min-width:0;flex:1 1 100%}
+ .grow-300{max-width:none;flex-basis:100%}
+ .inline-form .field{flex:1 1 100%}
+ .pill-row{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}
+ .pill{flex:none}
+ .form-actions .btn{flex:1}
+ .rate .opts{flex-wrap:wrap}
+ .nota-h .stamp{transform:none}
+ .dl{gap:14px}
+}
+@media (max-width:560px){
+ .pay{font-size:24px}.price-xl{font-size:26px}
+ .cat .ph{height:96px}.hero-ph{height:140px}
+}

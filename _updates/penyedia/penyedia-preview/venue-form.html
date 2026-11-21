@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ubah venue · Panel Pemilik Venue Pesta Kita</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="admin.css"><link rel="stylesheet" href="penyedia.css"><link rel="stylesheet" href="penyedia-lanjutan.css">
+<link href="keselarasan.css" rel="stylesheet"/><script src="aksi.js" defer></script></head><body>
+<a class="skip" href="#konten">Lewati ke konten</a>
+<input type="checkbox" id="nav-toggle" class="sr-only" aria-label="Buka menu">
+<div class="app"><aside class="sidebar"><a class="brand" href="venue.html"><span class="logo" aria-hidden="true"></span><span><b>Pesta Kita</b><small>Panel Pemilik Venue</small></span></a><nav class="nav" aria-label="Menu utama"><a href="venue.html"><span class="ic i-home" aria-hidden="true"></span>Beranda</a></nav><p class="nav-label">Katalog saya</p><nav class="nav" aria-label="Katalog saya"><a href="venue-data.html" aria-current="page"><span class="ic i-box" aria-hidden="true"></span>Data venue</a><a href="pengajuan-harga.html"><span class="ic i-tag" aria-hidden="true"></span>Pengajuan harga<span class="n"><span class="sr-only">1 perlu tindakan</span><span aria-hidden="true">1</span></span></a></nav><p class="nav-label">Operasional</p><nav class="nav" aria-label="Operasional"><a href="pesanan.html"><span class="ic i-clip" aria-hidden="true"></span>Pesanan<span class="n"><span class="sr-only">2 perlu tindakan</span><span aria-hidden="true">2</span></span></a><a href="keberatan.html"><span class="ic i-alert" aria-hidden="true"></span>Keberatan</a><a href="rundown.html"><span class="ic i-cal" aria-hidden="true"></span>Rundown acara</a><a href="pencairan.html"><span class="ic i-wallet" aria-hidden="true"></span>Pencairan</a></nav><p class="nav-label">Akun</p><nav class="nav" aria-label="Akun"><a href="profil.html"><span class="ic i-users" aria-hidden="true"></span>Profil usaha</a><a href="notifikasi.html"><span class="ic i-bell" aria-hidden="true"></span>Notifikasi<span class="n"><span class="sr-only">2 belum dibaca</span><span aria-hidden="true">2</span></span></a><a href="login.html"><span class="ic i-out" aria-hidden="true"></span>Keluar</a></nav></aside><label class="overlay" for="nav-toggle"></label><div class="main"><header class="topbar"><label class="burger" for="nav-toggle"><span class="ic i-menu" aria-hidden="true"></span><span class="sr-only">Menu</span></label>
+<div class="search" role="search"><span class="ic i-search" aria-hidden="true"></span><label class="sr-only" for="cari">Cari</label><input id="cari" type="search" placeholder="Cari pesanan atau acara…"></div>
+<div class="top-right"><a class="icon-btn" href="notifikasi.html" aria-label="Notifikasi, 2 belum dibaca"><span class="ic i-bell" aria-hidden="true"></span><span class="dot"></span></a>
+<a class="user" href="profil.html"><span class="avatar" aria-hidden="true">G</span><span class="t"><b>Graha Melati</b><small>venue@pestakita.test</small></span></a></div></header>
+<main id="konten" class="content" tabindex="-1">
+<div class="page-head"><div><div class="crumbs"><a href="venue.html">Beranda</a> / <a href="venue-data.html">Data venue</a> / <span data-tambah="Tambah venue">Ubah venue</span></div><h1 data-tambah="Tambah venue">Ubah venue</h1><p class="sub">Kelola identitas, kapasitas, harga, fasilitas, dan foto venue dalam satu formulir.</p></div></div>
+
+<form class="card form-card" onsubmit="return false" data-form data-after="venue-data.html" data-done="Perubahan disimpan. Perubahan harga menunggu persetujuan Admin." data-done-tambah="Venue disimpan dan menunggu persetujuan Admin.">
+  <div class="card-h"><div><h2>Informasi venue</h2><p class="sub">Lengkapi informasi utama yang akan dilihat calon klien.</p></div><span class="badge b-info">Draf perubahan</span></div>
+  <div class="card-b">
+    <div class="form-grid">
+      <div class="field full"><label for="nama-venue">Nama venue <span class="req">*</span></label><input class="input" id="nama-venue" required value="Graha Melati Ballroom"><p class="hint">Gunakan nama yang dikenal oleh calon penyewa.</p></div>
+      <div class="field"><label for="jenis">Jenis venue <span class="req">*</span></label><select class="input" id="jenis" required><option>Ballroom</option><option>Gedung serbaguna</option><option>Garden / outdoor</option><option>Restoran</option><option>Rumah / private venue</option><option>Lainnya</option></select></div>
+      <div class="field"><label for="kapasitas">Kapasitas maksimal (orang) <span class="req">*</span></label><input class="input" id="kapasitas" type="number" min="1" value="250" required><p class="hint">Sesuaikan dengan tata letak acara yang paling umum.</p></div>
+      <div class="field full"><label for="alamat">Alamat lengkap <span class="req">*</span></label><textarea class="input" id="alamat" rows="2" required>Jl. Soekarno-Hatta No. 21, Malang, Jawa Timur</textarea></div>
+      <div class="field full"><label for="deskripsi">Deskripsi venue <span class="req">*</span></label><textarea class="input" id="deskripsi" rows="4" required>Ballroom dengan area penerima tamu, ruang utama berpendingin udara, dan akses parkir yang luas. Cocok untuk pernikahan dan acara keluarga.</textarea><p class="hint">Jelaskan suasana, keunggulan, dan jenis acara yang sesuai.</p></div>
+    </div>
+  </div>
+  <div class="card-h"><div><h2>Harga dan fasilitas</h2><p class="sub">Harga awal ditampilkan setelah disetujui Admin.</p></div></div>
+  <div class="card-b">
+    <div class="form-grid">
+      <div class="field"><label for="harga">Harga sewa venue (Rp) <span class="req">*</span></label><input class="input" id="harga" type="number" min="0" value="7500000" required aria-describedby="harga-h"><p class="hint" id="harga-h">Perubahan harga diajukan ke Admin. Harga lama tetap berlaku sampai disetujui.</p></div><div class="field" data-only="ubah"><label for="alasan-harga">Alasan perubahan harga</label><textarea class="input" id="alasan-harga" rows="2"></textarea><p class="hint">Isi jika harga diubah.</p></div>
+      <div class="field"><label for="kebersihan">Biaya kebersihan (Rp)</label><input class="input" id="kebersihan" type="text" value="Rp 350.000" readonly data-tambah-value="Ditetapkan Admin" aria-describedby="kb-h"><p class="hint" id="kb-h">Biaya kebersihan hanya dapat diubah Admin.</p></div>
+      <div class="field"><label for="durasi">Durasi sewa (jam)</label><input class="input" id="durasi" type="number" min="1" value="8"><p class="hint">Cantumkan durasi yang termasuk dalam harga.</p></div>
+      <div class="field"><label for="deposit">Deposit (Rp)</label><input class="input" id="deposit" type="number" min="0" value="1000000"></div>
+      <div class="field full"><label>Fasilitas tersedia</label><div class="check-grid"><label class="check"><input type="checkbox" checked> Area parkir</label><label class="check"><input type="checkbox" checked> AC</label><label class="check"><input type="checkbox" checked> Toilet</label><label class="check"><input type="checkbox"> Ruang rias</label><label class="check"><input type="checkbox" checked> Sound system</label><label class="check"><input type="checkbox"> Area outdoor</label></div></div>
+      <div class="field full"><label for="catatan">Ketentuan tambahan</label><textarea class="input" id="catatan" rows="3" placeholder="Tuliskan aturan venue yang perlu diketahui klien"></textarea></div>
+    </div>
+  </div>
+  <div class="card-h"><div><h2>Foto venue</h2><p class="sub">Unggah foto yang menggambarkan kondisi venue saat ini.</p></div></div>
+  <div class="card-b">
+    <div class="upload-box"><span class="ic i-image" aria-hidden="true"></span><div class="grow"><b>Tambahkan foto venue</b><small class="sub-t">Format JPG/PNG, maksimal 5 MB per foto. Pilih beberapa foto.</small></div><input type="file" accept="image/png,image/jpeg" multiple aria-label="Unggah foto venue"></div>
+    <div class="photo-placeholder"><div><span class="ic i-image"></span><b>Foto utama</b><small>Belum ada foto</small></div><div><span class="ic i-image"></span><b>Foto area</b><small>Belum ada foto</small></div><div><span class="ic i-image"></span><b>Foto fasilitas</b><small>Belum ada foto</small></div></div>
+    <label class="check mt-20"><input type="checkbox" checked> Aktif dan dapat menerima permintaan pemesanan</label>
+    <p class="hint">Venue baru atau perubahan informasi penting akan ditinjau Admin sebelum ditampilkan.</p>
+    <div class="form-actions"><button class="btn" type="submit" data-tambah="Simpan dan ajukan ke Admin">Simpan perubahan</button><a class="btn btn-o" href="venue-data.html">Batal</a></div>
+  </div>
+</form>
+
+</main></div></div></body></html>

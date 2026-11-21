@@ -1,0 +1,14 @@
+/* Pesta Kita — Pengelolaan foto profil & portofolio penyedia (Tahap 5.3).
+   Melengkapi .upload-box dan .photo-placeholder dari penyedia-lanjutan.css
+   dengan daftar pratinjau media yang dipilih di browser saja (belum disimpan
+   ke server). Memakai design token (--pk-*) dan alias dari admin.css. */
+
+.media-list{list-style:none;margin:14px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}
+.media-list:empty{display:none}
+.media-item{margin:0;border:1px solid var(--line);border-radius:var(--pk-radius-soft);overflow:hidden;background:var(--brand-50)}
+.media-item img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+.media-item figcaption{padding:6px 8px;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+@media (max-width:480px){
+  .media-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+}

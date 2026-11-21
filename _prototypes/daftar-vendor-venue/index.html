@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="id">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Daftar Vendor / Pemilik Venue · Pesta Kita</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400..800&family=Figtree:wght@300..900&display=swap"
+            rel="stylesheet"
+        />
+        <link href="./css/main.css" rel="stylesheet" />
+    </head>
+    <body>
+        <main id="konten" class="auth-split" tabindex="-1">
+            <aside class="auth-brand">
+                <span class="auth-orb o1" aria-hidden="true"></span>
+                <span class="auth-orb o2" aria-hidden="true"></span>
+                <span class="auth-orb o3" aria-hidden="true"></span>
+                <span class="auth-orb o4" aria-hidden="true"></span>
+                <span class="auth-orb o5" aria-hidden="true"></span>
+
+                <a class="auth-brand-line" href="../landing-page/index.html">
+                    <span class="auth-logo" aria-hidden="true">P</span>
+                    <b>Pesta Kita</b>
+                </a>
+
+                <div class="auth-brand-copy">
+                    <h2>Mulai susun pesta pertama Anda.</h2>
+                    <p>
+                        Konsep, vendor, venue, dan rundown dalam satu tempat.
+                        Jadwal bentrok dicek otomatis.
+                    </p>
+                    <ul class="auth-brand-points">
+                        <li>Gratis untuk klien — bayar hanya saat memesan</li>
+                        <li>
+                            Usaha penyedia tampil setelah diverifikasi Admin
+                        </li>
+                        <li>Satu akun, satu peran, langsung bisa dipakai</li>
+                    </ul>
+                </div>
+
+                <span class="auth-brand-foot">&copy; 2026 Pesta Kita</span>
+            </aside>
+
+            <section class="auth-panel">
+                <div class="auth-form-wrap">
+                    <h1 class="auth-title">Buat akun baru</h1>
+                    <p class="auth-sub">
+                        Bergabung dengan ekosistem perencanaan acara Pesta Kita.
+                    </p>
+
+                    <form
+                        class="auth-form"
+                        method="POST"
+                        action="#"
+                        onsubmit="return false;"
+                    >
+                        <div>
+                            <span class="role-label" id="role-label"
+                                >Saya mendaftar sebagai</span
+                            >
+                            <div
+                                class="role-cards"
+                                role="radiogroup"
+                                aria-labelledby="role-label"
+                            >
+                                <label class="role-card">
+                                    <input
+                                        type="radio"
+                                        name="role"
+                                        value="klien"
+                                        onchange="handleRoleChange('klien')"
+                                    />
+                                    <b>Klien</b>
+                                    <small>Merencanakan acara</small>
+                                </label>
+                                <label class="role-card">
+                                    <input
+                                        type="radio"
+                                        name="role"
+                                        value="vendor"
+                                        checked
+                                        onchange="handleRoleChange('vendor')"
+                                    />
+                                    <b>Vendor</b>
+                                    <small>Katering, dekorasi, peralatan</small>
+                                </label>
+                                <label class="role-card">
+                                    <input
+                                        type="radio"
+                                        name="role"
+                                        value="venue"
+                                        onchange="handleRoleChange('venue')"
+                                    />
+                                    <b>Pemilik venue</b>
+                                    <small>Menyewakan tempat</small>
+                                </label>
+                            </div>
+                            <p class="role-note">
+                                Akun vendor dan pemilik venue bisa langsung
+                                digunakan. Usaha baru ditampilkan kepada Klien
+                                setelah diverifikasi Admin.
+                            </p>
+                        </div>
+
+                        <div class="auth-field">
+                            <label for="nm">Nama lengkap</label>
+                            <input
+                                class="auth-input"
+                                id="nm"
+                                name="name"
+                                type="text"
+                                autocomplete="name"
+                                required
+                                placeholder="Contoh: Rina Putri"
+                            />
+                        </div>
+                        <div class="auth-field">
+                            <label for="em">Email</label>
+                            <input
+                                class="auth-input"
+                                id="em"
+                                name="email"
+                                type="email"
+                                autocomplete="email"
+                                required
+                                placeholder="nama@email.com"
+                            />
+                        </div>
+                        <div class="auth-field">
+                            <label for="tl">Nomor telepon / WhatsApp</label>
+                            <input
+                                class="auth-input"
+                                id="tl"
+                                name="phone"
+                                type="tel"
+                                autocomplete="tel"
+                                placeholder="08xxxxxxxxxx"
+                            />
+                        </div>
+
+                        <div id="vendor-extra-fields" class="provider-box">
+                            <b id="extra-title"
+                                >Khusus vendor &amp; pemilik venue</b
+                            >
+                            <div class="auth-form">
+                                <div class="auth-field">
+                                    <label for="nu" id="label-nu"
+                                        >Nama usaha vendor</label
+                                    >
+                                    <input
+                                        class="auth-input"
+                                        id="nu"
+                                        name="business_name"
+                                        type="text"
+                                        placeholder="Contoh: Dapur Nusantara"
+                                    />
+                                </div>
+                                <div class="auth-field" id="wrap-ka">
+                                    <label for="ka">Kategori layanan</label>
+                                    <select
+                                        class="auth-input"
+                                        id="ka"
+                                        name="category"
+                                    >
+                                        <option>Katering &amp; F&amp;B</option>
+                                        <option>Dekorasi Pesta</option>
+                                        <option>
+                                            Sound System &amp; Audio
+                                        </option>
+                                        <option>MC &amp; Hiburan</option>
+                                        <option>
+                                            Fotografi &amp; Dokumentasi
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="auth-field">
+                                    <label for="al">Alamat operasional</label>
+                                    <input
+                                        class="auth-input"
+                                        id="al"
+                                        name="address"
+                                        type="text"
+                                        placeholder="Jl. Sudirman No. 12, Kediri"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="auth-field">
+                            <label for="p1">Kata sandi</label>
+                            <input
+                                class="auth-input"
+                                id="p1"
+                                name="password"
+                                type="password"
+                                autocomplete="new-password"
+                                required
+                                minlength="8"
+                                placeholder="Minimal 8 karakter"
+                            />
+                        </div>
+                        <div class="auth-field">
+                            <label for="p2">Ulangi kata sandi</label>
+                            <input
+                                class="auth-input"
+                                id="p2"
+                                name="password_confirmation"
+                                type="password"
+                                autocomplete="new-password"
+                                required
+                                placeholder="Ulangi kata sandi"
+                            />
+                        </div>
+
+                        <button type="submit" class="auth-submit">
+                            Daftar Sekarang
+                        </button>
+                    </form>
+
+                    <hr class="auth-divider" />
+                    <p class="auth-alt">
+                        Sudah punya akun?
+                        <a href="../masuk/index.html">Masuk</a>
+                    </p>
+                </div>
+            </section>
+        </main>
+        <script>
+            function handleRoleChange(role) {
+                const extra = document.getElementById("vendor-extra-fields");
+                const title = document.getElementById("extra-title");
+                const labelNu = document.getElementById("label-nu");
+                const wrapKa = document.getElementById("wrap-ka");
+
+                document.querySelectorAll(".role-card").forEach((card) => {
+                    card.classList.toggle(
+                        "is-selected",
+                        card.querySelector("input").value === role,
+                    );
+                });
+
+                if (role === "klien") {
+                    extra.style.display = "none";
+                } else if (role === "vendor") {
+                    extra.style.display = "block";
+                    title.textContent = "Khusus vendor — informasi usaha";
+                    labelNu.textContent = "Nama usaha vendor";
+                    wrapKa.style.display = "block";
+                } else if (role === "venue") {
+                    extra.style.display = "block";
+                    title.textContent =
+                        "Khusus pemilik venue — informasi gedung";
+                    labelNu.textContent = "Nama venue / gedung";
+                    wrapKa.style.display = "none";
+                }
+            }
+            handleRoleChange("vendor");
+        </script>
+    </body>
+</html>
